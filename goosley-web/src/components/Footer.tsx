@@ -1,0 +1,53 @@
+import Link from "next/link";
+import { Flag, ArrowRight } from "lucide-react";
+
+export function Footer() {
+  return (
+    <footer className="bg-foreground text-background py-32">
+      <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20">
+        <div>
+          <Link href="/" className="flex items-center gap-2 mb-12">
+            <Flag className="w-12 h-12 text-background fill-background" />
+          </Link>
+          <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
+            VAMOS CONSTRUIR <br/> O FUTURO.
+          </h2>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-12 lg:pt-24">
+          <div>
+            <h4 className="text-sm font-bold mb-8 tracking-widest uppercase text-background/50">A Solução</h4>
+            <ul className="space-y-4 text-xl font-medium tracking-tight">
+              <li><Link href="/landing-pages" className="hover:opacity-50 transition-opacity">Landing Pages</Link></li>
+              <li><Link href="/e-commerce" className="hover:opacity-50 transition-opacity">E-commerce</Link></li>
+              <li><Link href="/aplicativos" className="hover:opacity-50 transition-opacity">Aplicativos</Link></li>
+              <li><Link href="/automacoes" className="hover:opacity-50 transition-opacity">Automações & Voice Tuning</Link></li>
+              <li><Link href="/sistemas-web" className="hover:opacity-50 transition-opacity">Sistemas Web & Backend</Link></li>
+              <li><Link href="/agentes-corporativos" className="hover:opacity-50 transition-opacity">Agentes IA Corporativos</Link></li>
+              <li><Link href="/workflows" className="hover:opacity-50 transition-opacity">Workflows Autônomos</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-bold mb-8 tracking-widest uppercase text-background/50">Contato</h4>
+            <ul className="space-y-4 text-xl font-medium tracking-tight">
+              <li>+55 11 99999-9999</li>
+              <li className="pt-8">
+                <div className="flex gap-6">
+                  <Link href="#" className="hover:opacity-50 transition-opacity uppercase text-sm font-bold tracking-widest">IG</Link>
+                  <Link href="#" className="hover:opacity-50 transition-opacity uppercase text-sm font-bold tracking-widest">LI</Link>
+                  <Link href="#" className="hover:opacity-50 transition-opacity uppercase text-sm font-bold tracking-widest">GH</Link>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div className="container mx-auto px-6 md:px-12 mt-32 pt-8 border-t border-background/20 text-sm font-bold tracking-widest uppercase text-background/50 flex flex-col md:flex-row justify-between items-center gap-4">
+        <p>&copy; {new Date().getFullYear()} GOOSLEY DIGITAL.</p>
+        <p>TODOS OS DIREITOS RESERVADOS.</p>
+      </div>
+    </footer>
+  );
+}

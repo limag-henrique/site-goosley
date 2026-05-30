@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #000000;
+  --accent: #f4f4f5;
+  --accent-foreground: #09090b;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --font-sans: var(--font-inter);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #000000;
+    --foreground: #ffffff;
+    --accent: #18181b;
+    --accent-foreground: #fafafa;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Hide cursor when custom cursor is active */
+.no-cursor {
+  cursor: none !important;
+}
+.no-cursor * {
+  cursor: none !important;
+}
+
+/* Masked Text Reveal Utility */
+.mask-reveal-container {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: top;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background-color: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass-panel {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Álgebra Booleana - Estados Iniciais de Animação */
+.is-loaded .js-mask-active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.js-mask-active {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Lenis Scroll Smooth Base Styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+/* Fluid Gradient Background Animations */
+@keyframes fluid-1 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(50%, 60%) scale(1.5) rotate(45deg); }
+  50% { transform: translate(-40%, 30%) scale(0.6) rotate(-20deg); }
+  75% { transform: translate(60%, -50%) scale(1.4) rotate(90deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+@keyframes fluid-2 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(-60%, -40%) scale(0.5) rotate(-45deg); }
+  50% { transform: translate(40%, -60%) scale(1.6) rotate(30deg); }
+  75% { transform: translate(-50%, 50%) scale(0.8) rotate(-90deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+@keyframes fluid-3 {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  25% { transform: translate(60%, -50%) scale(1.4) rotate(60deg); }
+  50% { transform: translate(-50%, 60%) scale(0.7) rotate(-30deg); }
+  75% { transform: translate(40%, 40%) scale(1.5) rotate(120deg); }
+  100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+}
+
+.animate-fluid-1 {
+  animation: fluid-1 7s ease-in-out infinite alternate;
+}
+.animate-fluid-2 {
+  animation: fluid-2 9s ease-in-out infinite alternate;
+}
+.animate-fluid-3 {
+  animation: fluid-3 11s ease-in-out infinite alternate;
+}
+
+/* Grain Overlay */
+.grain-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
