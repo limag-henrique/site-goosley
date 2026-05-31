@@ -37,12 +37,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR" className={cn(inter.variable, dancingScript.variable, "h-full antialiased")} suppressHydrationWarning>
-      <body className="min-h-full flex flex-col bg-background text-foreground" suppressHydrationWarning>
+    <html lang="pt-BR" className={cn(inter.variable, dancingScript.variable, "h-full overflow-x-hidden antialiased")} suppressHydrationWarning>
+      <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden" suppressHydrationWarning>
         <SmoothScrollProvider>
           <CustomCursor />
           <Navbar />
-          <main className="flex-1">
+          <main className="flex-1 overflow-x-hidden">
             {children}
           </main>
           <Footer />

@@ -23,7 +23,7 @@ export function Hero() {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white pt-24 pb-12"
+      className="relative min-h-[50vh] md:min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white pt-24 pb-12"
     >
       {/* Fluid Background with Parallax */}
       <motion.div 
@@ -69,13 +69,13 @@ export function Hero() {
           </div>
         </motion.div>
 
-        {/* Line 2: Description + RALLYING */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between w-full mb-2 md:mb-4">
+        {/* Line 2: Description (Desktop) + PARA SEU */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-end md:justify-between w-full mb-2 md:mb-4">
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-            className="w-full md:w-[40%] lg:w-[30%] order-2 md:order-1 mt-6 md:mt-0 pl-2 md:pl-[8%] xl:pl-[10%]"
+            className="hidden md:block w-full md:w-[40%] lg:w-[30%] order-2 md:order-1 mt-6 md:mt-0 pl-2 md:pl-[8%] xl:pl-[10%]"
           >
             <p className="text-sm sm:text-base md:text-lg font-medium leading-snug text-white/90">
               A Goosley Digital é uma consultoria que adapta à necessidade do seu negócio para desenvolver soluções criativas que geram impacto
@@ -94,7 +94,7 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Line 3: Arrow + AROUND */}
+        {/* Line 3: Arrow + NEGÓCIO */}
         <div className="flex items-center justify-start md:justify-center w-full relative mt-4 md:mt-0">
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
@@ -119,6 +119,18 @@ export function Hero() {
             </motion.h1>
           </motion.div>
         </div>
+
+        {/* Mobile Description */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
+          className="md:hidden w-full mt-8 pl-2"
+        >
+          <p className="text-base font-medium leading-snug text-white/90">
+            A Goosley Digital é uma consultoria que adapta à necessidade do seu negócio para desenvolver soluções criativas que geram impacto
+          </p>
+        </motion.div>
       </motion.div>
     </section>
   );

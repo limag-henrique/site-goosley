@@ -105,7 +105,7 @@ export default function Home() {
               rotate: [0, 90, 0]
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-1/2 -left-1/2 w-full h-full bg-orange-500/10 blur-[120px] rounded-full"
+            className="absolute -top-1/2 -left-1/2 w-full h-full bg-orange-500/10 blur-[120px] rounded-full will-change-transform"
           />
           <motion.div 
             animate={{ 
@@ -114,7 +114,7 @@ export default function Home() {
               rotate: [0, -90, 0]
             }}
             transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-indigo-600/10 blur-[120px] rounded-full"
+            className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-indigo-600/10 blur-[120px] rounded-full will-change-transform hidden md:block"
           />
         </div>
 
@@ -130,7 +130,7 @@ export default function Home() {
             </defs>
           </svg>
           <motion.div
-            className="absolute top-0 left-0 w-[200vw] h-full flex"
+            className="absolute top-0 left-0 w-[200vw] h-full flex will-change-transform"
             animate={{ x: ["-50%", "0%"] }}
             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
           >
@@ -146,7 +146,7 @@ export default function Home() {
             ))}
           </motion.div>
           <motion.div
-            className="absolute top-0 left-0 w-[200vw] h-full flex"
+            className="hidden md:flex absolute top-0 left-0 w-[200vw] h-full will-change-transform"
             animate={{ x: ["-50%", "0%"] }}
             transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           >
