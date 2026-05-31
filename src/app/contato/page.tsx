@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, MapPin, Phone, MessageCircle } from "lucide-react";
+import { Send, MapPin, Phone, MessageCircle, Mail } from "lucide-react";
 import { useState } from "react";
 
 export default function Contato() {
@@ -37,6 +37,17 @@ export default function Contato() {
                 <div>
                   <h4 className="font-bold text-lg">Telefone</h4>
                   <p className="text-foreground/70">+55 31 99421-7926</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="p-4 bg-background rounded-2xl shadow-sm">
+                  <Mail className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">E-mail</h4>
+                  <a href="mailto:henriquelimagusmao@gmail.com" className="text-foreground/70 hover:text-blue-600 transition-colors">
+                    henriquelimagusmao@gmail.com
+                  </a>
                 </div>
               </div>
               <div className="flex items-start gap-4">

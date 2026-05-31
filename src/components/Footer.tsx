@@ -38,6 +38,11 @@ export function Footer() {
             <h4 className="text-sm font-bold mb-8 tracking-widest uppercase text-background/50">Contato</h4>
             <ul className="space-y-4 text-xl font-medium tracking-tight">
               <li>+55 31 99421-7926</li>
+              <li>
+                <a href="mailto:henriquelimagusmao@gmail.com" className="hover:opacity-70 transition-opacity">
+                  henriquelimagusmao@gmail.com
+                </a>
+              </li>
               <li className="pt-8">
                 <Link 
                   href="https://wa.me/5531994217926" 
