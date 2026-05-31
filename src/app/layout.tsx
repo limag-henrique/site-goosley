@@ -18,7 +18,7 @@ const dancingScript = Dancing_Script({
 });
 
 export const metadata: Metadata = {
-  title: "Goosley Digital | Premium Tech Solutions",
+  title: "Goosley Digital",
   description: "A Goosley Digital é uma empresa premium de tecnologia focada em criação de aplicativos, sistemas web complexos e automações.",
   icons: {
     icon: "/images/logo com fundo.png",

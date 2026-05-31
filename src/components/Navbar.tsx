@@ -46,7 +46,7 @@ export function Navbar() {
               />
             </div>
             <span className={cn(
-              "text-white font-bold tracking-widest uppercase transition-all duration-300",
+              "font-bold tracking-widest uppercase transition-colors duration-300 text-white",
               isLargeLogo ? "text-lg md:text-2xl" : "text-sm md:text-base"
             )}>
               Goosley Digital
@@ -54,16 +54,20 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Menu */}
-          <nav className="hidden md:flex items-center gap-8 text-sm font-bold tracking-widest uppercase">
+          <nav className={cn(
+            "hidden md:flex items-center gap-8 text-sm font-bold tracking-widest uppercase transition-colors duration-300 text-white"
+          )}>
             <Link href="/a-solucao" className="hover:opacity-50 transition-opacity">Nossas Soluções</Link>
-            <Link href="/precos" className="hover:opacity-50 transition-opacity">Preços</Link>
+            <Link href="/precos" className="hover:opacity-50 transition-opacity">Simule seu Projeto</Link>
             <Link href="/portfolio" className="hover:opacity-50 transition-opacity">Portfólio</Link>
             <Link href="/contato" className="hover:opacity-50 transition-opacity">Contato</Link>
           </nav>
 
           {/* Mobile Menu Toggle */}
           <button 
-            className="md:hidden z-50 p-2"
+            className={cn(
+              "md:hidden z-50 p-2 transition-colors duration-300 text-white"
+            )}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             aria-label="Toggle menu"
             aria-expanded={isMenuOpen}
@@ -88,7 +92,7 @@ export function Navbar() {
           <X size={32} />
         </button>
         <Link href="/a-solucao" onClick={() => setIsMenuOpen(false)}>Nossas Soluções</Link>
-        <Link href="/precos" onClick={() => setIsMenuOpen(false)}>Preços</Link>
+        <Link href="/precos" onClick={() => setIsMenuOpen(false)}>Simule seu Projeto</Link>
         <Link href="/portfolio" onClick={() => setIsMenuOpen(false)}>Portfólio</Link>
         <Link href="/contato" onClick={() => setIsMenuOpen(false)}>Contato</Link>
       </div>
