@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
@@ -48,7 +49,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="mb-16"
           >
-            <h2 className="text-5xl font-black uppercase tracking-tighter">A Solução</h2>
+            <h2 className="text-5xl font-black uppercase tracking-tighter">NOSSAS SOLUÇÕES</h2>
           </motion.div>
 
           <div className="flex flex-col">
@@ -69,7 +70,7 @@ export default function Home() {
             />
             <HoverReveal 
               text="AUTOMAÇÕES & VOICE TUNING" 
-              imageSrc="https://images.unsplash.com/photo-1531297172864-742d131f49b5?q=80&w=3270&auto=format&fit=crop" 
+              imageSrc="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=3270&auto=format&fit=crop" 
               href="/automacoes"
             />
             <HoverReveal 
@@ -91,51 +92,108 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Parallax Image Collage with Glassmorphism */}
-      <section className="py-32 relative min-h-[150vh] overflow-hidden bg-accent">
-        <div className="sticky top-0 h-screen flex items-center justify-center pointer-events-none z-20">
-          <div className="flex gap-4 pointer-events-auto">
-            <button className="glass-panel px-8 py-3 rounded-full text-foreground font-bold tracking-widest uppercase hover:bg-white/30 transition-all">
-              Marca
-            </button>
-            <button className="glass-panel px-8 py-3 rounded-full text-foreground font-bold tracking-widest uppercase hover:bg-white/30 transition-all">
-              Visão
-            </button>
-            <button className="glass-panel px-8 py-3 rounded-full text-foreground font-bold tracking-widest uppercase hover:bg-white/30 transition-all">
-              Cultura
-            </button>
-          </div>
+      {/* Dynamic CTA Section */}
+      <section className="relative py-48 overflow-hidden bg-white text-black flex flex-col items-center justify-center">
+        {/* Animated Background Gradients */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3],
+              rotate: [0, 90, 0]
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-1/2 -left-1/2 w-full h-full bg-orange-500/10 blur-[120px] rounded-full"
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.5, 1],
+              opacity: [0.2, 0.4, 0.2],
+              rotate: [0, -90, 0]
+            }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+            className="absolute -bottom-1/2 -right-1/2 w-full h-full bg-indigo-600/10 blur-[120px] rounded-full"
+          />
         </div>
 
-        <div className="absolute inset-0 flex justify-center items-start gap-8 px-6 mt-32 z-10 pointer-events-none">
-          <motion.div style={{ y: y1 }} className="w-1/3 flex flex-col gap-8 pt-32">
-             <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=3270&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
-             <div className="relative aspect-square w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?q=80&w=3270&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
+        {/* Animated Background Waves */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-60">
+          <svg className="absolute w-0 h-0">
+            <defs>
+              <linearGradient id="waveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="#f97316" stopOpacity="0.1" />
+                <stop offset="50%" stopColor="#4f46e5" stopOpacity="0.4" />
+                <stop offset="100%" stopColor="#f97316" stopOpacity="0.1" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <motion.div
+            className="absolute top-0 left-[-100vw] w-[200vw] h-full flex"
+            animate={{ x: ["0%", "50%"] }}
+            transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          >
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="w-[100vw] h-full relative">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full absolute inset-0">
+                  <path d="M0,20 Q25,0 50,20 T100,20" fill="none" stroke="url(#waveGrad)" strokeWidth="1.5" vectorEffect="non-scaling-stroke"/>
+                  <path d="M0,40 Q25,20 50,40 T100,40" fill="none" stroke="url(#waveGrad)" strokeWidth="2.5" vectorEffect="non-scaling-stroke"/>
+                  <path d="M0,60 Q25,40 50,60 T100,60" fill="none" stroke="url(#waveGrad)" strokeWidth="1.5" vectorEffect="non-scaling-stroke"/>
+                  <path d="M0,80 Q25,60 50,80 T100,80" fill="none" stroke="url(#waveGrad)" strokeWidth="1.0" vectorEffect="non-scaling-stroke"/>
+                </svg>
+              </div>
+            ))}
           </motion.div>
-
-          <motion.div style={{ y: y2 }} className="w-1/3 flex flex-col gap-8">
-             <div className="relative aspect-square w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=3164&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
-             <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=3270&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
-             <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=3270&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
+          <motion.div
+            className="absolute top-0 left-[-100vw] w-[200vw] h-full flex"
+            animate={{ x: ["0%", "50%"] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          >
+            {[...Array(2)].map((_, i) => (
+              <div key={i} className="w-[100vw] h-full relative">
+                <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full absolute inset-0">
+                  <path d="M0,30 Q25,50 50,30 T100,30" fill="none" stroke="url(#waveGrad)" strokeWidth="1.2" vectorEffect="non-scaling-stroke"/>
+                  <path d="M0,50 Q25,70 50,50 T100,50" fill="none" stroke="url(#waveGrad)" strokeWidth="2.0" vectorEffect="non-scaling-stroke"/>
+                  <path d="M0,70 Q25,90 50,70 T100,70" fill="none" stroke="url(#waveGrad)" strokeWidth="0.8" vectorEffect="non-scaling-stroke"/>
+                </svg>
+              </div>
+            ))}
           </motion.div>
+        </div>
 
-          <motion.div style={{ y: y3 }} className="w-1/3 flex flex-col gap-8 pt-64">
-             <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=3270&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
-             <div className="relative aspect-[3/4] w-full rounded-xl overflow-hidden shadow-2xl">
-                <Image src="https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=3270&auto=format&fit=crop" alt="Gallery" fill className="object-cover" />
-             </div>
+        <div className="container relative z-10 mx-auto px-6 flex flex-col items-center text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="max-w-4xl"
+          >
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-medium tracking-tight mb-8">
+              Já sabe quais são as melhores <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-indigo-600">
+                soluções para você?
+              </span>
+            </h2>
+            
+            <p className="text-xl text-black/60 mb-12 font-medium tracking-tight">
+              Descubra agora com nosso teste.
+            </p>
+
+            <Link href="/quiz">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="group relative inline-flex items-center justify-center px-8 py-4 font-medium text-white tracking-wide bg-black/90 backdrop-blur-md border border-white/10 rounded-full overflow-hidden transition-all shadow-xl hover:shadow-[0_0_40px_rgba(234,88,12,0.3)]"
+              >
+                <div className="absolute inset-0 w-0 bg-gradient-to-r from-orange-500 to-indigo-600 transition-all duration-500 ease-out group-hover:w-full z-0" />
+                <span className="relative z-10 flex items-center gap-3">
+                  acessar soluções
+                  <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                </span>
+              </motion.button>
+            </Link>
           </motion.div>
         </div>
       </section>
@@ -174,7 +232,7 @@ export default function Home() {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="text-2xl md:text-4xl max-w-4xl mt-12 font-medium tracking-tight"
           >
-            Nós removemos o ruído. Construímos produtos rápidos, belos e fundamentalmente funcionais. Sem templates. Sem concessões.
+            Nós removemos o ruído. Construímos soluções rápidas, belas e fundamentalmente funcionais. Sem templates. Sem concessões.
           </motion.p>
       </section>
 

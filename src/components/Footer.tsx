@@ -22,7 +22,7 @@ export function Footer() {
         
         <div className="grid grid-cols-2 gap-12 lg:pt-24">
           <div>
-            <h4 className="text-sm font-bold mb-8 tracking-widest uppercase text-background/50">A Solução</h4>
+            <h4 className="text-sm font-bold mb-8 tracking-widest uppercase text-background/50">Nossas Soluções</h4>
             <ul className="space-y-4 text-xl font-medium tracking-tight">
               <li><Link href="/landing-pages" className="hover:opacity-50 transition-opacity">Landing Pages</Link></li>
               <li><Link href="/e-commerce" className="hover:opacity-50 transition-opacity">E-commerce</Link></li>
@@ -37,13 +37,11 @@ export function Footer() {
           <div>
             <h4 className="text-sm font-bold mb-8 tracking-widest uppercase text-background/50">Contato</h4>
             <ul className="space-y-4 text-xl font-medium tracking-tight">
-              <li>+55 11 99999-9999</li>
+              <li>+55 31 99421-7926</li>
               <li className="pt-8">
-                <div className="flex gap-6">
-                  <Link href="#" className="hover:opacity-50 transition-opacity uppercase text-sm font-bold tracking-widest">IG</Link>
-                  <Link href="#" className="hover:opacity-50 transition-opacity uppercase text-sm font-bold tracking-widest">LI</Link>
-                  <Link href="#" className="hover:opacity-50 transition-opacity uppercase text-sm font-bold tracking-widest">GH</Link>
-                </div>
+                <Link href="https://wa.me/5531994217926" target="_blank" rel="noopener noreferrer" className="hover:opacity-50 transition-opacity text-base">
+                  Converse conosco através do WhatsApp
+                </Link>
               </li>
             </ul>
           </div>

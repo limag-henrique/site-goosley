@@ -20,7 +20,7 @@ export default function ASolucao() {
           className="max-w-4xl"
         >
           <span className="inline-block px-4 py-1 border border-foreground rounded-full text-sm font-bold uppercase tracking-widest mb-8">
-            (A SOLUÇÃO)
+            (NOSSAS SOLUÇÕES)
           </span>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
             Nossas Soluções

@@ -1,23 +1,15 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, MapPin, Phone } from "lucide-react";
+import { Send, MapPin, Phone, MessageCircle } from "lucide-react";
 import { useState } from "react";
 
 export default function Contato() {
-  const [formState, setFormState] = useState({ name: "", email: "", message: "" });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [message, setMessage] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    // Simulando um envio de formulário para experiência UI/UX
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setIsSuccess(true);
-      setFormState({ name: "", email: "", message: "" });
-    }, 1500);
+    window.location.href = `mailto:henriquelimagusmao@gmail.com?subject=Detalhes%20do%20Projeto&body=${encodeURIComponent(message)}`;
   };
 
   return (
@@ -44,7 +36,7 @@ export default function Contato() {
                 </div>
                 <div>
                   <h4 className="font-bold text-lg">Telefone</h4>
-                  <p className="text-foreground/70">+55 11 99999-9999</p>
+                  <p className="text-foreground/70">+55 31 99421-7926</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -53,7 +45,18 @@ export default function Contato() {
                 </div>
                 <div>
                   <h4 className="font-bold text-lg">Localização</h4>
-                  <p className="text-foreground/70">São Paulo, SP - Brasil<br/>Atendimento Global</p>
+                  <p className="text-foreground/70">Belo Horizonte, MG - Brasil<br/>Atendimento Global</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4">
+                <div className="p-4 bg-background rounded-2xl shadow-sm">
+                  <MessageCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-lg">WhatsApp</h4>
+                  <a href="https://wa.me/5531994217926" target="_blank" rel="noopener noreferrer" className="text-foreground/70 hover:text-green-600 transition-colors">
+                    Converse conosco através do WhatsApp
+                  </a>
                 </div>
               </div>
             </div>
@@ -68,74 +71,28 @@ export default function Contato() {
           >
             <h3 className="text-3xl font-bold mb-8 tracking-tight">Envie uma mensagem</h3>
             
-            {isSuccess ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="bg-green-50 text-green-800 p-6 rounded-2xl border border-green-200"
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label htmlFor="message" className="block text-sm font-semibold mb-2">Detalhes do Projeto</label>
+                <textarea 
+                  id="message"
+                  required
+                  rows={8}
+                  value={message}
+                  onChange={(e) => setMessage(e.target.value)}
+                  className="w-full px-5 py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none"
+                  placeholder="Como podemos te ajudar?"
+                />
+              </div>
+              
+              <button 
+                type="submit"
+                className="w-full bg-blue-600 text-white font-semibold text-lg py-4 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
               >
-                <h4 className="font-bold text-lg mb-2">Mensagem enviada!</h4>
-                <p>Nossa equipe recebeu seu contato e retornará em breve.</p>
-                <button 
-                  onClick={() => setIsSuccess(false)}
-                  className="mt-6 font-medium text-green-700 underline"
-                >
-                  Enviar outra mensagem
-                </button>
-              </motion.div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold mb-2">Nome Completo</label>
-                  <input 
-                    type="text" 
-                    id="name"
-                    required
-                    value={formState.name}
-                    onChange={(e) => setFormState({...formState, name: e.target.value})}
-                    className="w-full px-5 py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
-                    placeholder="Seu nome"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold mb-2">E-mail Corporativo</label>
-                  <input 
-                    type="email" 
-                    id="email"
-                    required
-                    value={formState.email}
-                    onChange={(e) => setFormState({...formState, email: e.target.value})}
-                    className="w-full px-5 py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all"
-                    placeholder="email@empresa.com"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="message" className="block text-sm font-semibold mb-2">Detalhes do Projeto</label>
-                  <textarea 
-                    id="message"
-                    required
-                    rows={5}
-                    value={formState.message}
-                    onChange={(e) => setFormState({...formState, message: e.target.value})}
-                    className="w-full px-5 py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none"
-                    placeholder="Como podemos te ajudar?"
-                  />
-                </div>
-                
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full bg-blue-600 text-white font-semibold text-lg py-4 rounded-xl hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                >
-                  {isSubmitting ? "Enviando..." : (
-                    <>
-                      Enviar Solicitação
-                      <Send className="w-5 h-5" />
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+                Enviar Solicitação
+                <Send className="w-5 h-5" />
+              </button>
+            </form>
           </motion.div>
 
         </div>
