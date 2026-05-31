@@ -7,6 +7,7 @@ import { ArrowUpRight } from "lucide-react";
 export function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
@@ -16,6 +17,12 @@ export function CustomCursor() {
   const cursorYSpring = useSpring(cursorY, springConfig);
 
   useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.matchMedia("(max-width: 768px)").matches || 'ontouchstart' in window);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX - 32); // Offset by half of cursor width (64/2)
       cursorY.set(e.clientY - 32);
@@ -34,6 +41,7 @@ export function CustomCursor() {
     window.addEventListener("mouseover", handleMouseOver);
 
     return () => {
+      window.removeEventListener("resize", checkMobile);
       window.removeEventListener("mousemove", moveCursor);
       window.removeEventListener("mouseover", handleMouseOver);
     };
@@ -47,6 +55,8 @@ export function CustomCursor() {
     }
     return () => document.body.classList.remove("no-cursor");
   }, [isVisible]);
+
+  if (isMobile) return null;
 
   return (
     <motion.div

@@ -67,7 +67,7 @@ export default function Contato() {
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-background p-10 md:p-14 rounded-[2rem] shadow-xl shadow-foreground/5 border border-border"
+            className="bg-background p-10 md:p-14 rounded-[2rem] shadow-xl shadow-foreground/5 border border-border md:hidden block"
           >
             <h3 className="text-3xl font-bold mb-8 tracking-tight">Envie uma mensagem</h3>
             

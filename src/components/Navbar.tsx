@@ -45,7 +45,7 @@ export function Navbar() {
             />
           </div>
           <span className={cn(
-            "text-white font-bold tracking-widest uppercase transition-all duration-300",
+            "text-white font-bold tracking-widest uppercase transition-all duration-300 md:hidden",
             isLargeLogo ? "text-lg md:text-2xl" : "text-sm md:text-base"
           )}>
             Goosley Digital
@@ -70,13 +70,19 @@ export function Navbar() {
           {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
         </button>
 
-        {/* Mobile Nav */}
         <div 
           className={cn(
             "fixed inset-0 z-[100] bg-background flex flex-col items-center justify-center gap-8 text-4xl font-bold tracking-tighter uppercase transition-all duration-500",
             isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 invisible -translate-y-full pointer-events-none"
           )}
         >
+          <button 
+            className="absolute top-6 right-6 p-2 text-foreground md:hidden"
+            onClick={() => setIsMenuOpen(false)}
+            aria-label="Close menu"
+          >
+            <X size={32} />
+          </button>
           <Link href="/a-solucao" onClick={() => setIsMenuOpen(false)}>Nossas Soluções</Link>
           <Link href="/precos" onClick={() => setIsMenuOpen(false)}>Preços</Link>
           <Link href="/portfolio" onClick={() => setIsMenuOpen(false)}>Portfólio</Link>

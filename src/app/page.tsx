@@ -4,9 +4,11 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Image from "next/image";
-import { HoverReveal } from "@/components/HoverReveal";
-import { InfiniteMarquee } from "@/components/InfiniteMarquee";
 import { Hero } from "@/components/Hero";
+import dynamic from "next/dynamic";
+
+const HoverReveal = dynamic(() => import("@/components/HoverReveal").then(mod => mod.HoverReveal), { ssr: true });
+const InfiniteMarquee = dynamic(() => import("@/components/InfiniteMarquee").then(mod => mod.InfiniteMarquee), { ssr: true });
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,6 +90,13 @@ export default function Home() {
               imageSrc="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=3270&auto=format&fit=crop" 
               href="/workflows"
             />
+            <HoverReveal 
+              text="QUIZ" 
+              description="Descubra agora a solução mais adequada para você"
+              ctaText="Iniciar o quiz"
+              imageSrc="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=3270&auto=format&fit=crop" 
+              href="/quiz"
+            />
           </div>
         </div>
       </section>
@@ -128,8 +137,8 @@ export default function Home() {
             </defs>
           </svg>
           <motion.div
-            className="absolute top-0 left-[-100vw] w-[200vw] h-full flex"
-            animate={{ x: ["0%", "50%"] }}
+            className="absolute top-0 left-0 w-[200vw] h-full flex"
+            animate={{ x: ["-50%", "0%"] }}
             transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
           >
             {[...Array(2)].map((_, i) => (
@@ -144,8 +153,8 @@ export default function Home() {
             ))}
           </motion.div>
           <motion.div
-            className="absolute top-0 left-[-100vw] w-[200vw] h-full flex"
-            animate={{ x: ["0%", "50%"] }}
+            className="absolute top-0 left-0 w-[200vw] h-full flex"
+            animate={{ x: ["-50%", "0%"] }}
             transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
           >
             {[...Array(2)].map((_, i) => (
@@ -199,28 +208,28 @@ export default function Home() {
       </section>
 
       {/* Massive Typography Section */}
-      <section className="py-32 px-6 md:px-12 flex flex-col items-center justify-center text-center">
-         <span className="inline-block px-4 py-1 border border-foreground rounded-full text-sm font-bold uppercase tracking-widest mb-12">
+      <section className="py-32 px-6 md:px-12 flex flex-col items-center md:items-start justify-center text-center md:text-left">
+         <span className="inline-block px-4 py-1 border border-foreground rounded-full text-sm font-bold uppercase tracking-widest mb-12 self-center md:self-start">
             (METODOLOGIA)
           </span>
-         <div className="mask-reveal-container w-full block">
+         <div className="mask-reveal-container w-full flex justify-center md:justify-start">
             <motion.h2 
               initial={{ y: "100%" }}
               whileInView={{ y: "0%" }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[10vw] leading-[0.85] font-black tracking-tighter uppercase"
+              className="text-[10vw] leading-[0.85] font-black tracking-tighter uppercase text-center md:text-left"
             >
               SIMPLICIDADE
             </motion.h2>
           </div>
-         <div className="mask-reveal-container w-full block">
+         <div className="mask-reveal-container w-full flex justify-center md:justify-start">
             <motion.h2 
               initial={{ y: "100%" }}
               whileInView={{ y: "0%" }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-              className="text-[10vw] leading-[0.85] font-black tracking-tighter uppercase"
+              className="text-[10vw] leading-[0.85] font-black tracking-tighter uppercase text-center md:text-left"
             >
               RADICAL.
             </motion.h2>
@@ -230,7 +239,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-2xl md:text-4xl max-w-4xl mt-12 font-medium tracking-tight"
+            className="text-2xl md:text-4xl max-w-4xl mt-12 font-medium tracking-tight text-center md:text-left"
           >
             Nós removemos o ruído. Construímos soluções rápidas, belas e fundamentalmente funcionais. Sem templates. Sem concessões.
           </motion.p>

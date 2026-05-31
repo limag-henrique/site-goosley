@@ -66,7 +66,7 @@ export function Hero() {
           <motion.h1 
             initial={{ y: "100%" }}
             animate={{ y: "0%" }}
-            transition={{ duration: 1, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ duration: 1, delay: typeof window !== 'undefined' && window.innerWidth < 768 ? 0 : 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="text-[9vw] leading-[0.85] font-black tracking-tighter uppercase text-white will-change-transform"
           >
             FUTURO.

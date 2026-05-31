@@ -72,6 +72,41 @@ function EstimatorInner() {
   const missingSelections = activeCategory.variables.filter(v => !selections[v.id]);
   const isComplete = missingSelections.length === 0;
 
+  const handleWhatsAppRedirect = () => {
+    const selectedVariableDetails = activeCategory.variables
+      .map(v => {
+        const optionId = selections[v.id];
+        if (!optionId) return null;
+        const option = v.options.find(o => o.id === optionId);
+        return `- ${v.name}: ${option?.label}`;
+      })
+      .filter(Boolean)
+      .join('\n');
+
+    let text = `Olá! Gostaria de solicitar uma proposta para *${activeCategory.title}*.\n\n`;
+    if (selectedVariableDetails) {
+      text += `Minhas escolhas:\n${selectedVariableDetails}\n\n`;
+    }
+    
+    const investmentText = setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta";
+    text += `*Estimativa Inicial (Setup):* ${investmentText}\n`;
+    
+    if (recurringMaxTotal > 0 || recurringCosts.length > 0) {
+      const recText = recurringMaxTotal > 0 ? `${formatRange(recurringMinTotal, recurringMaxTotal)} / mês` : "Variável";
+      text += `*Custo Recorrente Estimado:* ${recText}\n`;
+    }
+
+    if (timeMaxTotal > 0) {
+      const timeText = timeMinTotal === timeMaxTotal ? `${timeMinTotal} dias úteis` : `${timeMinTotal} a ${timeMaxTotal} dias úteis`;
+      text += `*Prazo de Entrega Estimado:* ${timeText}\n`;
+    }
+    
+    text += `\nAguardo retorno para detalharmos o escopo!`;
+
+    const encodedText = encodeURIComponent(text);
+    window.open(`https://wa.me/5531994217926?text=${encodedText}`, "_blank");
+  };
+
   return (
     <div className="flex flex-col lg:flex-row gap-12 w-full max-w-7xl mx-auto">
       {/* Main Form Content */}
@@ -242,6 +277,7 @@ function EstimatorInner() {
             </div>
             
             <button 
+              onClick={handleWhatsAppRedirect}
               className="w-full py-4 rounded-xl font-bold uppercase tracking-widest transition-all bg-foreground text-background hover:scale-[1.02]"
             >
               Solicitar Proposta

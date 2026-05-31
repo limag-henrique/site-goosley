@@ -10,9 +10,11 @@ interface HoverRevealProps {
   text: string;
   imageSrc: string;
   href?: string;
+  description?: string;
+  ctaText?: string;
 }
 
-export function HoverReveal({ text, imageSrc, href }: HoverRevealProps) {
+export function HoverReveal({ text, imageSrc, href, description, ctaText }: HoverRevealProps) {
   const [isHovered, setIsHovered] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -50,9 +52,23 @@ export function HoverReveal({ text, imageSrc, href }: HoverRevealProps) {
       onMouseLeave={handleMouseLeave}
       onMouseMove={handleMouseMove}
     >
-      <h3 className="text-4xl md:text-6xl font-bold tracking-tighter group-hover:pl-8 transition-all duration-300">
-        {text}
-      </h3>
+      <div className="flex flex-col md:flex-row md:items-center justify-between w-full">
+        <h3 className="text-4xl md:text-6xl font-bold tracking-tighter group-hover:pl-8 transition-all duration-300">
+          {text}
+        </h3>
+        {description && (
+          <div className="mt-4 md:mt-0 md:text-right flex flex-col items-start md:items-end group-hover:pr-8 transition-all duration-300">
+            <p className="text-lg md:text-xl font-medium tracking-tight text-foreground/70 mb-2">
+              {description}
+            </p>
+            {ctaText && (
+              <span className="text-sm font-bold uppercase tracking-widest text-foreground underline underline-offset-4">
+                {ctaText}
+              </span>
+            )}
+          </div>
+        )}
+      </div>
 
       <motion.div
         className="absolute top-0 left-0 w-[300px] h-[200px] rounded-xl overflow-hidden pointer-events-none z-10 shadow-2xl"
