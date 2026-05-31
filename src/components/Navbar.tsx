@@ -13,7 +13,6 @@ export function Navbar() {
   const pathname = usePathname();
 
   const isHome = pathname === "/";
-  const isLargeLogo = isHome && !isScrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,17 +26,14 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4",
           isScrolled ? "bg-background/90 backdrop-blur-md" : "bg-transparent",
-          isLargeLogo ? "py-6" : "py-2"
+          isHome && !isScrolled ? "-translate-y-full opacity-0 pointer-events-none" : "translate-y-0 opacity-100"
         )}
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-4 z-50 group">
-            <div className={cn(
-              "relative transition-all duration-300",
-              isLargeLogo ? "w-24 h-24" : "w-10 h-10"
-            )}>
+            <div className="relative w-10 h-10 transition-all duration-300">
               <Image 
                 src="/images/logo branco transparente.png" 
                 alt="Logo Goosley" 
@@ -45,10 +41,7 @@ export function Navbar() {
                 className="object-contain transition-transform duration-300 group-hover:scale-105" 
               />
             </div>
-            <span className={cn(
-              "font-bold tracking-widest uppercase transition-colors duration-300 text-white",
-              isLargeLogo ? "text-lg md:text-2xl" : "text-sm md:text-base"
-            )}>
+            <span className="font-bold tracking-widest uppercase transition-colors duration-300 text-white text-sm md:text-base">
               Goosley Digital
             </span>
           </Link>
