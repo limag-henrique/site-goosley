@@ -1,15 +1,20 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Lenis from "lenis";
+import { usePathname, useSearchParams } from "next/navigation";
 
 export function SmoothScrollProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [lenis, setLenis] = useState<Lenis | null>(null);
+
   useEffect(() => {
-    const lenis = new Lenis({
+    const l = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
@@ -19,8 +24,10 @@ export function SmoothScrollProvider({
       touchMultiplier: 2,
     });
 
+    setLenis(l);
+
     function raf(time: number) {
-      lenis.raf(time);
+      l.raf(time);
       requestAnimationFrame(raf);
     }
 
@@ -30,9 +37,19 @@ export function SmoothScrollProvider({
     document.body.classList.add("is-loaded");
 
     return () => {
-      lenis.destroy();
+      l.destroy();
+      setLenis(null);
     };
   }, []);
+
+  useEffect(() => {
+    if (lenis) {
+      // Small delay to ensure React has rendered the new page content
+      requestAnimationFrame(() => {
+        lenis.scrollTo(0, { immediate: true });
+      });
+    }
+  }, [pathname, searchParams, lenis]);
 
   return <>{children}</>;
 }
