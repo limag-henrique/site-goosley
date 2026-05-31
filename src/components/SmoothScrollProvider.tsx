@@ -43,6 +43,7 @@ export function SmoothScrollProvider({
   }, []);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (lenis) {
       // Small delay to ensure React has rendered the new page content
       requestAnimationFrame(() => {

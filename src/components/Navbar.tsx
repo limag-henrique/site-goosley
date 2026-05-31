@@ -46,7 +46,7 @@ export function Navbar() {
               />
             </div>
             <span className={cn(
-              "text-white font-bold tracking-widest uppercase transition-all duration-300 md:hidden",
+              "text-white font-bold tracking-widest uppercase transition-all duration-300",
               isLargeLogo ? "text-lg md:text-2xl" : "text-sm md:text-base"
             )}>
               Goosley Digital
