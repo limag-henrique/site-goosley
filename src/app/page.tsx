@@ -51,7 +51,7 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="mb-16"
           >
-            <h2 className="text-5xl font-black uppercase tracking-tighter">NOSSAS SOLUÇÕES</h2>
+            <h2 className="text-5xl font-black lowercase tracking-tighter">nossas soluções</h2>
           </motion.div>
 
           <div className="flex flex-col">
@@ -89,13 +89,6 @@ export default function Home() {
               text="WORKFLOWS AUTÔNOMOS" 
               imageSrc="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=3270&auto=format&fit=crop" 
               href="/workflows"
-            />
-            <HoverReveal 
-              text="QUIZ" 
-              description="Descubra agora a solução mais adequada para você"
-              ctaText="Iniciar o quiz"
-              imageSrc="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=3270&auto=format&fit=crop" 
-              href="/quiz"
             />
           </div>
         </div>

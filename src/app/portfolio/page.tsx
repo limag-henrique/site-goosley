@@ -63,14 +63,14 @@ export default function Portfolio() {
         // Movimento muito vagaroso (aprox. 30px por segundo)
         containerRef.current.scrollLeft += (30 * deltaTime) / 1000;
         
-        // Loop infinito simples caso chegue ao fim (ajuste se necessário)
+        // Loop infinito
+        // Como duplicamos o array, quando chegarmos na metade do scrollWidth,
+        // resetamos para o início de forma invisível.
         if (
           containerRef.current.scrollLeft >= 
-          containerRef.current.scrollWidth - containerRef.current.clientWidth - 5
+          containerRef.current.scrollWidth / 2
         ) {
-          // Volta suavemente para o início se quiser um loop completo, 
-          // mas para um portfólio menor, podemos apenas parar no final.
-          // Aqui optaremos por deixá-lo chegar ao fim suavemente.
+          containerRef.current.scrollLeft = 0;
         }
       }
       lastTime = currentTime;
@@ -80,6 +80,8 @@ export default function Portfolio() {
     animationFrameId = requestAnimationFrame(scroll);
     return () => cancelAnimationFrame(animationFrameId);
   }, [hoveredIndex]);
+
+  const displayProjects = [...projects, ...projects, ...projects, ...projects];
 
   return (
     <div className="pt-32 min-h-screen bg-[#0a0a0a] text-white overflow-hidden flex flex-col">
@@ -104,7 +106,7 @@ export default function Portfolio() {
         style={{ scrollBehavior: 'auto' }} // Scroll manipulado via JS
       >
         <div className="flex gap-4 h-[60vh] md:h-[70vh] w-max">
-          {projects.map((project, index) => {
+          {displayProjects.map((project, index) => {
             const isHovered = hoveredIndex === index;
 
             return (
@@ -136,15 +138,18 @@ export default function Portfolio() {
                 {/* Overlay Escuro constante para leitura */}
                 <div className="absolute inset-0 bg-black/40 transition-opacity duration-700 group-hover:bg-black/20" />
 
-                {/* Categoria Horizontal (Mostrada quando não expandido) */}
+                {/* Categoria Horizontal e Título (Mostrada quando não expandido) */}
                 <motion.div
                   initial={{ opacity: 1 }}
                   animate={{ opacity: isHovered ? 0 : 1 }}
                   transition={{ duration: 0.3 }}
-                  className="absolute inset-x-0 bottom-0 p-8 flex items-end pointer-events-none bg-gradient-to-t from-black/80 to-transparent h-1/2"
+                  className="absolute inset-x-0 bottom-0 p-8 flex flex-col justify-end pointer-events-none bg-gradient-to-t from-black/80 to-transparent h-1/2"
                 >
-                  <h3 className="text-white font-bold text-lg md:text-xl uppercase tracking-widest drop-shadow-md">
+                  <span className="text-white/60 font-bold text-sm uppercase tracking-widest drop-shadow-md mb-2">
                     {project.category}
+                  </span>
+                  <h3 className="text-white font-bold text-2xl md:text-3xl drop-shadow-md">
+                    {project.title}
                   </h3>
                 </motion.div>
 
