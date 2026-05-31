@@ -2,96 +2,201 @@
 
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 export default function Portfolio() {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const projects = [
     {
       title: "Meliora 2.0 SDF",
       category: "Sistemas Web Complexos",
       description: "Aplicação web para gestão integrada de processos e dados. Desenvolvida com Laravel 5.7 e Vue.js. Entregue em 5 meses.",
+      image: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=3270&auto=format&fit=crop"
     },
     {
       title: "Sistema Financeiro",
       category: "Automações Inteligentes e IA",
       description: "Plataforma de gestão financeira pessoal com inteligência de investimentos (Modelo de Markowitz) usando Python e Streamlit. Entregue em 2 semanas.",
+      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=3164&auto=format&fit=crop"
     },
     {
       title: "Capivara Romântica",
       category: "Automações Inteligentes",
       description: "Agente de IA customizado para WhatsApp utilizando OpenAI e FastAPI, simulando a personalidade de um universitário. Entregue em 1 mês.",
-      link: "https://huggingface.co/spaces/limag-henrique/capivara"
+      link: "https://huggingface.co/spaces/limag-henrique/capivara",
+      image: "https://images.unsplash.com/photo-1604871000636-074fa5117945?q=80&w=3270&auto=format&fit=crop"
     },
     {
       title: "Gusli Books",
       category: "Landing Pages e E-commerces",
       description: "Plataforma de e-commerce de livros com Node.js, React e SQLite. Demonstração de loja virtual literária completa. Entregue em 2 semanas.",
-      link: "https://gusli-books.onrender.com"
+      link: "https://gusli-books.onrender.com",
+      image: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=3270&auto=format&fit=crop"
     },
     {
       title: "Gusmão Madeiras",
       category: "Landing Pages",
       description: "Portfólio web responsivo em SPA, catálogo com filtros em tempo real e integração com WhatsApp para orçamentos. Entregue em 1 semana.",
-      link: "https://limag-henrique.github.io/gusmaomadeiras-site/"
+      link: "https://limag-henrique.github.io/gusmaomadeiras-site/",
+      image: "https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=3270&auto=format&fit=crop"
     },
     {
       title: "Revista Entre Parágrafos",
       category: "Sistemas Web Complexos",
       description: "Portal acadêmico completo com sistema back-end, área restrita para autores e leitores para publicação de artigos. Entregue em 1 mês.",
-      link: "https://entreparagrafos.com.br/"
+      link: "https://entreparagrafos.com.br/",
+      image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=3270&auto=format&fit=crop"
     },
   ];
 
+  // Efeito de auto-scroll suave
+  useEffect(() => {
+    let animationFrameId: number;
+    let lastTime = performance.now();
+    
+    const scroll = (currentTime: number) => {
+      if (containerRef.current && hoveredIndex === null) {
+        const deltaTime = currentTime - lastTime;
+        // Movimento muito vagaroso (aprox. 30px por segundo)
+        containerRef.current.scrollLeft += (30 * deltaTime) / 1000;
+        
+        // Loop infinito simples caso chegue ao fim (ajuste se necessário)
+        if (
+          containerRef.current.scrollLeft >= 
+          containerRef.current.scrollWidth - containerRef.current.clientWidth - 5
+        ) {
+          // Volta suavemente para o início se quiser um loop completo, 
+          // mas para um portfólio menor, podemos apenas parar no final.
+          // Aqui optaremos por deixá-lo chegar ao fim suavemente.
+        }
+      }
+      lastTime = currentTime;
+      animationFrameId = requestAnimationFrame(scroll);
+    };
+
+    animationFrameId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [hoveredIndex]);
+
   return (
-    <div className="pt-32 pb-32 min-h-screen bg-background">
-      <div className="container mx-auto px-6 md:px-12">
-        <motion.div 
+    <div className="pt-32 min-h-screen bg-[#0a0a0a] text-white overflow-hidden flex flex-col">
+      <div className="container mx-auto px-6 md:px-12 mb-12">
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-3xl mb-20"
+          className="max-w-3xl"
         >
-          <h1 className="text-6xl font-bold tracking-tighter mb-6">Nosso Portfólio</h1>
-          <p className="text-xl text-foreground/70">
-            Explore nossa galeria de projetos e descubra como a Goosley Digital entrega excelência técnica e visual.
+          <h1 className="text-6xl font-black tracking-tighter mb-6 uppercase">Nosso Portfólio</h1>
+          <p className="text-xl text-white/70">
+            Descubra as soluções que desenvolvemos. Explore nossa galeria interativa abaixo.
           </p>
         </motion.div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+      {/* Accordion Container */}
+      <div 
+        ref={containerRef}
+        className="flex-1 w-full flex items-center overflow-x-auto pb-20 px-6 md:px-12 gap-4 hide-scrollbar"
+        style={{ scrollBehavior: 'auto' }} // Scroll manipulado via JS
+      >
+        <div className="flex gap-4 h-[60vh] md:h-[70vh] w-max">
           {projects.map((project, index) => {
-            const Wrapper = project.link ? motion.a : motion.div;
-            
+            const isHovered = hoveredIndex === index;
+
             return (
-              <Wrapper
+              <motion.div
                 key={index}
-                href={project.link}
-                target={project.link ? "_blank" : undefined}
-                rel={project.link ? "noopener noreferrer" : undefined}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true, margin: "-100px" }}
-                transition={{ duration: 0.6, delay: index % 2 === 0 ? 0 : 0.2, ease: [0.16, 1, 0.3, 1] }}
-                className={`group block ${project.link ? "cursor-pointer" : "cursor-default"}`}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                animate={{
+                  width: isHovered ? "800px" : "350px",
+                }}
+                transition={{
+                  duration: 0.7,
+                  ease: [0.16, 1, 0.3, 1], // Physics-based ease (Apple-like spring simulation)
+                }}
+                className={`relative h-full rounded-3xl overflow-hidden cursor-pointer flex-shrink-0 group`}
+                style={{
+                  // Max width no mobile para não quebrar a tela
+                  maxWidth: isHovered ? "85vw" : "60vw"
+                }}
               >
-                <div className="aspect-[4/3] bg-accent/50 rounded-3xl mb-6 overflow-hidden relative">
-                  {/* Placeholder para a imagem do projeto. Num cenário real, usaríamos <Image> do next */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-foreground/5 to-foreground/20 group-hover:scale-105 transition-transform duration-700 ease-out" />
+                {/* Background Image */}
+                <Image
+                  src={project.image}
+                  alt={project.title}
+                  fill
+                  className="object-cover absolute inset-0 transition-transform duration-[2s] ease-out group-hover:scale-110"
+                />
+                
+                {/* Overlay Escuro constante para leitura */}
+                <div className="absolute inset-0 bg-black/40 transition-opacity duration-700 group-hover:bg-black/20" />
+
+                {/* Categoria Horizontal (Mostrada quando não expandido) */}
+                <motion.div
+                  initial={{ opacity: 1 }}
+                  animate={{ opacity: isHovered ? 0 : 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="absolute inset-x-0 bottom-0 p-8 flex items-end pointer-events-none bg-gradient-to-t from-black/80 to-transparent h-1/2"
+                >
+                  <h3 className="text-white font-bold text-lg md:text-xl uppercase tracking-widest drop-shadow-md">
+                    {project.category}
+                  </h3>
+                </motion.div>
+
+                {/* Conteúdo Expandido (Título, Descrição, Link, Prazo) */}
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ 
+                    opacity: isHovered ? 1 : 0,
+                    y: isHovered ? 0 : 50 
+                  }}
+                  transition={{ duration: 0.5, delay: isHovered ? 0.3 : 0 }}
+                  className="absolute bottom-0 left-0 w-full p-8 md:p-12 bg-gradient-to-t from-black/90 via-black/50 to-transparent pointer-events-none"
+                >
+                  <div className="text-blue-400 font-bold text-sm mb-3 uppercase tracking-widest drop-shadow-md">
+                    {project.category}
+                  </div>
                   
-                  {project.link && (
-                    <div className="absolute top-6 right-6 bg-background rounded-full p-4 opacity-0 group-hover:opacity-100 transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
-                      <ArrowUpRight className="w-6 h-6" />
-                    </div>
-                  )}
-                </div>
-                <div>
-                  <div className="text-blue-600 font-medium text-sm mb-2 uppercase tracking-wider">{project.category}</div>
-                  <h3 className="text-3xl font-bold mb-2 tracking-tight group-hover:text-blue-600 transition-colors">{project.title}</h3>
-                  <p className="text-foreground/70 text-lg">{project.description}</p>
-                </div>
-              </Wrapper>
+                  <h2 className="text-3xl md:text-5xl font-black mb-4 tracking-tighter text-white drop-shadow-lg">
+                    {project.title}
+                  </h2>
+                  
+                  <div className="max-w-xl">
+                    <p className="text-white/80 text-lg md:text-xl mb-6 font-medium drop-shadow-md">
+                      {project.description}
+                    </p>
+                    
+                    {project.link && (
+                      <a 
+                        href={project.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-white text-black px-6 py-3 rounded-full font-bold uppercase tracking-wider text-sm hover:bg-blue-600 hover:text-white transition-colors pointer-events-auto"
+                      >
+                        Ver Solução <ArrowUpRight className="w-4 h-4" />
+                      </a>
+                    )}
+                  </div>
+                </motion.div>
+              </motion.div>
             );
           })}
         </div>
       </div>
+      <style jsx global>{`
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .hide-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
     </div>
   );
 }

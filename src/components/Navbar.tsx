@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
-import { Menu, X, Flag } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -25,8 +26,13 @@ export function Navbar() {
       )}
     >
       <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 z-50 group">
-          <Flag className="w-8 h-8 text-foreground fill-foreground/10 group-hover:fill-foreground transition-all duration-300" />
+        <Link href="/" className="flex items-center z-50 group relative w-24 h-24">
+          <Image 
+            src="/images/logo branco transparente.png" 
+            alt="Logo Goosley" 
+            fill
+            className="object-contain transition-transform duration-300 group-hover:scale-105" 
+          />
         </Link>
 
         {/* Desktop Menu */}

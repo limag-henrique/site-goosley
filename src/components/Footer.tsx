@@ -1,13 +1,19 @@
 import Link from "next/link";
-import { Flag, ArrowRight } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight } from "lucide-react";
 
 export function Footer() {
   return (
     <footer className="bg-foreground text-background py-32">
       <div className="container mx-auto px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20">
         <div>
-          <Link href="/" className="flex items-center gap-2 mb-12">
-            <Flag className="w-12 h-12 text-background fill-background" />
+          <Link href="/" className="flex items-center mb-12 relative w-32 h-32">
+            <Image 
+              src="/images/logo preto transparente.png" 
+              alt="Logo Goosley" 
+              fill
+              className="object-contain" 
+            />
           </Link>
           <h2 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
             VAMOS CONSTRUIR <br/> O FUTURO.
