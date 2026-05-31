@@ -1,16 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import Lenis from "lenis";
 import { usePathname, useSearchParams } from "next/navigation";
+
+function RouteChangeListener({ lenis }: { lenis: Lenis | null }) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    if (lenis) {
+      requestAnimationFrame(() => {
+        lenis.scrollTo(0, { immediate: true });
+      });
+    }
+  }, [pathname, searchParams, lenis]);
+
+  return null;
+}
 
 export function SmoothScrollProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
@@ -42,15 +56,12 @@ export function SmoothScrollProvider({
     };
   }, []);
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-    if (lenis) {
-      // Small delay to ensure React has rendered the new page content
-      requestAnimationFrame(() => {
-        lenis.scrollTo(0, { immediate: true });
-      });
-    }
-  }, [pathname, searchParams, lenis]);
-
-  return <>{children}</>;
+  return (
+    <>
+      <Suspense fallback={null}>
+        <RouteChangeListener lenis={lenis} />
+      </Suspense>
+      {children}
+    </>
+  );
 }
