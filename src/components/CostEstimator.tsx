@@ -34,6 +34,8 @@ function EstimatorInner() {
   let setupMaxTotal = 0;
   let recurringMinTotal = 0;
   let recurringMaxTotal = 0;
+  let timeMinTotal = 0;
+  let timeMaxTotal = 0;
   const variableCosts: string[] = [];
   const recurringCosts: string[] = [];
 
@@ -46,6 +48,8 @@ function EstimatorInner() {
       setupMaxTotal += option.setupMax;
       recurringMinTotal += option.recurringMin;
       recurringMaxTotal += option.recurringMax;
+      timeMinTotal += option.timeMin || 0;
+      timeMaxTotal += option.timeMax || 0;
 
       if (option.setupText && option.setupMin === 0 && option.setupMax === 0 && option.setupText !== "Incluso") {
         variableCosts.push(`${variable.name}: ${option.setupText}`);
@@ -156,6 +160,14 @@ function EstimatorInner() {
                                 </span>
                               </div>
                             )}
+                            {(option.timeMax ?? 0) > 0 && (
+                              <div className="text-sm mt-1">
+                                <span className="text-foreground/60">Prazo Adicional: </span>
+                                <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                                  {option.timeMin === option.timeMax ? `+${option.timeMin} dias` : `+${option.timeMin} a ${option.timeMax} dias`}
+                                </span>
+                              </div>
+                            )}
                           </div>
                         </button>
                       );
@@ -208,6 +220,17 @@ function EstimatorInner() {
                         ))}
                       </div>
                     )}
+                  </div>
+                )}
+
+                {timeMaxTotal > 0 && (
+                  <div className="flex flex-col mt-4 border-t border-foreground/10 pt-4">
+                    <span className="text-sm text-foreground/60 mb-1">Prazo de Entrega Estimado</span>
+                    <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                      {timeMinTotal === timeMaxTotal 
+                        ? `${timeMinTotal} dias úteis` 
+                        : `${timeMinTotal} a ${timeMaxTotal} dias úteis`}
+                    </span>
                   </div>
                 )}
               </div>
