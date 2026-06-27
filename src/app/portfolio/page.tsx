@@ -14,13 +14,27 @@ export default function Portfolio() {
       title: "Meliora 2.0 SDF",
       category: "Sistemas Web Complexos",
       description: "Aplicação web para gestão integrada de processos e dados. Desenvolvida com Laravel 5.7 e Vue.js. Entregue em 5 meses.",
-      image: "https://images.unsplash.com/photo-1550684376-efcbd6e3f031?q=80&w=3270&auto=format&fit=crop"
+      image: "/images/portfolio/meliora.png"
     },
     {
       title: "Sistema Financeiro",
       category: "Automações Inteligentes e IA",
       description: "Plataforma de gestão financeira pessoal com inteligência de investimentos (Modelo de Markowitz) usando Python e Streamlit. Entregue em 2 semanas.",
-      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=3164&auto=format&fit=crop"
+      image: "/images/portfolio/sistema-financeiro.png"
+    },
+    {
+      title: "Are you a criminal - Machine Learning",
+      category: "Machine Learning e IA",
+      description: "Sistema em Python que extrai um embedding facial normalizado e compara com um conjunto local de imagens de referência.",
+      link: "https://github.com/limag-henrique/are-you-a-criminal-ML/",
+      image: "/images/portfolio/machine-learning.png"
+    },
+    {
+      title: "GWeb",
+      category: "Sistemas Web Complexos",
+      description: "Aplicativo de desenvolvimento de software web por interfaces gráficas facilitadas. Feito com C#.",
+      link: "https://github.com/limag-henrique/gweb/",
+      image: "/images/portfolio/gweb.png"
     },
     {
       title: "Capivara Romântica",
@@ -34,21 +48,21 @@ export default function Portfolio() {
       category: "Landing Pages e E-commerces",
       description: "Plataforma de e-commerce de livros com Node.js, React e SQLite. Demonstração de loja virtual literária completa. Entregue em 2 semanas.",
       link: "https://gusli-books.onrender.com",
-      image: "https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=3270&auto=format&fit=crop"
+      image: "/images/portfolio/gusli-books.png"
     },
     {
       title: "Gusmão Madeiras",
       category: "Landing Pages",
       description: "Portfólio web responsivo em SPA, catálogo com filtros em tempo real e integração com WhatsApp para orçamentos. Entregue em 1 semana.",
       link: "https://limag-henrique.github.io/gusmaomadeiras-site/",
-      image: "https://images.unsplash.com/photo-1557672172-298e090bd0f1?q=80&w=3270&auto=format&fit=crop"
+      image: "/images/portfolio/gusmao-madeiras.png"
     },
     {
       title: "Revista Entre Parágrafos",
       category: "Sistemas Web Complexos",
       description: "Portal acadêmico completo com sistema back-end, área restrita para autores e leitores para publicação de artigos. Entregue em 1 mês.",
       link: "https://entreparagrafos.com.br/",
-      image: "https://images.unsplash.com/photo-1541701494587-cb58502866ab?q=80&w=3270&auto=format&fit=crop"
+      image: "/images/portfolio/entreparagrafos.png"
     },
   ];
 
