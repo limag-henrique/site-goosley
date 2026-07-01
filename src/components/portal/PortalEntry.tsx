@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowRight, KeyRound, LockKeyhole, UserPlus } from "lucide-react";
+import { ArrowRight, LockKeyhole, UserPlus } from "lucide-react";
 
 type Mode = "login" | "register" | "forgot" | "reset";
 
@@ -76,10 +76,9 @@ export function PortalEntry() {
         </section>
 
         <section className="border border-white/10 bg-white/[0.04] p-5 shadow-2xl shadow-black/40 sm:p-6">
-          <div className="mb-6 grid grid-cols-3 border border-white/10 p-1">
+          <div className="mb-6 grid grid-cols-2 border border-white/10 p-1">
             <AccessTab active={mode === "login"} label="Acesso" icon={<LockKeyhole size={16} />} onClick={() => setMode("login")} />
             <AccessTab active={mode === "register"} label="Nova conta" icon={<UserPlus size={16} />} onClick={() => setMode("register")} />
-            <AccessTab active={mode === "forgot" || mode === "reset"} label="Senha" icon={<KeyRound size={16} />} onClick={() => setMode("forgot")} />
           </div>
 
           <form action={handleSubmit} className="space-y-4">

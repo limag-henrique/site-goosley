@@ -51,6 +51,7 @@ import {
   updateOwnProfile,
   updatePayment,
   updatePayoutRequest,
+  updateProgrammerRateApproval,
   updateProject,
   updateProgrammerTask,
   updateSettings,
@@ -264,6 +265,9 @@ export async function handleAdmin(request: NextRequest, segments: string[]) {
       return NextResponse.json({ users: listUsers(actor, new URL(request.url).searchParams.get("search") || undefined) });
     }
     if (segments[0] === "users" && segments[1] === "programmers" && request.method === "POST") return NextResponse.json({ user: createProgrammer(actor, await body()) }, { status: 201 });
+    if (segments[0] === "users" && segments[1] && segments[2] === "programmer-profile" && request.method === "PATCH") {
+      return NextResponse.json({ programmerProfile: updateProgrammerRateApproval(actor, segments[1], await body()) });
+    }
     if (segments[0] === "users" && segments[1] && request.method === "PATCH") return NextResponse.json({ user: updateUser(actor, segments[1], await body()) });
 
     if (segments[0] === "projects" && segments.length === 1 && request.method === "GET") return NextResponse.json({ projects: listClientProjects(actor) });

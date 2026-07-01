@@ -304,6 +304,46 @@ export function createProgrammer(actor: RequestActor, payload: unknown) {
   return toSafeUser(user);
 }
 
+export function updateProgrammerRateApproval(actor: RequestActor, programmerId: string, payload: unknown) {
+  requireRole(actor, ["admin"]);
+  const body = asRecord(payload);
+  const db = getDb();
+  const user = findById(db.users, programmerId, "Developer");
+  if (!isDeveloperRole(user.role)) throw new PortalError("User must be a developer.", 422, "INVALID_DEVELOPER");
+
+  let profile = db.programmerProfiles.find((item) => item.userId === programmerId);
+  if (!profile) {
+    profile = {
+      userId: programmerId,
+      displayName: user.name,
+      skills: [],
+      hourlyReferenceRateCents: 0,
+      status: user.status,
+    };
+    db.programmerProfiles.push(profile);
+  }
+
+  const before = { ...profile };
+  const hourlyReferenceRateCents = integerCents(body, "hourlyReferenceRateCents", { optional: true, min: 0 });
+  const approveRate = typeof body.approveRate === "boolean" ? body.approveRate : String(body.approveRate || "") === "true";
+  const revokeRate = typeof body.revokeRate === "boolean" ? body.revokeRate : String(body.revokeRate || "") === "true";
+
+  if (hourlyReferenceRateCents != null) profile.hourlyReferenceRateCents = hourlyReferenceRateCents;
+  profile.notes = stringField(body, "notes", { optional: true, max: 1000 }) || profile.notes;
+  if (approveRate) {
+    profile.hourlyRateApprovedAt = nowIso();
+    profile.hourlyRateApprovedByAdminId = actor.user.id;
+  }
+  if (revokeRate) {
+    delete profile.hourlyRateApprovedAt;
+    delete profile.hourlyRateApprovedByAdminId;
+  }
+
+  logAudit({ actorUserId: actor.user.id, action: "admin.updated_programmer_rate", entityType: "programmerProfile", entityId: programmerId, before, after: profile, actor });
+  notify(programmerId, "rate.updated", "Valor/hora atualizado", profile.hourlyRateApprovedAt ? "Seu valor/hora foi aprovado." : "Seu valor/hora aguarda aprovacao.", "/meu-portal/developer/profile");
+  return profile;
+}
+
 export function updateUser(actor: RequestActor, userId: string, payload: unknown) {
   requireRole(actor, ["admin"]);
   const body = asRecord(payload);
@@ -564,12 +604,28 @@ export function listProgrammerDashboard(actor: RequestActor) {
   requireRole(actor, ["developer", "admin"]);
   const userId = actor.user.id;
   const db = getDb();
+  const profile = db.programmerProfiles.find((item) => item.userId === userId);
   return {
     tasks: listProjectTasksForActor(actor).filter((task) => actor.user.role === "admin" || task.assignedToProgrammerId === userId),
     projects: listProgrammerProjects(actor),
     earnings: listProgrammerEarnings(actor),
     timeEntries: listTimeEntries(actor),
     notifications: db.notifications.filter((notification) => actor.user.role === "admin" || notification.userId === userId).slice(-20),
+    programmerProfile:
+      actor.user.role === "admin"
+        ? undefined
+        : profile
+          ? {
+              userId: profile.userId,
+              displayName: profile.displayName,
+              skills: profile.skills,
+              githubUsername: profile.githubUsername,
+              status: profile.status,
+              hourlyReferenceRateCents: profile.hourlyRateApprovedAt ? profile.hourlyReferenceRateCents : undefined,
+              hourlyRateApprovedAt: profile.hourlyRateApprovedAt,
+              hourlyRatePendingCents: profile.hourlyRateApprovedAt ? undefined : profile.hourlyReferenceRateCents,
+            }
+          : undefined,
   };
 }
 
@@ -1221,6 +1277,7 @@ export function adminDashboard(actor: RequestActor) {
   const db = getDb();
   return {
     users: db.users.map(toSafeUser),
+    programmerProfiles: db.programmerProfiles,
     projects: db.projects,
     tasks: db.tasks,
     payments: db.payments,

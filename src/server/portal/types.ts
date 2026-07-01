@@ -39,6 +39,8 @@ export interface ProgrammerProfile {
   skills: string[];
   githubUsername?: string;
   hourlyReferenceRateCents: number;
+  hourlyRateApprovedAt?: string;
+  hourlyRateApprovedByAdminId?: string;
   payoutInfo?: Record<string, unknown>;
   status: UserStatus;
   notes?: string;

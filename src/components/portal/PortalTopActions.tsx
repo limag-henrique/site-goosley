@@ -5,9 +5,10 @@ import type { SafeUser } from "@/server/portal/services";
 
 export function PortalTopActions({ user }: { user: SafeUser }) {
   async function toggleTheme() {
-    const root = document.documentElement;
+    const root = document.querySelector(".portal-theme-root") || document.documentElement;
     const next = root.classList.contains("dark") ? "light" : "dark";
     root.classList.toggle("dark", next === "dark");
+    document.documentElement.classList.toggle("dark", next === "dark");
     localStorage.setItem("goosley-theme", next);
     await fetch("/auth/profile", {
       method: "PATCH",
@@ -24,16 +25,16 @@ export function PortalTopActions({ user }: { user: SafeUser }) {
   return (
     <>
       <button
-        aria-label="Toggle theme"
+        aria-label="Alternar tema"
         onClick={toggleTheme}
         className="grid h-10 w-10 place-items-center border border-black/10 bg-white dark:border-white/10 dark:bg-white/5"
-        title="Theme"
+        title="Tema"
       >
         <Sun className="dark:hidden" size={18} />
         <Moon className="hidden dark:block" size={18} />
       </button>
       <button
-        aria-label="Profile"
+        aria-label="Perfil"
         className="hidden h-10 items-center gap-2 border border-black/10 bg-white px-3 text-sm font-semibold dark:border-white/10 dark:bg-white/5 sm:flex"
         title={user.email}
       >
@@ -41,10 +42,10 @@ export function PortalTopActions({ user }: { user: SafeUser }) {
         <span>{user.name}</span>
       </button>
       <button
-        aria-label="Logout"
+        aria-label="Sair"
         onClick={logout}
         className="grid h-10 w-10 place-items-center border border-black/10 bg-white text-red-600 dark:border-white/10 dark:bg-white/5 dark:text-red-300"
-        title="Logout"
+        title="Sair"
       >
         <LogOut size={18} />
       </button>

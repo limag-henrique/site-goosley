@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { CheckCircle2, Play, Square, TimerReset } from "lucide-react";
+import { pricingData } from "@/data/pricingData";
 
 type Field = {
   name: string;
@@ -100,9 +102,9 @@ export function EstimateCalculator() {
   return (
     <form onSubmit={submit} className="grid gap-3">
       <div className="grid gap-3 sm:grid-cols-3">
-        <NumberInput name="features" label="Features" value={6} />
-        <NumberInput name="complexity" label="Complexity" value={3} />
-        <NumberInput name="integrations" label="Integrations" value={2} />
+        <NumberInput name="features" label="Funcionalidades" value={6} />
+        <NumberInput name="complexity" label="Complexidade" value={3} />
+        <NumberInput name="integrations" label="Integracoes" value={2} />
       </div>
       <button className="min-h-11 bg-orange-400 px-4 font-black uppercase tracking-widest text-black">Calcular</button>
       {result ? (
@@ -113,6 +115,293 @@ export function EstimateCalculator() {
         </div>
       ) : null}
     </form>
+  );
+}
+
+type PortalTask = {
+  id: string;
+  projectId: string;
+  title: string;
+  description: string;
+  status: string;
+  priority: string;
+  dueDate?: string;
+  estimatedHours?: number;
+};
+
+type PortalProject = {
+  id: string;
+  title: string;
+  repositoryUrl?: string;
+  githubUrl?: string;
+};
+
+type PortalTimeEntry = {
+  id: string;
+  projectId: string;
+  taskId?: string;
+  description: string;
+  repositoryUrl: string;
+  startedAt: string;
+  endedAt?: string;
+  durationSeconds: number;
+  status: string;
+};
+
+export function TaskCommentForm({ task, endpoint }: { task: PortalTask; endpoint: string }) {
+  return (
+    <ActionForm
+      endpoint={endpoint}
+      fields={[{ name: "body", label: `Comentario sobre: ${task.title}`, type: "textarea", required: true }]}
+      submitLabel="Adicionar comentario"
+      successLabel="Comentario enviado para a conversa do projeto."
+    />
+  );
+}
+
+export function DeveloperTimeTracker({
+  projects,
+  tasks,
+  timeEntries,
+}: {
+  projects: PortalProject[];
+  tasks: PortalTask[];
+  timeEntries: PortalTimeEntry[];
+}) {
+  const running = timeEntries.find((entry) => entry.status === "running");
+  const firstProject = projects[0];
+  const [projectId, setProjectId] = useState(running?.projectId || firstProject?.id || "");
+  const projectTasks = tasks.filter((task) => task.projectId === projectId);
+  const [taskId, setTaskId] = useState(running?.taskId || projectTasks[0]?.id || "");
+  const activeProject = projects.find((project) => project.id === projectId) || firstProject;
+  const [description, setDescription] = useState(running?.description || "");
+  const [repositoryUrl, setRepositoryUrl] = useState(running?.repositoryUrl || activeProject?.repositoryUrl || activeProject?.githubUrl || "");
+  const [elapsed, setElapsed] = useState(running ? elapsedSeconds(running.startedAt) : 0);
+  const [status, setStatus] = useState("");
+  const [pending, setPending] = useState(false);
+
+  useEffect(() => {
+    if (!running) return;
+    const interval = window.setInterval(() => setElapsed(elapsedSeconds(running.startedAt)), 1000);
+    return () => window.clearInterval(interval);
+  }, [running]);
+
+  async function start() {
+    setPending(true);
+    setStatus("");
+    const response = await fetch("/developer/time-entries/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectId, taskId: taskId || undefined, repositoryUrl, description }),
+    });
+    const data = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+    setPending(false);
+    if (!response.ok) {
+      setStatus(data.error?.message || "Nao foi possivel iniciar o timer.");
+      return;
+    }
+    window.location.reload();
+  }
+
+  async function stop() {
+    if (!running) return;
+    setPending(true);
+    setStatus("");
+    const response = await fetch(`/developer/time-entries/${running.id}/stop`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ repositoryUrl, description }),
+    });
+    const data = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+    setPending(false);
+    if (!response.ok) {
+      setStatus(data.error?.message || "Nao foi possivel parar o timer.");
+      return;
+    }
+    window.location.reload();
+  }
+
+  return (
+    <div className="grid gap-4">
+      <div className="grid gap-3 border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            <TimerReset size={17} />
+            Rastreador de tempo
+          </div>
+          <strong className="font-mono text-2xl">{formatDuration(running ? elapsed : 0)}</strong>
+        </div>
+        <div className="grid gap-3 xl:grid-cols-[1.4fr_1fr_1fr_auto]">
+          <input
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            placeholder="No que voce esta trabalhando?"
+            className={inputClassName}
+          />
+          <select
+            value={projectId}
+            onChange={(event) => {
+              const nextProjectId = event.target.value;
+              const project = projects.find((item) => item.id === nextProjectId);
+              setProjectId(nextProjectId);
+              setTaskId(tasks.find((task) => task.projectId === nextProjectId)?.id || "");
+              if (!running) setRepositoryUrl(project?.repositoryUrl || project?.githubUrl || "");
+            }}
+            className={inputClassName}
+          >
+            {projects.map((project) => (
+              <option key={project.id} value={project.id}>{project.title}</option>
+            ))}
+          </select>
+          <select value={taskId} onChange={(event) => setTaskId(event.target.value)} className={inputClassName}>
+            <option value="">Sem tarefa vinculada</option>
+            {projectTasks.map((task) => (
+              <option key={task.id} value={task.id}>{task.title}</option>
+            ))}
+          </select>
+          {running ? (
+            <button onClick={stop} disabled={pending} className="inline-flex min-h-11 items-center justify-center gap-2 bg-red-500 px-5 font-black uppercase tracking-widest text-white disabled:opacity-60">
+              <Square size={16} />
+              Parar
+            </button>
+          ) : (
+            <button onClick={start} disabled={pending || !projectId} className="inline-flex min-h-11 items-center justify-center gap-2 bg-orange-400 px-5 font-black uppercase tracking-widest text-black disabled:opacity-60">
+              <Play size={16} />
+              Iniciar
+            </button>
+          )}
+        </div>
+        <input
+          value={repositoryUrl}
+          onChange={(event) => setRepositoryUrl(event.target.value)}
+          placeholder="Repositorio ou link tecnico"
+          className={inputClassName}
+        />
+        {status ? <p className="text-sm text-zinc-600 dark:text-zinc-300">{status}</p> : null}
+      </div>
+      <div className="grid gap-2 text-sm">
+        {timeEntries.slice(-6).reverse().map((entry) => (
+          <div key={entry.id} className="flex flex-wrap items-center justify-between gap-3 border border-black/10 bg-white p-3 dark:border-white/10 dark:bg-white/[0.04]">
+            <span>{entry.description}</span>
+            <strong>{formatDuration(entry.status === "running" ? elapsedSeconds(entry.startedAt) : entry.durationSeconds)}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function PortalProjectEstimator() {
+  const [categoryId, setCategoryId] = useState(pricingData[0]?.id || "");
+  const activeCategory = pricingData.find((category) => category.id === categoryId) || pricingData[0];
+  const [selections, setSelections] = useState<Record<string, string>>(() => defaultSelectionsFor(activeCategory));
+  const [status, setStatus] = useState("");
+  const [pending, setPending] = useState(false);
+
+  const totals = activeCategory.variables.reduce(
+    (sum, variable) => {
+      const option = variable.options.find((item) => item.id === selections[variable.id]);
+      if (!option) return sum;
+      return {
+        setupMin: sum.setupMin + option.setupMin,
+        setupMax: sum.setupMax + option.setupMax,
+        recurringMin: sum.recurringMin + option.recurringMin,
+        recurringMax: sum.recurringMax + option.recurringMax,
+        timeMin: sum.timeMin + (option.timeMin || 0),
+        timeMax: sum.timeMax + (option.timeMax || 0),
+      };
+    },
+    { setupMin: 0, setupMax: 0, recurringMin: 0, recurringMax: 0, timeMin: 0, timeMax: 0 }
+  );
+
+  async function submitBudget() {
+    setPending(true);
+    setStatus("");
+    const selectedDetails = activeCategory.variables
+      .map((variable) => {
+        const option = variable.options.find((item) => item.id === selections[variable.id]);
+        return option ? `${variable.name}: ${option.label}` : "";
+      })
+      .filter(Boolean);
+    const response = await fetch("/client/budgets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: `Novo projeto - ${activeCategory.title}`,
+        description: `${activeCategory.description}\n\nEscolhas:\n${selectedDetails.join("\n")}`,
+        estimatedValueCents: Math.max(0, totals.setupMax) * 100,
+      }),
+    });
+    const data = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
+    setPending(false);
+    setStatus(response.ok ? "Estimativa importada e enviada para analise no portal." : data.error?.message || "Nao foi possivel enviar a estimativa.");
+  }
+
+  return (
+    <div className="grid gap-5">
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        {pricingData.map((category) => (
+          <button
+            key={category.id}
+            type="button"
+            onClick={() => {
+              setCategoryId(category.id);
+              setSelections(defaultSelectionsFor(category));
+            }}
+            className={`border p-4 text-left transition ${
+              activeCategory.id === category.id
+                ? "border-orange-400 bg-orange-400 text-black"
+                : "border-black/10 bg-white hover:border-orange-400 dark:border-white/10 dark:bg-white/[0.04]"
+            }`}
+          >
+            <strong className="block">{category.title}</strong>
+            <span className="mt-2 block text-sm opacity-75">{category.description}</span>
+          </button>
+        ))}
+      </div>
+      <div className="grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+        <div className="grid gap-4">
+          {activeCategory.variables.map((variable) => (
+            <div key={variable.id} className="border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
+              <h3 className="mb-3 font-black">{variable.name}</h3>
+              <div className="grid gap-2">
+                {variable.options.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    onClick={() => setSelections((current) => ({ ...current, [variable.id]: option.id }))}
+                    className={`flex items-start justify-between gap-3 border px-3 py-3 text-left text-sm transition ${
+                      selections[variable.id] === option.id
+                        ? "border-orange-400 bg-orange-50 dark:bg-orange-400/10"
+                        : "border-black/10 dark:border-white/10"
+                    }`}
+                  >
+                    <span>
+                      <strong className="block">{option.label}</strong>
+                      <span className="text-zinc-600 dark:text-zinc-400">Setup: {range(option.setupMin, option.setupMax)}</span>
+                    </span>
+                    {selections[variable.id] === option.id ? <CheckCircle2 className="text-orange-500" size={18} /> : null}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <aside className="h-fit border border-black/10 bg-white p-5 dark:border-white/10 dark:bg-zinc-950">
+          <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Resumo importado da calculadora</p>
+          <h3 className="mt-2 text-2xl font-black">{activeCategory.title}</h3>
+          <div className="mt-5 grid gap-3 text-sm">
+            <SummaryLine label="Setup estimado" value={range(totals.setupMin, totals.setupMax)} />
+            <SummaryLine label="Recorrente mensal" value={totals.recurringMax > 0 ? `${range(totals.recurringMin, totals.recurringMax)} / mes` : "Sem recorrencia estimada"} />
+            <SummaryLine label="Prazo estimado" value={totals.timeMax > 0 ? `${totals.timeMin} a ${totals.timeMax} dias uteis` : "A definir"} />
+          </div>
+          <button onClick={submitBudget} disabled={pending} className="mt-5 w-full bg-orange-400 px-4 py-3 font-black uppercase tracking-widest text-black disabled:opacity-60">
+            {pending ? "Enviando" : "Enviar estimativa"}
+          </button>
+          {status ? <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-300">{status}</p> : null}
+        </aside>
+      </div>
+    </div>
   );
 }
 
@@ -129,4 +418,35 @@ const inputClassName = "min-h-11 border border-black/10 bg-white px-3 text-zinc-
 
 function money(cents: number) {
   return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(cents / 100);
+}
+
+function range(min: number, max: number) {
+  if (min === max) return money(min * 100);
+  return `${money(min * 100)} - ${money(max * 100)}`;
+}
+
+function SummaryLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between gap-4 border-b border-black/10 pb-2 dark:border-white/10">
+      <span className="text-zinc-600 dark:text-zinc-400">{label}</span>
+      <strong className="text-right">{value}</strong>
+    </div>
+  );
+}
+
+function defaultSelectionsFor(category: (typeof pricingData)[number]) {
+  return Object.fromEntries(
+    category.variables.map((variable) => [variable.id, variable.options.find((option) => option.isDefault)?.id || variable.options[0]?.id || ""])
+  );
+}
+
+function elapsedSeconds(startedAt: string) {
+  return Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
+}
+
+function formatDuration(seconds: number) {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  return [hours, minutes, secs].map((part) => String(part).padStart(2, "0")).join(":");
 }
