@@ -12,6 +12,7 @@
     "seed:portal": "tsx scripts/seed-portal.ts"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.20.1",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "clsx": "^2.1.1",
@@ -35,6 +36,7 @@
     "eslint-config-next": "16.2.6",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.106.0"
   }
 }
