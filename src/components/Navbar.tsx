@@ -54,6 +54,7 @@ export function Navbar() {
             <Link href="/precos" className="hover:opacity-50 transition-opacity">Simule seu Projeto</Link>
             <Link href="/portfolio" className="hover:opacity-50 transition-opacity">Portfólio</Link>
             <Link href="/contato" className="hover:opacity-50 transition-opacity">Contato</Link>
+            <Link href="/meu-portal" className="hover:opacity-50 transition-opacity">Meu Portal</Link>
           </nav>
 
           {/* Mobile Menu Toggle */}
@@ -88,6 +89,7 @@ export function Navbar() {
         <Link href="/precos" onClick={() => setIsMenuOpen(false)}>Simule seu Projeto</Link>
         <Link href="/portfolio" onClick={() => setIsMenuOpen(false)}>Portfólio</Link>
         <Link href="/contato" onClick={() => setIsMenuOpen(false)}>Contato</Link>
+        <Link href="/meu-portal" onClick={() => setIsMenuOpen(false)}>Meu Portal</Link>
       </div>
     </>
   );

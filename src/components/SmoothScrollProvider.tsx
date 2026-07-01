@@ -38,7 +38,9 @@ export function SmoothScrollProvider({
       touchMultiplier: 2,
     });
 
-    setLenis(l);
+    const stateFrame = requestAnimationFrame(() => {
+      setLenis(l);
+    });
 
     function raf(time: number) {
       l.raf(time);
@@ -51,8 +53,8 @@ export function SmoothScrollProvider({
     document.body.classList.add("is-loaded");
 
     return () => {
+      cancelAnimationFrame(stateFrame);
       l.destroy();
-      setLenis(null);
     };
   }, []);
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useFrame, useThree, extend } from "@react-three/fiber";
+import { useFrame, useThree, extend, type ThreeElement } from "@react-three/fiber";
 import { ScrollControls, useScroll, useTexture, Html, shaderMaterial } from "@react-three/drei";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo } from "react";
 import * as THREE from "three";
 import { Project } from "./PortfolioCanvas";
 import { gsap } from "gsap";
@@ -67,10 +67,18 @@ const ProjectMaterial = shaderMaterial(
 
 extend({ ProjectMaterial });
 
+type ProjectMaterialInstance = THREE.ShaderMaterial & {
+  uTexture: THREE.Texture;
+  uTime: number;
+  uScrollOffset: number;
+  uIsActive: number;
+  uAlpha: number;
+};
+
 // Add to Three elements namespace for TS
 declare module '@react-three/fiber' {
   interface ThreeElements {
-    projectMaterial: any;
+    projectMaterial: ThreeElement<typeof ProjectMaterial>;
   }
 }
 
@@ -137,7 +145,7 @@ interface ProjectSliceProps {
 
 function ProjectSlice({ project, index, angle, radius, activeProject, setActiveProject, scrollVelocity }: ProjectSliceProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const matRef = useRef<any>(null);
+  const matRef = useRef<ProjectMaterialInstance>(null);
   const { viewport } = useThree();
   const texture = useTexture(project.image);
   
@@ -259,7 +267,7 @@ function ProjectSlice({ project, index, angle, radius, activeProject, setActiveP
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
                 className="absolute top-12 right-12 text-white font-bold uppercase tracking-widest pointer-events-auto hover:opacity-50 transition-opacity drop-shadow-md"
-                onClick={(e: any) => {
+                onClick={(e) => {
                   e.stopPropagation();
                   setActiveProject(null);
                   gsap.to("body", { backgroundColor: "#0a0a0a", duration: 0.8 });
