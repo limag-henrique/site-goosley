@@ -16,3 +16,8 @@ export async function POST(request: NextRequest, context: AuthRouteContext) {
   const { auth = [] } = await context.params;
   return handleAuth(request, auth);
 }
+
+export async function PATCH(request: NextRequest, context: AuthRouteContext) {
+  const { auth = [] } = await context.params;
+  return handleAuth(request, auth);
+}

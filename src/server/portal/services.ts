@@ -14,7 +14,8 @@ import type {
 } from "./types";
 import { ForbiddenError, NotFoundError, PortalError, UnauthorizedError } from "./errors";
 import { getDb } from "./store";
-import { addDays, createId, hashPassword, nowIso, verifyPassword } from "./security";
+import { addDays, createId, createSecureToken, hashPassword, hashToken, nowIso, verifyPassword } from "./security";
+import { sendPasswordResetEmail } from "./email";
 import {
   asRecord,
   emailField,
@@ -31,6 +32,7 @@ const taskStatuses = ["todo", "in_progress", "review", "done", "rejected", "canc
 const paymentStatuses = ["pending", "paid", "verified", "failed", "refunded", "cancelled"] as const;
 const payoutStatuses = ["requested", "approved", "rejected", "paid", "cancelled"] as const;
 const earningStatuses = ["pending", "available", "payout_requested", "paid", "cancelled"] as const;
+const userRoles = ["client", "developer", "admin"] as const;
 
 export type SafeUser = Omit<User, "passwordHash">;
 
@@ -40,11 +42,21 @@ export function toSafeUser(user: User): SafeUser {
     name: user.name,
     email: user.email,
     role: user.role,
+    avatar: user.avatar,
+    themePreference: user.themePreference,
     status: user.status,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     lastLoginAt: user.lastLoginAt,
   };
+}
+
+function isDeveloperRole(role: UserRole | string) {
+  return role === "developer" || role === "programmer";
+}
+
+function roleAllowed(role: UserRole, roles: UserRole[]) {
+  return roles.includes(role) || (isDeveloperRole(role) && roles.some(isDeveloperRole));
 }
 
 function isActive(user: User) {
@@ -74,7 +86,7 @@ export function requireActor(user?: User, meta: Pick<RequestActor, "ipAddress" |
 }
 
 export function requireRole(actor: RequestActor, roles: UserRole[]) {
-  if (!roles.includes(actor.user.role)) {
+  if (!roleAllowed(actor.user.role, roles)) {
     throw new ForbiddenError(`Requires role: ${roles.join(" or ")}`);
   }
 }
@@ -159,10 +171,95 @@ export function login(payload: unknown) {
   };
 }
 
+export async function requestPasswordReset(payload: unknown, appUrl = process.env.APP_URL || "http://localhost:3000") {
+  const body = asRecord(payload);
+  const email = emailField(body);
+  const db = getDb();
+  const user = db.users.find((item) => item.email.toLowerCase() === email);
+
+  if (!user || !isActive(user)) {
+    return { ok: true };
+  }
+
+  const token = createSecureToken();
+  const timestamp = nowIso();
+  db.passwordResetTokens.push({
+    id: createId("prt"),
+    userId: user.id,
+    tokenHash: hashToken(token),
+    expiresAt: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+    createdAt: timestamp,
+  });
+
+  const resetUrl = `${appUrl.replace(/\/$/, "")}/meu-portal?resetToken=${encodeURIComponent(token)}&email=${encodeURIComponent(email)}`;
+  await sendPasswordResetEmail(email, resetUrl);
+  logAudit({ actorUserId: user.id, action: "auth.password_reset_requested", entityType: "user", entityId: user.id });
+  return { ok: true };
+}
+
+export function resetPassword(payload: unknown) {
+  const body = asRecord(payload);
+  const email = emailField(body);
+  const token = stringField(body, "token", { min: 20, max: 300 });
+  const password = stringField(body, "password", { min: 8, max: 200 });
+  const db = getDb();
+  const user = db.users.find((item) => item.email.toLowerCase() === email);
+
+  if (!user) {
+    throw new UnauthorizedError("Invalid or expired reset token");
+  }
+
+  const tokenHash = hashToken(token);
+  const resetToken = db.passwordResetTokens.find(
+    (item) => item.userId === user.id && item.tokenHash === tokenHash && !item.usedAt && new Date(item.expiresAt).getTime() > Date.now()
+  );
+
+  if (!resetToken) {
+    throw new UnauthorizedError("Invalid or expired reset token");
+  }
+
+  user.passwordHash = hashPassword(password);
+  user.updatedAt = nowIso();
+  resetToken.usedAt = user.updatedAt;
+  destroyUserSessions(user.id);
+  logAudit({ actorUserId: user.id, action: "auth.password_reset_completed", entityType: "user", entityId: user.id });
+  return { ok: true };
+}
+
+export function updateOwnProfile(actor: RequestActor, payload: unknown) {
+  const body = asRecord(payload);
+  const db = getDb();
+  const user = findById(db.users, actor.user.id, "User");
+  const before = toSafeUser(user);
+  const name = stringField(body, "name", { optional: true, min: 2, max: 120 });
+  const avatar = stringField(body, "avatar", { optional: true, max: 1000 });
+  const themePreference = enumField(body, "themePreference", ["light", "dark", "system"] as const, { optional: true });
+  const currentPassword = stringField(body, "currentPassword", { optional: true, min: 1, max: 200 });
+  const newPassword = stringField(body, "newPassword", { optional: true, min: 8, max: 200 });
+
+  if (name) user.name = name;
+  if (avatar) user.avatar = avatar;
+  if (themePreference) user.themePreference = themePreference;
+  if (newPassword) {
+    if (!currentPassword || !verifyPassword(currentPassword, user.passwordHash)) {
+      throw new UnauthorizedError("Current password is invalid");
+    }
+    user.passwordHash = hashPassword(newPassword);
+  }
+  user.updatedAt = nowIso();
+  logAudit({ actorUserId: actor.user.id, action: "user.updated_profile", entityType: "user", entityId: user.id, before, after: toSafeUser(user), actor });
+  return toSafeUser(user);
+}
+
 export function getRoleHome(role: UserRole) {
   if (role === "admin") return "/meu-portal/admin";
-  if (role === "programmer") return "/meu-portal/programmer";
+  if (isDeveloperRole(role)) return "/meu-portal/developer";
   return "/meu-portal/client";
+}
+
+function destroyUserSessions(userId: string) {
+  const db = getDb();
+  db.sessions = db.sessions.filter((session) => session.userId !== userId);
 }
 
 export function createProgrammer(actor: RequestActor, payload: unknown) {
@@ -183,7 +280,8 @@ export function createProgrammer(actor: RequestActor, payload: unknown) {
     name,
     email,
     passwordHash: hashPassword(password),
-    role: "programmer",
+    role: "developer",
+    themePreference: "dark",
     status: "active",
     createdAt: timestamp,
     updatedAt: timestamp,
@@ -202,7 +300,7 @@ export function createProgrammer(actor: RequestActor, payload: unknown) {
   });
 
   logAudit({ actorUserId: actor.user.id, action: "admin.created_programmer", entityType: "user", entityId: user.id, after: toSafeUser(user), actor });
-  notify(user.id, "account.created", "Conta de programador criada", "Seu acesso ao Meu Portal foi criado.", "/meu-portal/programmer");
+  notify(user.id, "account.created", "Conta de desenvolvedor criada", "Seu acesso ao Meu Portal foi criado.", "/meu-portal/developer");
   return toSafeUser(user);
 }
 
@@ -214,7 +312,7 @@ export function updateUser(actor: RequestActor, userId: string, payload: unknown
   const before = toSafeUser(user);
 
   const status = enumField(body, "status", userStatuses, { optional: true });
-  const role = enumField(body, "role", ["client", "programmer", "admin"] as const, { optional: true });
+  const role = enumField(body, "role", userRoles, { optional: true });
   const name = stringField(body, "name", { optional: true, min: 2, max: 120 });
 
   if (status) user.status = status;
@@ -271,7 +369,7 @@ export function listProjectTasksForActor(actor: RequestActor, projectId?: string
     tasks = tasks.filter((task) => clientProjectIds.includes(task.projectId));
   }
 
-  if (actor.user.role === "programmer") {
+  if (isDeveloperRole(actor.user.role)) {
     tasks = tasks.filter((task) => task.assignedToProgrammerId === actor.user.id || isProjectMember(task.projectId, actor.user.id));
   }
 
@@ -388,6 +486,45 @@ export function createClientRequest(actor: RequestActor, projectId: string, payl
   return task;
 }
 
+export function createBudgetRequest(actor: RequestActor, payload: unknown) {
+  requireRole(actor, ["client", "admin"]);
+  const body = asRecord(payload);
+  const db = getDb();
+  const timestamp = nowIso();
+  const budget = {
+    id: createId("bdg"),
+    clientId: actor.user.role === "client" ? actor.user.id : stringField(body, "clientId", { min: 1 }),
+    projectId: stringField(body, "projectId", { optional: true }),
+    title: stringField(body, "title", { min: 3, max: 160 }),
+    description: stringField(body, "description", { min: 10, max: 5000 }),
+    estimatedValueCents: integerCents(body, "estimatedValueCents", { optional: true, min: 0 }) || estimateBudgetCents(body),
+    status: "submitted" as const,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+
+  db.budgets.push(budget);
+  notifyAdmins("budget.submitted", "Novo orcamento enviado", budget.title);
+  logAudit({ actorUserId: actor.user.id, action: "budget.submitted", entityType: "budget", entityId: budget.id, after: budget, actor });
+  return budget;
+}
+
+export function listBudgetsForActor(actor: RequestActor) {
+  const db = getDb();
+  if (actor.user.role === "admin") return db.budgets;
+  requireRole(actor, ["client"]);
+  return db.budgets.filter((budget) => budget.clientId === actor.user.id);
+}
+
+export function estimateBudget(payload: unknown) {
+  const body = asRecord(payload);
+  return {
+    estimatedValueCents: estimateBudgetCents(body),
+    estimatedDays: Math.max(7, Math.round(numberField(body, "complexity", { optional: true, min: 1, max: 5 }) || 2) * 10),
+    scopeScore: Math.round((numberField(body, "features", { optional: true, min: 1, max: 50 }) || 5) * 1.35),
+  };
+}
+
 export function createVisualComment(actor: RequestActor, projectId: string, payload: unknown) {
   requireRole(actor, ["client", "admin"]);
   const body = asRecord(payload);
@@ -424,7 +561,7 @@ export function listVisualComments(actor: RequestActor, projectId: string) {
 }
 
 export function listProgrammerDashboard(actor: RequestActor) {
-  requireRole(actor, ["programmer", "admin"]);
+  requireRole(actor, ["developer", "admin"]);
   const userId = actor.user.id;
   const db = getDb();
   return {
@@ -437,7 +574,7 @@ export function listProgrammerDashboard(actor: RequestActor) {
 }
 
 export function listProgrammerProjects(actor: RequestActor) {
-  requireRole(actor, ["programmer", "admin"]);
+  requireRole(actor, ["developer", "admin"]);
   const db = getDb();
   if (actor.user.role === "admin") {
     return db.projects.map((project) => projectDto(project, actor));
@@ -448,12 +585,12 @@ export function listProgrammerProjects(actor: RequestActor) {
 }
 
 export function updateProgrammerTask(actor: RequestActor, taskId: string, payload: unknown) {
-  requireRole(actor, ["programmer", "admin"]);
+  requireRole(actor, ["developer", "admin"]);
   const body = asRecord(payload);
   const db = getDb();
   const task = findById(db.tasks, taskId, "Task");
-  if (actor.user.role === "programmer" && task.assignedToProgrammerId !== actor.user.id) {
-    throw new ForbiddenError("Task is not assigned to this programmer.");
+  if (isDeveloperRole(actor.user.role) && task.assignedToProgrammerId !== actor.user.id) {
+    throw new ForbiddenError("Task is not assigned to this developer.");
   }
 
   const status = enumField(body, "status", taskStatuses, { optional: true });
@@ -470,23 +607,23 @@ export function updateProgrammerTask(actor: RequestActor, taskId: string, payloa
 }
 
 export function startTimeEntry(actor: RequestActor, payload: unknown) {
-  requireRole(actor, ["programmer"]);
+  requireRole(actor, ["developer"]);
   const body = asRecord(payload);
   const db = getDb();
   if (db.timeEntries.some((entry) => entry.programmerId === actor.user.id && entry.status === "running")) {
-    throw new PortalError("Only one running timer is allowed per programmer.", 409, "RUNNING_TIMER_EXISTS");
+    throw new PortalError("Only one running timer is allowed per developer.", 409, "RUNNING_TIMER_EXISTS");
   }
 
   const projectId = stringField(body, "projectId", { min: 1 });
   if (!isProjectMember(projectId, actor.user.id)) {
-    throw new ForbiddenError("Programmer is not assigned to this project.");
+    throw new ForbiddenError("Developer is not assigned to this project.");
   }
 
   const taskId = stringField(body, "taskId", { optional: true });
   if (taskId) {
     const task = findById(db.tasks, taskId, "Task");
     if (task.projectId !== projectId || task.assignedToProgrammerId !== actor.user.id) {
-      throw new ForbiddenError("Task is not assigned to this programmer on this project.");
+      throw new ForbiddenError("Task is not assigned to this developer on this project.");
     }
   }
 
@@ -510,12 +647,12 @@ export function startTimeEntry(actor: RequestActor, payload: unknown) {
 }
 
 export function stopTimeEntry(actor: RequestActor, timeEntryId: string, payload: unknown) {
-  requireRole(actor, ["programmer"]);
+  requireRole(actor, ["developer"]);
   const body = asRecord(payload ?? {});
   const db = getDb();
   const entry = findById(db.timeEntries, timeEntryId, "Time entry");
   if (entry.programmerId !== actor.user.id) {
-    throw new ForbiddenError("Time entry belongs to another programmer.");
+    throw new ForbiddenError("Time entry belongs to another developer.");
   }
 
   if (entry.status !== "running") {
@@ -540,19 +677,19 @@ export function stopTimeEntry(actor: RequestActor, timeEntryId: string, payload:
 export function listTimeEntries(actor: RequestActor) {
   const db = getDb();
   if (actor.user.role === "admin") return db.timeEntries;
-  requireRole(actor, ["programmer"]);
+  requireRole(actor, ["developer"]);
   return db.timeEntries.filter((entry) => entry.programmerId === actor.user.id);
 }
 
 export function listProgrammerEarnings(actor: RequestActor) {
   const db = getDb();
   if (actor.user.role === "admin") return db.programmerEarnings;
-  requireRole(actor, ["programmer"]);
+  requireRole(actor, ["developer"]);
   return db.programmerEarnings.filter((earning) => earning.programmerId === actor.user.id);
 }
 
 export function requestPayout(actor: RequestActor, payload: unknown) {
-  requireRole(actor, ["programmer"]);
+  requireRole(actor, ["developer"]);
   const body = asRecord(payload);
   const amountCents = integerCents(body, "amountCents", { min: 1 });
   const currency = stringField(body, "currency", { optional: true, min: 3, max: 3 }) || "BRL";
@@ -595,8 +732,16 @@ export function createProject(actor: RequestActor, payload: unknown) {
     title: stringField(body, "title", { min: 3, max: 160 }),
     description: stringField(body, "description", { min: 5, max: 5000 }),
     status: enumField(body, "status", ["draft", "active", "paused", "completed", "cancelled"] as const, { optional: true }) || "draft",
+    progressPercentage: numberField(body, "progressPercentage", { optional: true, min: 0, max: 100 }) || 0,
+    budgetEstimateCents: integerCents(body, "budgetEstimateCents", { optional: true, min: 0 }),
+    finalPriceCents: integerCents(body, "finalPriceCents", { optional: true, min: 0 }),
     grossAmountPaidByClientCents: integerCents(body, "grossAmountPaidByClientCents", { optional: true, min: 0 }) || 0,
     currency: stringField(body, "currency", { optional: true, min: 3, max: 3 }) || "BRL",
+    githubUrl: stringField(body, "githubUrl", { optional: true, max: 1000 }),
+    stagingUrl: stringField(body, "stagingUrl", { optional: true, max: 1000 }),
+    productionUrl: stringField(body, "productionUrl", { optional: true, max: 1000 }),
+    codeStatus: stringField(body, "codeStatus", { optional: true, max: 200 }),
+    technicalNotes: stringField(body, "technicalNotes", { optional: true, max: 3000 }),
     liveUrl: stringField(body, "liveUrl", { optional: true, max: 1000 }),
     repositoryUrl: stringField(body, "repositoryUrl", { optional: true, max: 1000 }),
     performanceUrl: stringField(body, "performanceUrl", { optional: true, max: 1000 }),
@@ -613,20 +758,28 @@ export function createProject(actor: RequestActor, payload: unknown) {
 }
 
 export function updateProject(actor: RequestActor, projectId: string, payload: unknown) {
-  requireRole(actor, ["admin"]);
+  requireRole(actor, ["admin", "developer"]);
   const body = asRecord(payload);
-  const db = getDb();
-  const project = findById(db.projects, projectId, "Project");
+  const project = findProjectForActor(actor, projectId);
   const before = { ...project };
   const title = stringField(body, "title", { optional: true, min: 3, max: 160 });
   const description = stringField(body, "description", { optional: true, min: 5, max: 5000 });
   const status = enumField(body, "status", ["draft", "active", "paused", "completed", "cancelled"] as const, { optional: true });
+  const progressPercentage = numberField(body, "progressPercentage", { optional: true, min: 0, max: 100 });
   const grossAmountPaidByClientCents = integerCents(body, "grossAmountPaidByClientCents", { optional: true, min: 0 });
 
-  if (title) project.title = title;
-  if (description) project.description = description;
-  if (status) project.status = status;
-  if (grossAmountPaidByClientCents != null) project.grossAmountPaidByClientCents = grossAmountPaidByClientCents;
+  if (actor.user.role === "admin") {
+    if (title) project.title = title;
+    if (description) project.description = description;
+    if (status) project.status = status;
+    if (grossAmountPaidByClientCents != null) project.grossAmountPaidByClientCents = grossAmountPaidByClientCents;
+  }
+  if (progressPercentage != null) project.progressPercentage = progressPercentage;
+  project.githubUrl = stringField(body, "githubUrl", { optional: true, max: 1000 }) || project.githubUrl;
+  project.stagingUrl = stringField(body, "stagingUrl", { optional: true, max: 1000 }) || project.stagingUrl;
+  project.productionUrl = stringField(body, "productionUrl", { optional: true, max: 1000 }) || project.productionUrl;
+  project.codeStatus = stringField(body, "codeStatus", { optional: true, max: 200 }) || project.codeStatus;
+  project.technicalNotes = stringField(body, "technicalNotes", { optional: true, max: 3000 }) || project.technicalNotes;
   project.liveUrl = stringField(body, "liveUrl", { optional: true, max: 1000 }) || project.liveUrl;
   project.repositoryUrl = stringField(body, "repositoryUrl", { optional: true, max: 1000 }) || project.repositoryUrl;
   project.performanceUrl = stringField(body, "performanceUrl", { optional: true, max: 1000 }) || project.performanceUrl;
@@ -643,8 +796,8 @@ export function assignProgrammer(actor: RequestActor, projectId: string, payload
   findById(db.projects, projectId, "Project");
   const programmerId = stringField(body, "programmerId", { min: 1 });
   const programmer = findById(db.users, programmerId, "Programmer");
-  if (programmer.role !== "programmer") throw new PortalError("User must be a programmer.", 422, "INVALID_PROGRAMMER");
-  if (isProjectMember(projectId, programmerId)) throw new PortalError("Programmer is already assigned.", 409, "ALREADY_ASSIGNED");
+  if (!isDeveloperRole(programmer.role)) throw new PortalError("User must be a developer.", 422, "INVALID_DEVELOPER");
+  if (isProjectMember(projectId, programmerId)) throw new PortalError("Developer is already assigned.", 409, "ALREADY_ASSIGNED");
 
   const member = {
     projectId,
@@ -658,7 +811,7 @@ export function assignProgrammer(actor: RequestActor, projectId: string, payload
 
   db.projectMembers.push(member);
   logAudit({ actorUserId: actor.user.id, action: "admin.assigned_programmer", entityType: "projectMember", entityId: `${projectId}:${programmerId}`, after: member, actor });
-  notify(programmerId, "project.assigned", "Projeto atribuido", "Voce foi adicionado a um projeto.", "/meu-portal/programmer");
+  notify(programmerId, "project.assigned", "Projeto atribuido", "Voce foi adicionado a um projeto.", "/meu-portal/developer");
   return member;
 }
 
@@ -696,7 +849,7 @@ export function createTask(actor: RequestActor, payload: unknown) {
 
   db.tasks.push(task);
   if (task.assignedToProgrammerId) {
-    notify(task.assignedToProgrammerId, "task.assigned", "Nova tarefa atribuida", task.title, "/meu-portal/programmer");
+    notify(task.assignedToProgrammerId, "task.assigned", "Nova tarefa atribuida", task.title, "/meu-portal/developer");
   }
   logAudit({ actorUserId: actor.user.id, action: "admin.created_task", entityType: "task", entityId: task.id, after: task, actor });
   return task;
@@ -746,6 +899,7 @@ export function createPayment(actor: RequestActor, payload: unknown) {
     grossAmountCents: integerCents(body, "grossAmountCents", { min: 1 }),
     currency: stringField(body, "currency", { optional: true, min: 3, max: 3 }) || project.currency,
     status: enumField(body, "status", paymentStatuses, { optional: true }) || "pending",
+    dueDate: stringField(body, "dueDate", { optional: true }),
     paymentProvider: stringField(body, "paymentProvider", { optional: true, max: 120 }),
     providerReference: stringField(body, "providerReference", { optional: true, max: 200 }),
     paidAt: stringField(body, "paidAt", { optional: true }),
@@ -910,7 +1064,7 @@ export function updateEarning(actor: RequestActor, earningId: string, payload: u
 export function listPayoutRequests(actor: RequestActor) {
   const db = getDb();
   if (actor.user.role === "admin") return db.payoutRequests;
-  requireRole(actor, ["programmer"]);
+  requireRole(actor, ["developer"]);
   return db.payoutRequests.filter((payout) => payout.programmerId === actor.user.id);
 }
 
@@ -929,12 +1083,12 @@ export function updatePayoutRequest(actor: RequestActor, payoutRequestId: string
   }
   payout.notes = stringField(body, "notes", { optional: true, max: 1000 }) || payout.notes;
   logAudit({ actorUserId: actor.user.id, action: "admin.updated_payout", entityType: "payoutRequest", entityId: payout.id, before, after: payout, actor });
-  notify(payout.programmerId, `payout.${payout.status}`, "Pedido de saque atualizado", `Status: ${payout.status}`, "/meu-portal/programmer");
+  notify(payout.programmerId, `payout.${payout.status}`, "Pedido de saque atualizado", `Status: ${payout.status}`, "/meu-portal/developer");
   return payout;
 }
 
 export function syncGithubRepository(actor: RequestActor, projectId: string, payload: unknown = {}) {
-  requireRole(actor, ["admin", "programmer"]);
+  requireRole(actor, ["admin", "developer"]);
   const body = asRecord(payload ?? {});
   const db = getDb();
   const project = findProjectForActor(actor, projectId);
@@ -963,7 +1117,7 @@ export function syncGithubRepository(actor: RequestActor, projectId: string, pay
     id: createId("ghm"),
     projectId,
     repositoryId: repository.id,
-    programmerId: actor.user.role === "programmer" ? actor.user.id : stringField(body, "programmerId", { optional: true }),
+    programmerId: isDeveloperRole(actor.user.role) ? actor.user.id : stringField(body, "programmerId", { optional: true }),
     githubAuthorName: stringField(body, "githubAuthorName", { optional: true }) || actor.user.name,
     githubAuthorEmail: stringField(body, "githubAuthorEmail", { optional: true }) || actor.user.email,
     commitSha: stringField(body, "commitSha", { optional: true }) || createId("sha"),
@@ -1056,7 +1210,7 @@ export function realtimeSnapshot(actor: RequestActor) {
     dashboard:
       actor.user.role === "client"
         ? { projects: listClientProjects(actor) }
-        : actor.user.role === "programmer"
+        : isDeveloperRole(actor.user.role)
           ? listProgrammerDashboard(actor)
           : adminDashboard(actor),
   };
@@ -1070,6 +1224,7 @@ export function adminDashboard(actor: RequestActor) {
     projects: db.projects,
     tasks: db.tasks,
     payments: db.payments,
+    budgets: db.budgets,
     payoutRequests: db.payoutRequests,
     auditLogCount: db.auditLogs.length,
     settings: db.systemSettings,
@@ -1128,11 +1283,18 @@ function validateRevenueSettings(settings: ReturnType<typeof getRevenueSettings>
   }
 }
 
+function estimateBudgetCents(body: Record<string, unknown>) {
+  const features = numberField(body, "features", { optional: true, min: 1, max: 50 }) || 5;
+  const complexity = numberField(body, "complexity", { optional: true, min: 1, max: 5 }) || 2;
+  const integrations = numberField(body, "integrations", { optional: true, min: 0, max: 20 }) || 0;
+  return Math.round((features * 90000 + complexity * 180000 + integrations * 120000) / 10000) * 10000;
+}
+
 function findProjectForActor(actor: RequestActor, projectId: string) {
   const project = findById(getDb().projects, projectId, "Project");
   if (actor.user.role === "admin") return project;
   if (actor.user.role === "client" && project.clientId === actor.user.id) return project;
-  if (actor.user.role === "programmer" && isProjectMember(project.id, actor.user.id)) return project;
+  if (isDeveloperRole(actor.user.role) && isProjectMember(project.id, actor.user.id)) return project;
   throw new ForbiddenError("User cannot access this project.");
 }
 
@@ -1147,9 +1309,15 @@ function projectDto(project: Project, actor: RequestActor) {
     title: project.title,
     description: project.description,
     status: project.status,
+    progressPercentage: project.progressPercentage,
     currency: project.currency,
-    liveUrl: project.liveUrl,
-    repositoryUrl: project.repositoryUrl,
+    liveUrl: project.liveUrl || project.productionUrl,
+    repositoryUrl: project.repositoryUrl || project.githubUrl,
+    githubUrl: project.githubUrl || project.repositoryUrl,
+    stagingUrl: project.stagingUrl,
+    productionUrl: project.productionUrl || project.liveUrl,
+    codeStatus: project.codeStatus,
+    technicalNotes: project.technicalNotes,
     performanceUrl: project.performanceUrl,
     startDate: project.startDate,
     dueDate: project.dueDate,
@@ -1176,7 +1344,7 @@ function conversationParticipants(project: Project) {
 function notifyProjectMembers(projectId: string, type: string, title: string, body: string) {
   getDb().projectMembers
     .filter((member) => member.projectId === projectId)
-    .forEach((member) => notify(member.programmerId, type, title, body, "/meu-portal/programmer"));
+    .forEach((member) => notify(member.programmerId, type, title, body, "/meu-portal/developer"));
   notifyAdmins(type, title, body);
 }
 
@@ -1206,7 +1374,7 @@ function notify(userId: string, type: string, title: string, body: string, link?
 
 function roleSegmentForUser(userId: string) {
   const role = getDb().users.find((user) => user.id === userId)?.role;
-  return role === "admin" ? "admin" : role === "programmer" ? "programmer" : "client";
+  return role === "admin" ? "admin" : isDeveloperRole(role || "") ? "developer" : "client";
 }
 
 function logAudit(input: {

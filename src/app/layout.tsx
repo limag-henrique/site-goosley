@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Dancing_Script } from "next/font/google";
 import "./globals.css";
 import { SmoothScrollProvider } from "@/components/SmoothScrollProvider";
-import { Navbar } from "@/components/Navbar";
-import { Footer } from "@/components/Footer";
-import { CustomCursor } from "@/components/CustomCursor";
+import { PublicChrome } from "@/components/PublicChrome";
 import { cn } from "@/lib/utils";
 
 const inter = Inter({
@@ -40,15 +38,11 @@ export default function RootLayout({
     <html lang="pt-BR" className={cn(inter.variable, dancingScript.variable, "h-full overflow-x-hidden antialiased")} suppressHydrationWarning>
       <body className="min-h-full flex flex-col bg-background text-foreground overflow-x-hidden" suppressHydrationWarning>
         <SmoothScrollProvider>
-          <CustomCursor />
-          <Navbar />
-          <main className="flex-1 overflow-x-hidden">
+          <PublicChrome>
             {children}
-          </main>
-          <Footer />
+          </PublicChrome>
         </SmoothScrollProvider>
       </body>
     </html>
   );
 }
-

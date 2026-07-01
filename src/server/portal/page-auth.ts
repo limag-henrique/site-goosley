@@ -12,7 +12,7 @@ export async function requirePortalPageActor(roles?: UserRole[]): Promise<Reques
   }
 
   const actor = requireActor(user);
-  if (roles && !roles.includes(actor.user.role)) {
+  if (roles && !roles.includes(actor.user.role) && !(actor.user.role === "developer" && roles.includes("programmer"))) {
     redirect(getRoleHome(actor.user.role));
   }
 

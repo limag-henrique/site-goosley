@@ -1,23 +1,32 @@
 # Meu Portal Implementation Notes
 
-## Architecture Decisions
+## What Changed
 
-- The existing app is a Next.js 16 App Router project with no backend layer, so the portal was added as a Backend-for-Frontend using App Router `route.ts` handlers.
-- Business logic lives in `src/server/portal/*`; route handlers only dispatch, authenticate, validate, and format responses.
-- The current persistence layer is a seeded local development store. It is suitable for local demos and tests, not production multi-instance hosting.
-- Passwords are hashed with Node `scrypt`; sessions are server-side records referenced by HTTP-only cookies.
-- Money is stored as integer cents.
-- RBAC is centralized in `requireActor`, `requireRole`, and project ownership/member checks.
-- Earnings calculation is centralized in `recalculateEarnings`.
-- GitHub repository parsing and ignored-file logic are centralized in portal services.
+- Public `/meu-portal` now shows only "Acompanhamento operacional Goosley." plus login, new-account, forgot-password, and reset-password access.
+- Authenticated portal routes no longer render the commercial navbar/footer; they use a dedicated app shell with left sidebar navigation, top utility icons, theme toggle, profile shortcut, and logout.
+- RBAC is centered on `admin`, `client`, and `developer`. Legacy internal "programmer" route/function names remain compatible, but seeded users and exposed roles use `developer`.
+- Admin dashboard now greets with `Oi, Henrique` and removes "GodMode", "full control", and fixed full-name title copy.
+- Client and developer dashboards now have role-specific sidebars and functional modules backed by protected route handlers.
+- Developer users seeded: `caetano@goosley.local`, `raul@goosley.local`, `rodrigo@goosley.local`, and `rick@goosley.local`.
+- Password reset now uses hashed, expiring, one-use tokens and an email delivery abstraction.
+- Project records now support progress percentage, GitHub URL, staging URL, production URL, code status, and technical notes.
+- Payments now include due dates and remain structured for later payment-provider integration.
+- Budgets and estimate calculation were added for client budget requests.
+- Security headers, CSP, HttpOnly/SameSite session cookies, input validation, rate limiting, audit logs, and server-side Turnstile verification hooks are in place.
 
-## Assumptions
+## Cloudflare Direction
 
-- Public registration creates `client` users only.
-- Programmers and admins are created or promoted only through admin routes.
-- Default revenue split is 50% tax/fees, 25% Henrique Lima Gusmao, and 25% programmer pool.
-- GitHub effective LOC is a default signal, not the only source of truth.
-- Admin overrides require a reason and create audit logs.
+Current Cloudflare documentation distinguishes static Next.js on Pages from full-stack SSR/API Next.js on Workers. Because this portal uses authentication, route handlers, email verification, Turnstile validation, and future D1 persistence, the production target should be Cloudflare Workers with the OpenNext adapter. Static Cloudflare Pages is only appropriate for a static export of the public sales site.
+
+Recommended Cloudflare mapping:
+
+- Workers/OpenNext: Next.js runtime and route handlers.
+- D1: relational portal data using `migrations/001_meu_portal_schema.sql` as the starting schema.
+- KV: low-latency rate-limit counters, session metadata cache, feature flags.
+- R2: client attachments, reference files, screenshots, invoices.
+- Turnstile: login, registration, password recovery, and other abuse-prone forms. Server-side Siteverify validation is mandatory.
+- Workers Logs and audit records: operational monitoring without logging secrets.
+- Email provider via `EMAIL_API_KEY`: password recovery, account confirmation, notifications, and project updates.
 
 ## Local Seed Users
 
@@ -25,125 +34,60 @@ All local seed users use `Portal123!`.
 
 - `admin@goosley.local`
 - `cliente@goosley.local`
-- `programador@goosley.local`
+- `caetano@goosley.local`
+- `raul@goosley.local`
+- `rodrigo@goosley.local`
+- `rick@goosley.local`
 
-## New Pages
+## Main Pages
 
 - `/meu-portal`
-- `/meu-portal/client`
-- `/meu-portal/programmer`
 - `/meu-portal/admin`
+- `/meu-portal/client`
+- `/meu-portal/developer`
+- `/meu-portal/programmer` redirects to `/meu-portal/developer`
 
-## New Routes
-
-Authentication:
+## Important Routes
 
 - `POST /auth/register`
 - `POST /auth/login`
 - `POST /auth/logout`
 - `GET /auth/me`
-- `POST /auth/invite-programmer`
-
-Client:
-
-- `GET /client/projects`
-- `GET /client/projects/:projectId`
-- `GET /client/projects/:projectId/updates`
-- `GET /client/projects/:projectId/tasks`
-- `GET /client/projects/:projectId/payments`
-- `GET /client/projects/:projectId/messages`
-- `POST /client/projects/:projectId/messages`
-- `POST /client/projects/:projectId/requests`
-- `GET /client/projects/:projectId/visual-comments`
-- `POST /client/projects/:projectId/visual-comments`
-- `GET /client/realtime`
-
-Programmer:
-
-- `GET /programmer/dashboard`
-- `GET /programmer/tasks`
-- `PATCH /programmer/tasks/:taskId`
-- `GET /programmer/projects`
-- `GET /programmer/earnings`
-- `GET /programmer/time-entries`
-- `POST /programmer/time-entries/start`
-- `POST /programmer/time-entries/:timeEntryId/stop`
-- `POST /programmer/payout-requests`
-- `GET /programmer/messages`
-- `POST /programmer/messages?projectId=:projectId`
-- `GET /programmer/realtime`
-
-Admin:
-
-- `GET /admin/users`
-- `POST /admin/users/programmers`
-- `PATCH /admin/users/:userId`
-- `GET /admin/projects`
-- `POST /admin/projects`
-- `PATCH /admin/projects/:projectId`
-- `POST /admin/projects/:projectId/programmers`
-- `DELETE /admin/projects/:projectId/programmers/:programmerId`
-- `GET /admin/tasks`
-- `POST /admin/tasks`
-- `PATCH /admin/tasks/:taskId`
-- `POST /admin/visual-comments/:visualCommentId/convert-to-task`
-- `GET /admin/messages`
-- `POST /admin/messages?projectId=:projectId`
-- `POST /admin/broadcasts`
-- `GET /admin/payments`
-- `POST /admin/payments`
-- `PATCH /admin/payments/:paymentId`
-- `GET /admin/earnings/projects/:projectId`
-- `POST /admin/earnings/projects/:projectId/recalculate`
-- `PATCH /admin/earnings/:earningId`
-- `GET /admin/payout-requests`
-- `PATCH /admin/payout-requests/:payoutRequestId`
-- `POST /admin/github/projects/:projectId/sync`
-- `GET /admin/github/projects/:projectId/metrics`
-- `PATCH /admin/github/metrics/:metricId`
+- `PATCH /auth/profile`
+- `POST /auth/forgot-password`
+- `POST /auth/reset-password`
+- `GET|POST /client/budgets`
+- `POST /client/estimate`
+- `GET|PATCH /developer/projects/:projectId`
+- `GET|PATCH /developer/tasks/:taskId`
+- `GET|POST /developer/messages?projectId=:projectId`
+- `GET|POST|PATCH /admin/projects`
+- `GET|POST|PATCH /admin/payments`
+- `GET|PATCH /admin/settings`
 - `GET /admin/audit-logs`
-- `GET /admin/settings`
-- `PATCH /admin/settings`
-- `GET /admin/realtime`
 
-## Models
+## Required Environment Variables
 
-Typed models live in `src/server/portal/types.ts` and cover users, profiles, projects, members, tasks, updates, conversations, messages, visual comments, time entries, GitHub repositories and metrics, payments, earnings calculations, programmer earnings, payouts, settings, audit logs, notifications, and sessions.
+- `DATABASE_URL` or Cloudflare D1 binding (`DB`) when persistence is moved from the local store.
+- `AUTH_SECRET`
+- `PASSWORD_RESET_SECRET`
+- `EMAIL_API_KEY`
+- `EMAIL_FROM`
+- `APP_URL`
+- `TURNSTILE_SECRET_KEY`
+- `TURNSTILE_SITE_KEY`
+- `ENVIRONMENT`
 
-## Migrations And Seeds
-
-- Draft schema: `migrations/001_meu_portal_schema.sql`
-- Current local seed data is created by `src/server/portal/store.ts`.
-- Local seed preview script: `npm run seed:portal`
-- For production, replace the local store with Postgres, MySQL, or another transactional database, then map the service layer to repository functions.
-
-## Environment Variables
-
-No required secrets were introduced for the local implementation. Production should add:
-
-- `SESSION_SECRET`
-- `DATABASE_URL`
-- `GITHUB_TOKEN`
-- payment provider secrets
-- email provider secrets for invite and reset flows
-
-## Testing
+## Verification
 
 Run:
 
 ```bash
-npm run test
 npm run typecheck
-npm run lint
+npm test
 npm run build
 ```
 
-## Pending Future Improvements
+## Current Persistence Note
 
-- Replace the local seeded store with real migrations and transactional persistence.
-- Add durable database-backed sessions.
-- Add password reset emails and invite emails.
-- Replace near-real-time polling snapshots with SSE or WebSocket channels.
-- Add real GitHub API/webhook sync using credentials.
-- Add real payment provider webhooks.
-- Add admin CRUD screens for every route; the backend endpoints are already present.
+The app still uses the existing in-memory TypeScript store for local development and tests. The service layer and migration file are structured so the next step can replace `src/server/portal/store.ts` with D1-backed repository functions without rewriting dashboard or route code.

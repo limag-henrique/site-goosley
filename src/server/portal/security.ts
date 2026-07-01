@@ -19,6 +19,15 @@ export function createId(prefix: string) {
   return `${prefix}_${randomBytes(10).toString("hex")}`;
 }
 
+export function createSecureToken() {
+  return randomBytes(32).toString("base64url");
+}
+
+export function hashToken(token: string) {
+  const secret = process.env.PASSWORD_RESET_SECRET || process.env.AUTH_SECRET || "local-password-reset-secret";
+  return createHash("sha256").update(`${secret}:${token}`).digest("hex");
+}
+
 export function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const key = scryptSync(password, salt, SCRYPT_KEY_LENGTH).toString("hex");
@@ -94,4 +103,27 @@ export function checkRateLimit(key: string, limit = 10, windowMs = 60_000) {
 
   bucket.count += 1;
   return { allowed: true, remaining: limit - bucket.count };
+}
+
+export async function verifyTurnstileToken(token: string | undefined, remoteIp?: string) {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) {
+    return true;
+  }
+
+  if (!token) {
+    return false;
+  }
+
+  const formData = new FormData();
+  formData.append("secret", secret);
+  formData.append("response", token);
+  if (remoteIp) formData.append("remoteip", remoteIp);
+
+  const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+    method: "POST",
+    body: formData,
+  });
+  const result = (await response.json()) as { success?: boolean };
+  return Boolean(result.success);
 }

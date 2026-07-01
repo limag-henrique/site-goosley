@@ -1,12 +1,13 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { toErrorResponse } from "./errors";
-import { checkRateLimit, clearSessionCookie, getClientIp, SESSION_COOKIE_NAME, setSessionCookie } from "./security";
+import { checkRateLimit, clearSessionCookie, getClientIp, SESSION_COOKIE_NAME, setSessionCookie, verifyTurnstileToken } from "./security";
 import {
   adminDashboard,
   assignProgrammer,
   convertVisualCommentToTask,
   createClientRequest,
+  createBudgetRequest,
   createPayment,
   createProgrammer,
   createProject,
@@ -21,6 +22,7 @@ import {
   getNotifications,
   getSettings,
   listAuditLogs,
+  listBudgetsForActor,
   listClientProjects,
   listGithubMetrics,
   listPaymentsForActor,
@@ -37,6 +39,7 @@ import {
   realtimeSnapshot,
   recalculateEarnings,
   registerClient,
+  requestPasswordReset,
   removeProgrammer,
   requestPayout,
   requireActor,
@@ -45,12 +48,15 @@ import {
   updateAdminTask,
   updateEarning,
   updateGithubMetric,
+  updateOwnProfile,
   updatePayment,
   updatePayoutRequest,
   updateProject,
   updateProgrammerTask,
   updateSettings,
   updateUser,
+  resetPassword,
+  estimateBudget,
 } from "./services";
 
 export async function parseJson(request: NextRequest) {
@@ -78,7 +84,7 @@ export async function handleAuth(request: NextRequest, segments: string[]) {
   try {
     const action = segments[0] || "me";
     const ip = getClientIp(request);
-    if (["login", "register", "invite-programmer"].includes(action)) {
+    if (["login", "register", "invite-programmer", "forgot-password", "reset-password"].includes(action)) {
       const rate = checkRateLimit(`auth:${action}:${ip}`, 12, 60_000);
       if (!rate.allowed) {
         return NextResponse.json({ error: { code: "RATE_LIMITED", message: "Rate limit exceeded" } }, { status: 429 });
@@ -91,12 +97,20 @@ export async function handleAuth(request: NextRequest, segments: string[]) {
     }
 
     if (request.method === "POST" && action === "register") {
-      const user = registerClient(await parseJson(request));
+      const payload = await parseJson(request);
+      if (!(await verifyTurnstileFromPayload(payload, ip))) {
+        return NextResponse.json({ error: { code: "TURNSTILE_FAILED", message: "Security challenge failed" } }, { status: 403 });
+      }
+      const user = registerClient(payload);
       return NextResponse.json({ user, redirectTo: "/meu-portal/client" }, { status: 201 });
     }
 
     if (request.method === "POST" && action === "login") {
-      const result = login(await parseJson(request));
+      const payload = await parseJson(request);
+      if (!(await verifyTurnstileFromPayload(payload, ip))) {
+        return NextResponse.json({ error: { code: "TURNSTILE_FAILED", message: "Security challenge failed" } }, { status: 403 });
+      }
+      const result = login(payload);
       const response = NextResponse.json({ user: result.user, redirectTo: result.redirectTo });
       setSessionCookie(response, result.session.id, result.session.expiresAt);
       return response;
@@ -107,6 +121,27 @@ export async function handleAuth(request: NextRequest, segments: string[]) {
       const response = NextResponse.json({ ok: true });
       clearSessionCookie(response);
       return response;
+    }
+
+    if (request.method === "PATCH" && action === "profile") {
+      const actor = actorFromRequest(request);
+      return NextResponse.json({ user: updateOwnProfile(actor, await parseJson(request)) });
+    }
+
+    if (request.method === "POST" && action === "forgot-password") {
+      const payload = await parseJson(request);
+      if (!(await verifyTurnstileFromPayload(payload, ip))) {
+        return NextResponse.json({ error: { code: "TURNSTILE_FAILED", message: "Security challenge failed" } }, { status: 403 });
+      }
+      return NextResponse.json(await requestPasswordReset(payload, process.env.APP_URL));
+    }
+
+    if (request.method === "POST" && action === "reset-password") {
+      const payload = await parseJson(request);
+      if (!(await verifyTurnstileFromPayload(payload, ip))) {
+        return NextResponse.json({ error: { code: "TURNSTILE_FAILED", message: "Security challenge failed" } }, { status: 403 });
+      }
+      return NextResponse.json(resetPassword(payload));
     }
 
     if (request.method === "POST" && action === "invite-programmer") {
@@ -163,6 +198,15 @@ export async function handleClient(request: NextRequest, segments: string[]) {
       return NextResponse.json({ notifications: getNotifications(actor) });
     }
 
+    if (segments[0] === "budgets") {
+      if (request.method === "GET") return NextResponse.json({ budgets: listBudgetsForActor(actor) });
+      if (request.method === "POST") return NextResponse.json({ budget: createBudgetRequest(actor, await parseJson(request)) }, { status: 201 });
+    }
+
+    if (segments[0] === "estimate" && request.method === "POST") {
+      return NextResponse.json(estimateBudget(await parseJson(request)));
+    }
+
     if (segments[0] === "realtime" && request.method === "GET") {
       return NextResponse.json(realtimeSnapshot(actor));
     }
@@ -179,6 +223,7 @@ export async function handleProgrammer(request: NextRequest, segments: string[])
 
     if (segments[0] === "dashboard" && request.method === "GET") return NextResponse.json(listProgrammerDashboard(actor));
     if (segments[0] === "projects" && request.method === "GET") return NextResponse.json({ projects: listProgrammerProjects(actor) });
+    if (segments[0] === "projects" && segments[1] && request.method === "PATCH") return NextResponse.json({ project: updateProject(actor, segments[1], await parseJson(request)) });
     if (segments[0] === "tasks" && segments.length === 1 && request.method === "GET") return NextResponse.json({ tasks: listProjectTasksForActor(actor) });
     if (segments[0] === "tasks" && segments[1] && request.method === "PATCH") {
       return NextResponse.json({ task: updateProgrammerTask(actor, segments[1], await parseJson(request)) });
@@ -274,6 +319,7 @@ export async function handleAdmin(request: NextRequest, segments: string[]) {
     }
 
     if (segments[0] === "audit-logs" && request.method === "GET") return NextResponse.json({ auditLogs: listAuditLogs(actor) });
+    if (segments[0] === "budgets" && request.method === "GET") return NextResponse.json({ budgets: listBudgetsForActor(actor) });
     if (segments[0] === "settings" && request.method === "GET") return NextResponse.json({ settings: getSettings(actor) });
     if (segments[0] === "settings" && request.method === "PATCH") return NextResponse.json({ settings: updateSettings(actor, await body()) });
     if (segments[0] === "notifications" && request.method === "GET") return NextResponse.json({ notifications: getNotifications(actor) });
@@ -287,8 +333,14 @@ export async function handleAdmin(request: NextRequest, segments: string[]) {
 
 function roleRedirect(role: string) {
   if (role === "admin") return "/meu-portal/admin";
-  if (role === "programmer") return "/meu-portal/programmer";
+  if (role === "developer" || role === "programmer") return "/meu-portal/developer";
   return "/meu-portal/client";
+}
+
+async function verifyTurnstileFromPayload(payload: unknown, ip: string) {
+  const body = payload && typeof payload === "object" && !Array.isArray(payload) ? (payload as Record<string, unknown>) : {};
+  const token = typeof body.turnstileToken === "string" ? body.turnstileToken : undefined;
+  return verifyTurnstileToken(token, ip);
 }
 
 function notFound() {

@@ -1,4 +1,4 @@
-export type UserRole = "client" | "programmer" | "admin";
+export type UserRole = "client" | "developer" | "programmer" | "admin";
 export type UserStatus = "active" | "invited" | "suspended" | "disabled";
 export type ProjectStatus = "draft" | "active" | "paused" | "completed" | "cancelled";
 export type TaskStatus = "todo" | "in_progress" | "review" | "done" | "rejected" | "cancelled";
@@ -17,6 +17,8 @@ export interface User {
   email: string;
   passwordHash: string;
   role: UserRole;
+  avatar?: string;
+  themePreference?: "light" | "dark" | "system";
   status: UserStatus;
   createdAt: string;
   updatedAt: string;
@@ -48,8 +50,16 @@ export interface Project {
   title: string;
   description: string;
   status: ProjectStatus;
+  progressPercentage: number;
+  budgetEstimateCents?: number;
+  finalPriceCents?: number;
   grossAmountPaidByClientCents: number;
   currency: string;
+  githubUrl?: string;
+  stagingUrl?: string;
+  productionUrl?: string;
+  codeStatus?: string;
+  technicalNotes?: string;
   liveUrl?: string;
   repositoryUrl?: string;
   performanceUrl?: string;
@@ -191,11 +201,24 @@ export interface Payment {
   grossAmountCents: number;
   currency: string;
   status: PaymentStatus;
+  dueDate?: string;
   paymentProvider?: string;
   providerReference?: string;
   paidAt?: string;
   verifiedByAdminId?: string;
   notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Budget {
+  id: string;
+  clientId: string;
+  projectId?: string;
+  title: string;
+  description: string;
+  estimatedValueCents: number;
+  status: "draft" | "submitted" | "approved" | "rejected" | "converted";
   createdAt: string;
   updatedAt: string;
 }
@@ -251,6 +274,15 @@ export interface SystemSetting {
   updatedAt: string;
 }
 
+export interface PasswordResetToken {
+  id: string;
+  userId: string;
+  tokenHash: string;
+  expiresAt: string;
+  usedAt?: string;
+  createdAt: string;
+}
+
 export interface AuditLog {
   id: string;
   actorUserId: string;
@@ -297,11 +329,13 @@ export interface PortalDatabase {
   githubRepositories: GitHubRepository[];
   githubCommitMetrics: GitHubCommitMetric[];
   payments: Payment[];
+  budgets: Budget[];
   earningsCalculations: EarningsCalculation[];
   programmerEarnings: ProgrammerEarning[];
   payoutRequests: PayoutRequest[];
   systemSettings: SystemSetting[];
   auditLogs: AuditLog[];
+  passwordResetTokens: PasswordResetToken[];
   notifications: Notification[];
   sessions: Session[];
 }

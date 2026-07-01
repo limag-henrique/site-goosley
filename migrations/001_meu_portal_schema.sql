@@ -6,7 +6,9 @@ CREATE TABLE users (
   name TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
   password_hash TEXT NOT NULL,
-  role TEXT NOT NULL CHECK (role IN ('client', 'programmer', 'admin')),
+  role TEXT NOT NULL CHECK (role IN ('client', 'developer', 'admin')),
+  avatar TEXT,
+  theme_preference TEXT DEFAULT 'system',
   status TEXT NOT NULL CHECK (status IN ('active', 'invited', 'suspended', 'disabled')),
   created_at TIMESTAMPTZ NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL,
@@ -38,8 +40,16 @@ CREATE TABLE projects (
   title TEXT NOT NULL,
   description TEXT NOT NULL,
   status TEXT NOT NULL,
+  progress_percentage INTEGER NOT NULL DEFAULT 0 CHECK (progress_percentage >= 0 AND progress_percentage <= 100),
+  budget_estimate_cents INTEGER,
+  final_price_cents INTEGER,
   gross_amount_paid_by_client_cents INTEGER NOT NULL DEFAULT 0,
   currency TEXT NOT NULL DEFAULT 'BRL',
+  github_url TEXT,
+  staging_url TEXT,
+  production_url TEXT,
+  code_status TEXT,
+  technical_notes TEXT,
   live_url TEXT,
   repository_url TEXT,
   performance_url TEXT,
@@ -186,11 +196,24 @@ CREATE TABLE payments (
   gross_amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL,
   status TEXT NOT NULL,
+  due_date TIMESTAMPTZ,
   payment_provider TEXT,
   provider_reference TEXT,
   paid_at TIMESTAMPTZ,
   verified_by_admin_id TEXT REFERENCES users(id),
   notes TEXT,
+  created_at TIMESTAMPTZ NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE TABLE budgets (
+  id TEXT PRIMARY KEY,
+  client_id TEXT NOT NULL REFERENCES users(id),
+  project_id TEXT REFERENCES projects(id),
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  estimated_value_cents INTEGER NOT NULL,
+  status TEXT NOT NULL CHECK (status IN ('draft', 'submitted', 'approved', 'rejected', 'converted')),
   created_at TIMESTAMPTZ NOT NULL,
   updated_at TIMESTAMPTZ NOT NULL
 );
@@ -269,3 +292,15 @@ CREATE TABLE notifications (
   read_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL
 );
+
+CREATE TABLE password_reset_tokens (
+  id TEXT PRIMARY KEY,
+  user_id TEXT NOT NULL REFERENCES users(id),
+  token_hash TEXT NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  used_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX password_reset_tokens_lookup
+ON password_reset_tokens(user_id, token_hash, expires_at);

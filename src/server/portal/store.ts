@@ -47,7 +47,8 @@ function createSeedDatabase(): PortalDatabase {
   const timestamp = nowIso();
   const adminId = "usr_admin";
   const clientId = "usr_client";
-  const programmerId = "usr_programmer";
+  const programmerId = "usr_caetano";
+  const developerIds = ["usr_caetano", "usr_raul", "usr_rodrigo", "usr_rick"];
   const projectId = "prj_goosley";
   const repositoryId = "ghr_goosley_site";
   const conversationId = "cnv_goosley";
@@ -57,10 +58,11 @@ function createSeedDatabase(): PortalDatabase {
     users: [
       {
         id: adminId,
-        name: "Henrique Lima Gusmao",
+        name: "Henrique",
         email: "admin@goosley.local",
         passwordHash: hashPassword("Portal123!"),
         role: "admin",
+        themePreference: "dark",
         status: "active",
         createdAt: timestamp,
         updatedAt: timestamp,
@@ -77,10 +79,44 @@ function createSeedDatabase(): PortalDatabase {
       },
       {
         id: programmerId,
-        name: "Programador Demo",
-        email: "programador@goosley.local",
+        name: "Caetano",
+        email: "caetano@goosley.local",
         passwordHash: hashPassword("Portal123!"),
-        role: "programmer",
+        role: "developer",
+        themePreference: "dark",
+        status: "active",
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+      {
+        id: "usr_raul",
+        name: "Raul",
+        email: "raul@goosley.local",
+        passwordHash: hashPassword("Portal123!"),
+        role: "developer",
+        themePreference: "dark",
+        status: "active",
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+      {
+        id: "usr_rodrigo",
+        name: "Rodrigo",
+        email: "rodrigo@goosley.local",
+        passwordHash: hashPassword("Portal123!"),
+        role: "developer",
+        themePreference: "dark",
+        status: "active",
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+      {
+        id: "usr_rick",
+        name: "Rick",
+        email: "rick@goosley.local",
+        passwordHash: hashPassword("Portal123!"),
+        role: "developer",
+        themePreference: "dark",
         status: "active",
         createdAt: timestamp,
         updatedAt: timestamp,
@@ -95,14 +131,19 @@ function createSeedDatabase(): PortalDatabase {
       },
     ],
     programmerProfiles: [
-      {
-        userId: programmerId,
-        displayName: "Programador Demo",
-        skills: ["Next.js", "TypeScript", "Automations"],
-        githubUsername: "goosley-dev",
+      ...[
+        ["usr_caetano", "Caetano", "caetano-dev", ["Next.js", "TypeScript", "Cloudflare"]],
+        ["usr_raul", "Raul", "raul-dev", ["React", "UX", "Automation"]],
+        ["usr_rodrigo", "Rodrigo", "rodrigo-dev", ["API", "Security", "D1"]],
+        ["usr_rick", "Rick", "rick-dev", ["Full-stack", "QA", "Deploy"]],
+      ].map(([userId, displayName, githubUsername, skills]) => ({
+        userId: String(userId),
+        displayName: String(displayName),
+        skills: skills as string[],
+        githubUsername: String(githubUsername),
         hourlyReferenceRateCents: 12000,
-        status: "active",
-      },
+        status: "active" as const,
+      })),
     ],
     projects: [
       {
@@ -111,8 +152,16 @@ function createSeedDatabase(): PortalDatabase {
         title: "Meu Portal Goosley",
         description: "Portal operacional com acompanhamento de projeto, tarefas, comentarios e ganhos.",
         status: "active",
+        progressPercentage: 68,
+        budgetEstimateCents: 1200000,
+        finalPriceCents: 1000000,
         grossAmountPaidByClientCents: 1000000,
         currency: "BRL",
+        githubUrl: "https://github.com/goosley/site-goosley",
+        stagingUrl: "https://staging.goosley.local",
+        productionUrl: "https://goosley.local",
+        codeStatus: "Em desenvolvimento",
+        technicalNotes: "Base preparada para Cloudflare Workers, D1, R2, KV, Turnstile e email transacional.",
         liveUrl: "https://goosley.local",
         repositoryUrl: "https://github.com/goosley/site-goosley",
         performanceUrl: "https://pagespeed.web.dev/",
@@ -123,13 +172,13 @@ function createSeedDatabase(): PortalDatabase {
       },
     ],
     projectMembers: [
-      {
+      ...developerIds.map((developerId) => ({
         projectId,
-        programmerId,
-        roleInProject: "full-stack",
+        programmerId: developerId,
+        roleInProject: developerId === "usr_caetano" ? "lead full-stack" : "developer",
         assignedByAdminId: adminId,
         createdAt: timestamp,
-      },
+      })),
     ],
     tasks: [
       {
@@ -143,6 +192,20 @@ function createSeedDatabase(): PortalDatabase {
         priority: "high",
         source: "admin",
         estimatedHours: 12,
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+      {
+        id: "tsk_review",
+        projectId,
+        assignedToProgrammerId: "usr_rodrigo",
+        createdByUserId: adminId,
+        title: "Revisar seguranca das rotas",
+        description: "Validar RBAC, reset de senha, auditoria e protecao contra acesso indevido.",
+        status: "review",
+        priority: "urgent",
+        source: "admin",
+        estimatedHours: 6,
         createdAt: timestamp,
         updatedAt: timestamp,
       },
@@ -223,11 +286,25 @@ function createSeedDatabase(): PortalDatabase {
         grossAmountCents: 1000000,
         currency: "BRL",
         status: "verified",
+        dueDate: timestamp,
         paymentProvider: "manual",
         providerReference: "seed-payment",
         paidAt: timestamp,
         verifiedByAdminId: adminId,
         notes: "Seed payment for local development.",
+        createdAt: timestamp,
+        updatedAt: timestamp,
+      },
+    ],
+    budgets: [
+      {
+        id: "bdg_seed",
+        clientId,
+        projectId,
+        title: "Portal operacional Goosley",
+        description: "Dashboard por perfil, mensagens, pagamentos, projetos e autenticacao segura.",
+        estimatedValueCents: 1200000,
+        status: "approved",
         createdAt: timestamp,
         updatedAt: timestamp,
       },
@@ -272,10 +349,11 @@ function createSeedDatabase(): PortalDatabase {
         action: "seed.created",
         entityType: "system",
         entityId: "portal",
-        after: { seedUsers: ["admin@goosley.local", "cliente@goosley.local", "programador@goosley.local"] },
+        after: { seedUsers: ["admin@goosley.local", "cliente@goosley.local", "caetano@goosley.local", "raul@goosley.local", "rodrigo@goosley.local", "rick@goosley.local"] },
         createdAt: timestamp,
       },
     ],
+    passwordResetTokens: [],
     notifications: [
       {
         id: createId("ntf"),

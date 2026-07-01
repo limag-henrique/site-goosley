@@ -26,7 +26,7 @@ function actors() {
     db,
     admin: requireActor(db.users.find((user) => user.role === "admin")),
     client: requireActor(db.users.find((user) => user.role === "client")),
-    programmer: requireActor(db.users.find((user) => user.role === "programmer")),
+    programmer: requireActor(db.users.find((user) => user.role === "developer")),
   };
 }
 
@@ -50,7 +50,7 @@ test("admin can create programmers and list users", () => {
     skills: ["Next.js"],
   });
 
-  assert.equal(programmer.role, "programmer");
+  assert.equal(programmer.role, "developer");
   assert.ok(listUsers(admin).some((user) => user.email === "dev-criado@example.com"));
 });
 
