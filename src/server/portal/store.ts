@@ -29,34 +29,6 @@ const PORTAL_STATE_KEY = "default";
 
 const defaultSettings = (adminId: string, timestamp: string): SystemSetting[] => [
   {
-    key: "revenue.taxAndFeesPercent",
-    value: 50,
-    description: "Default tax, fees, and operating reserve percentage.",
-    updatedByAdminId: adminId,
-    updatedAt: timestamp,
-  },
-  {
-    key: "revenue.henriquePercent",
-    value: 25,
-    description: "Default revenue share percentage for the configured internal recipient.",
-    updatedByAdminId: adminId,
-    updatedAt: timestamp,
-  },
-  {
-    key: "revenue.programmerPoolPercent",
-    value: 25,
-    description: "Default programmer pool percentage.",
-    updatedByAdminId: adminId,
-    updatedAt: timestamp,
-  },
-  {
-    key: "revenue.internalRecipientName",
-    value: "Henrique Lima Gusmao",
-    description: "Configurable internal revenue recipient.",
-    updatedByAdminId: adminId,
-    updatedAt: timestamp,
-  },
-  {
     key: "github.defaultBranch",
     value: "main",
     description: "Fallback branch for repositories added without branch metadata.",
@@ -74,7 +46,6 @@ export function createSeedDatabase(): PortalDatabase {
   const projectId = "prj_goosley";
   const repositoryId = "ghr_goosley_site";
   const conversationId = "cnv_goosley";
-  const calculationId = "calc_seed";
 
   return {
     users: [
@@ -163,9 +134,6 @@ export function createSeedDatabase(): PortalDatabase {
         displayName: String(displayName),
         skills: skills as string[],
         githubUsername: String(githubUsername),
-        hourlyReferenceRateCents: 12000,
-        hourlyRateApprovedAt: userId === "usr_caetano" ? timestamp : undefined,
-        hourlyRateApprovedByAdminId: userId === "usr_caetano" ? adminId : undefined,
         status: "active" as const,
       })),
     ],
@@ -174,7 +142,7 @@ export function createSeedDatabase(): PortalDatabase {
         id: projectId,
         clientId,
         title: "Meu Portal Goosley",
-        description: "Portal operacional com acompanhamento de projeto, tarefas, comentarios e ganhos.",
+        description: "Portal operacional com acompanhamento de projeto, tarefas, comentarios e financeiro do cliente.",
         status: "active",
         progressPercentage: 68,
         budgetEstimateCents: 1200000,
@@ -216,7 +184,6 @@ export function createSeedDatabase(): PortalDatabase {
         priority: "high",
         source: "admin",
         dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toISOString(),
-        estimatedHours: 12,
         createdAt: timestamp,
         updatedAt: timestamp,
       },
@@ -231,7 +198,6 @@ export function createSeedDatabase(): PortalDatabase {
         priority: "urgent",
         source: "admin",
         dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 14).toISOString(),
-        estimatedHours: 6,
         createdAt: timestamp,
         updatedAt: timestamp,
       },
@@ -270,22 +236,6 @@ export function createSeedDatabase(): PortalDatabase {
       },
     ],
     visualComments: [],
-    timeEntries: [
-      {
-        id: "tim_seed",
-        programmerId,
-        projectId,
-        taskId: "tsk_seed",
-        repositoryUrl: "https://github.com/goosley/site-goosley",
-        description: "Implementacao da estrutura inicial do portal e validacao dos fluxos por perfil.",
-        startedAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
-        endedAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
-        durationSeconds: 7200,
-        status: "approved",
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-    ],
     githubRepositories: [
       {
         id: repositoryId,
@@ -297,25 +247,6 @@ export function createSeedDatabase(): PortalDatabase {
         addedByUserId: adminId,
         lastSyncedAt: timestamp,
         syncStatus: "synced",
-        createdAt: timestamp,
-      },
-    ],
-    githubCommitMetrics: [
-      {
-        id: "ghm_seed",
-        projectId,
-        repositoryId,
-        programmerId,
-        githubAuthorName: "Programador Demo",
-        githubAuthorEmail: "programador@goosley.local",
-        commitSha: "seed",
-        commitDate: timestamp,
-        message: "Seed portal metric",
-        effectiveLinesAdded: 750,
-        effectiveLinesDeleted: 20,
-        effectiveLinesModified: 250,
-        ignoredLines: 80,
-        ignoredReason: "Generated files and lock files ignored.",
         createdAt: timestamp,
       },
     ],
@@ -350,38 +281,6 @@ export function createSeedDatabase(): PortalDatabase {
         updatedAt: timestamp,
       },
     ],
-    earningsCalculations: [
-      {
-        id: calculationId,
-        projectId,
-        grossAmountCents: 1000000,
-        taxAndFeesAmountCents: 500000,
-        henriqueAmountCents: 250000,
-        programmerPoolAmountCents: 250000,
-        calculationVersion: 1,
-        calculatedByUserId: "system",
-        adminOverride: false,
-        finalized: false,
-        notes: "Seed calculation.",
-        createdAt: timestamp,
-      },
-    ],
-    programmerEarnings: [
-      {
-        id: "ern_seed",
-        calculationId,
-        projectId,
-        programmerId,
-        participationPercent: 100,
-        githubEffectiveLines: 1000,
-        manualAdjustmentAmountCents: 0,
-        finalAmountCents: 250000,
-        status: "available",
-        createdAt: timestamp,
-        updatedAt: timestamp,
-      },
-    ],
-    payoutRequests: [],
     systemSettings: defaultSettings(adminId, timestamp),
     auditLogs: [
       {

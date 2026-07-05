@@ -1,16 +1,16 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { AlertCircle, CalendarDays, CheckCircle2, Clock3, ExternalLink, ShieldCheck } from "lucide-react";
-import { ActionForm, DeveloperTimeTracker, PortalProjectEstimator, TaskCommentForm } from "./PortalForms";
+import { AlertCircle, CalendarDays, Clock3, ExternalLink, ShieldCheck } from "lucide-react";
+import { ActionForm, PortalProjectEstimator, TaskCommentForm } from "./PortalForms";
 import type { RequestActor } from "@/server/portal/types";
 import {
   adminDashboard,
+  getClientProject,
   getMessages,
   listBudgetsForActor,
   listClientProjects,
   listPaymentsForActor,
   listProgrammerDashboard,
-  listPayoutRequests,
 } from "@/server/portal/services";
 
 export function AdminPortalContent({ actor, section = "overview" }: { actor: RequestActor; section?: string }) {
@@ -18,7 +18,6 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
   const messages = getMessages(actor).messages;
   const clients = dashboard.users.filter((user) => user.role === "client");
   const developers = dashboard.users.filter((user) => user.role === "developer" || user.role === "programmer");
-  const payouts = listPayoutRequests(actor);
   const firstProject = dashboard.projects[0];
 
   if (section === "users") {
@@ -31,12 +30,11 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
               { name: "name", label: "Nome", required: true },
               { name: "email", label: "Email", type: "email", required: true },
               { name: "password", label: "Senha temporaria", type: "password", value: "Portal123!", required: true },
-              { name: "hourlyReferenceRateCents", label: "Valor/hora sugerido em centavos", type: "number", value: 0 },
             ]}
             submitLabel="Adicionar"
           />
         </Panel>
-        <Panel title="Aprovar valor/hora">
+        <Panel title="Desenvolvedores">
           <div className="grid gap-4">
             {developers.map((user) => {
               const profile = dashboard.programmerProfiles.find((item) => item.userId === user.id);
@@ -44,18 +42,11 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
                 <div key={user.id} className="border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
                   <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
                     <strong>{user.name}</strong>
-                    <Badge tone={profile?.hourlyRateApprovedAt ? "ok" : "warn"}>{profile?.hourlyRateApprovedAt ? "Aprovado" : "Pendente"}</Badge>
+                    <Badge tone={user.status === "active" ? "ok" : "warn"}>{statusPt(user.status)}</Badge>
                   </div>
-                  <ActionForm
-                    endpoint={`/admin/users/${user.id}/programmer-profile`}
-                    method="PATCH"
-                    fields={[
-                      { name: "hourlyReferenceRateCents", label: "Valor/hora em centavos", type: "number", value: profile?.hourlyReferenceRateCents || 0 },
-                      { name: "approveRate", label: "Aprovar agora", type: "select", value: profile?.hourlyRateApprovedAt ? "true" : "false", options: yesNoOptions },
-                      { name: "notes", label: "Observacoes", type: "textarea", value: profile?.notes || "" },
-                    ]}
-                    submitLabel="Salvar aprovacao"
-                  />
+                  <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                    {profile?.skills?.length ? `Especialidades: ${profile.skills.join(", ")}` : "Perfil pronto para atualizar projetos e conversar com clientes."}
+                  </p>
                 </div>
               );
             })}
@@ -111,6 +102,30 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
             submitLabel="Criar projeto"
           />
         </Panel>
+        <Panel title="Publicar atualizacao para o cliente">
+          {dashboard.projects.length ? (
+            <div className="grid gap-4">
+              {dashboard.projects.map((project) => (
+                <div key={project.id} className="border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-white/[0.04]">
+                  <strong className="mb-3 block">{project.title}</strong>
+                  <ActionForm
+                    endpoint={`/admin/projects/${project.id}/updates`}
+                    fields={[
+                      { name: "title", label: "Titulo da atualizacao", required: true },
+                      { name: "description", label: "O que o cliente deve ver", type: "textarea", required: true },
+                      { name: "status", label: "Status", value: "active" },
+                      { name: "visibleToClient", label: "Visivel para cliente", type: "select", value: "true", options: yesNoOptions },
+                    ]}
+                    submitLabel="Publicar"
+                    successLabel="Atualizacao publicada no portal do cliente."
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <Empty>Nenhum projeto disponivel.</Empty>
+          )}
+        </Panel>
       </Grid>
     );
   }
@@ -127,7 +142,6 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
               { name: "title", label: "O que precisa ser feito", required: true },
               { name: "description", label: "Detalhes", type: "textarea", required: true },
               { name: "dueDate", label: "Prazo", type: "date" },
-              { name: "estimatedHours", label: "Horas estimadas", type: "number" },
             ]}
             submitLabel="Criar tarefa"
           />
@@ -159,13 +173,10 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
   if (section === "finance") {
     return (
       <Grid>
-        <Panel title="Pagamentos e repasses">
+        <Panel title="Financeiro do cliente">
           <List>
             {dashboard.payments.map((payment) => (
               <ListItem key={payment.id} title={money(payment.grossAmountCents)} meta={`${statusPt(payment.status)} - ${payment.projectId}`} />
-            ))}
-            {payouts.map((payout) => (
-              <ListItem key={payout.id} title={`Saque ${money(payout.amountCents)}`} meta={statusPt(payout.status)} />
             ))}
           </List>
         </Panel>
@@ -185,22 +196,12 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
     );
   }
 
-  if (section === "settings" || section === "security") {
+  if (section === "security") {
     return (
       <Grid>
-        <Panel title="Configuracoes de receita">
-          <ActionForm
-            endpoint="/admin/settings"
-            method="PATCH"
-            fields={dashboard.settings
-              .filter((setting) => setting.key.startsWith("revenue."))
-              .map((setting) => ({ name: setting.key, label: setting.description, type: "number" as const, value: Number(setting.value) || 0 }))}
-            submitLabel="Salvar"
-          />
-        </Panel>
         <Panel title="Seguranca e auditoria">
           <ListItem title="Registros de auditoria" meta={`${dashboard.auditLogCount} eventos monitorados`} icon={<ShieldCheck size={18} />} />
-          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">O administrador controla usuarios, mensagens, entregaveis, pagamentos, permissoes e revisoes de cada perfil.</p>
+          <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">O administrador controla usuarios, mensagens, entregaveis, pagamentos do cliente, permissoes e revisoes de cada perfil.</p>
         </Panel>
       </Grid>
     );
@@ -210,13 +211,13 @@ export function AdminPortalContent({ actor, section = "overview" }: { actor: Req
     <Grid>
       <Panel title="Controle central">
         <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          Area do administrador para comandar projetos, usuarios, mensagens, entregaveis, financeiro, seguranca e aprovacoes. Cada bloco abaixo leva para uma pagina dedicada do portal.
+          Area do administrador para manter a pagina do cliente atualizada com projetos, mensagens, entregaveis, financeiro e permissoes. Cada bloco abaixo leva para uma pagina dedicada do portal.
         </p>
         <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <Shortcut href="/meu-portal/admin/users" title="Usuarios" text="Criar acessos, aprovar valor/hora e revisar status." />
-          <Shortcut href="/meu-portal/admin/projects" title="Projetos" text="Gerenciar progresso, links tecnicos e entregaveis." />
-          <Shortcut href="/meu-portal/admin/tasks" title="Tarefas" text="Criar tarefas com prazo, responsavel e prioridade." />
-          <Shortcut href="/meu-portal/admin/finance" title="Financeiro" text="Controlar pagamentos, repasses e calculos." />
+          <Shortcut href="/meu-portal/admin/users" title="Usuarios" text="Criar acessos e revisar status." />
+          <Shortcut href="/meu-portal/admin/projects" title="Projetos" text="Gerenciar progresso, links tecnicos e atualizacoes visiveis." />
+          <Shortcut href="/meu-portal/admin/tasks" title="Demandas" text="Organizar solicitacoes do cliente com prazo, responsavel e prioridade." />
+          <Shortcut href="/meu-portal/admin/finance" title="Financeiro" text="Atualizar pagamentos e vencimentos para o cliente." />
         </div>
       </Panel>
       <Panel title="Entregaveis recentes">
@@ -239,6 +240,7 @@ export function ClientPortalContent({ actor, section = "overview" }: { actor: Re
   const budgets = listBudgetsForActor(actor);
   const messages = getMessages(actor).messages;
   const project = projects[0];
+  const projectDetails = project ? getClientProject(actor, project.id) : undefined;
 
   if (section === "new-project" || section === "estimate") {
     return (
@@ -292,6 +294,53 @@ export function ClientPortalContent({ actor, section = "overview" }: { actor: Re
     );
   }
 
+  if (section === "requests") {
+    return (
+      <Grid>
+        <Panel title="Solicitar nova demanda">
+          {project ? (
+            <ActionForm
+              endpoint={`/client/projects/${project.id}/requests`}
+              fields={[
+                { name: "title", label: "Resumo da demanda", required: true },
+                { name: "description", label: "Detalhes, objetivo e referencias", type: "textarea", required: true },
+                { name: "priority", label: "Prioridade", type: "select", value: "medium", options: priorityOptions },
+              ]}
+              submitLabel="Enviar demanda"
+              successLabel="Demanda enviada para a equipe."
+            />
+          ) : (
+            <Empty>Nenhum projeto ativo.</Empty>
+          )}
+        </Panel>
+        <Panel title="Demandas do projeto">
+          {projectDetails ? <TaskList tasks={projectDetails.tasks} users={[]} /> : <Empty>Nenhuma demanda registrada.</Empty>}
+        </Panel>
+      </Grid>
+    );
+  }
+
+  if (section === "meetings") {
+    return (
+      <Panel title="Agendar reuniao com desenvolvedores">
+        {project ? (
+          <ActionForm
+            endpoint={`/client/projects/${project.id}/requests`}
+            fields={[
+              { name: "title", label: "Assunto", value: "Agendar reuniao com desenvolvedores", required: true },
+              { name: "description", label: "Datas sugeridas, pauta e participantes", type: "textarea", required: true },
+              { name: "priority", label: "Prioridade", type: "select", value: "high", options: priorityOptions },
+            ]}
+            submitLabel="Solicitar reuniao"
+            successLabel="Pedido de reuniao enviado para a equipe."
+          />
+        ) : (
+          <Empty>Nenhum projeto ativo.</Empty>
+        )}
+      </Panel>
+    );
+  }
+
   if (section === "payments") {
     return (
       <Panel title="Pagamentos">
@@ -341,6 +390,20 @@ export function ClientPortalContent({ actor, section = "overview" }: { actor: Re
           ))}
         </List>
       </Panel>
+      <Panel title="Atualizacoes da equipe">
+        {projectDetails?.updates.length ? (
+          <List>
+            {projectDetails.updates
+              .slice()
+              .sort((a, b) => a.order - b.order)
+              .map((update) => (
+                <ListItem key={update.id} title={update.title} meta={`${statusPt(update.status)} - ${date(update.createdAt)}`} />
+              ))}
+          </List>
+        ) : (
+          <Empty>Nenhuma atualizacao publicada.</Empty>
+        )}
+      </Panel>
       <Panel title="Proximo projeto">
         <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">Simule escopo, prazo e investimento usando a calculadora interna. A estimativa vira um orcamento dentro do portal.</p>
         <Link href="/meu-portal/client/estimate" className="mt-4 inline-flex bg-orange-400 px-4 py-3 text-sm font-black uppercase tracking-widest text-black">
@@ -384,20 +447,27 @@ export function DeveloperPortalContent({ actor, section = "overview" }: { actor:
             />
           ) : null}
         </Panel>
+        <Panel title="Atualizacao para o cliente">
+          {firstProject ? (
+            <ActionForm
+              endpoint={`/developer/projects/${firstProject.id}/updates`}
+              fields={[
+                { name: "title", label: "Titulo", required: true },
+                { name: "description", label: "Resumo claro para o cliente", type: "textarea", required: true },
+                { name: "status", label: "Status", value: firstProject.status },
+                { name: "visibleToClient", label: "Visivel para cliente", type: "select", value: "true", options: yesNoOptions },
+              ]}
+              submitLabel="Publicar atualizacao"
+              successLabel="Atualizacao publicada no portal do cliente."
+            />
+          ) : null}
+        </Panel>
       </Grid>
     );
   }
 
   if (section === "calendar") {
     return <TaskCalendar tasks={tasks} />;
-  }
-
-  if (section === "time") {
-    return (
-      <Panel title="Apontamento de horas">
-        <DeveloperTimeTracker projects={projects} tasks={tasks} timeEntries={dashboard.timeEntries} />
-      </Panel>
-    );
   }
 
   if (section === "messages") {
@@ -441,7 +511,6 @@ export function DeveloperPortalContent({ actor, section = "overview" }: { actor:
             submitLabel="Salvar"
           />
         </Panel>
-        <RatePanel profile={dashboard.programmerProfile} />
       </Grid>
     );
   }
@@ -459,7 +528,7 @@ export function DeveloperPortalContent({ actor, section = "overview" }: { actor:
                 </div>
                 <Badge tone={task.status === "done" ? "ok" : task.priority === "urgent" ? "warn" : undefined}>{statusPt(task.status)}</Badge>
               </div>
-              <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">Prazo: {task.dueDate ? date(task.dueDate) : "a definir"} - estimativa: {task.estimatedHours || 0}h</p>
+              <p className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">Prazo: {task.dueDate ? date(task.dueDate) : "a definir"}</p>
               <div className="mt-4 grid gap-4 lg:grid-cols-2">
                 <ActionForm
                   endpoint={`/developer/tasks/${task.id}`}
@@ -479,10 +548,23 @@ export function DeveloperPortalContent({ actor, section = "overview" }: { actor:
       <Panel title="Calendario de prazos">
         <MiniCalendar tasks={tasks} />
       </Panel>
-      <Panel title="Timer">
-        <DeveloperTimeTracker projects={projects} tasks={tasks} timeEntries={dashboard.timeEntries} />
+      <Panel title="Nova atualizacao ao cliente">
+        {firstProject ? (
+          <ActionForm
+            endpoint={`/developer/projects/${firstProject.id}/updates`}
+            fields={[
+              { name: "title", label: "Titulo", required: true },
+              { name: "description", label: "Resumo claro para o cliente", type: "textarea", required: true },
+              { name: "status", label: "Status", value: firstProject.status },
+              { name: "visibleToClient", label: "Visivel para cliente", type: "select", value: "true", options: yesNoOptions },
+            ]}
+            submitLabel="Publicar"
+            successLabel="Atualizacao publicada no portal do cliente."
+          />
+        ) : (
+          <Empty>Nenhum projeto atribuido.</Empty>
+        )}
       </Panel>
-      <RatePanel profile={dashboard.programmerProfile} />
     </Grid>
   );
 }
@@ -577,20 +659,6 @@ function MiniCalendar({ tasks }: { tasks: { id: string; title: string; dueDate?:
   );
 }
 
-function RatePanel({ profile }: { profile?: { hourlyReferenceRateCents?: number; hourlyRateApprovedAt?: string; hourlyRatePendingCents?: number } }) {
-  return (
-    <Panel title="Valor/hora">
-      {profile?.hourlyRateApprovedAt && profile.hourlyReferenceRateCents != null ? (
-        <ListItem title={money(profile.hourlyReferenceRateCents)} meta={`Aprovado em ${date(profile.hourlyRateApprovedAt)}`} icon={<CheckCircle2 size={18} />} />
-      ) : (
-        <p className="text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-          Seu valor/hora ainda precisa ser aprovado pelo administrador antes de aparecer no portal. Valor sugerido: {profile?.hourlyRatePendingCents != null ? money(profile.hourlyRatePendingCents) : "a definir"}.
-        </p>
-      )}
-    </Panel>
-  );
-}
-
 function SafeLink({ href, label }: { href?: string; label: string }) {
   return href ? (
     <a href={href} className="flex items-center justify-between border border-black/10 px-3 py-2 font-semibold dark:border-white/10">
@@ -636,7 +704,6 @@ function statusPt(value: string) {
     paid: "pago",
     paused: "pausado",
     pending: "pendente",
-    payout_requested: "saque solicitado",
     rejected: "rejeitado",
     requested: "solicitado",
     review: "em revisao",
@@ -660,6 +727,7 @@ const themeOptions = [
 ];
 
 const taskOptions = ["todo", "in_progress", "review", "done", "rejected", "cancelled"].map((value) => ({ value, label: statusPt(value) }));
+const priorityOptions = ["low", "medium", "high", "urgent"].map((value) => ({ value, label: statusPt(value) }));
 const paymentOptions = ["pending", "paid", "verified", "failed"].map((value) => ({ value, label: statusPt(value) }));
 
 const solutionCards = [

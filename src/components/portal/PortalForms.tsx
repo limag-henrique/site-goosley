@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { CheckCircle2, Play, Square, TimerReset } from "lucide-react";
+import { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { pricingData } from "@/data/pricingData";
 
 type Field = {
@@ -126,26 +126,6 @@ type PortalTask = {
   status: string;
   priority: string;
   dueDate?: string;
-  estimatedHours?: number;
-};
-
-type PortalProject = {
-  id: string;
-  title: string;
-  repositoryUrl?: string;
-  githubUrl?: string;
-};
-
-type PortalTimeEntry = {
-  id: string;
-  projectId: string;
-  taskId?: string;
-  description: string;
-  repositoryUrl: string;
-  startedAt: string;
-  endedAt?: string;
-  durationSeconds: number;
-  status: string;
 };
 
 export function TaskCommentForm({ task, endpoint }: { task: PortalTask; endpoint: string }) {
@@ -156,138 +136,6 @@ export function TaskCommentForm({ task, endpoint }: { task: PortalTask; endpoint
       submitLabel="Adicionar comentario"
       successLabel="Comentario enviado para a conversa do projeto."
     />
-  );
-}
-
-export function DeveloperTimeTracker({
-  projects,
-  tasks,
-  timeEntries,
-}: {
-  projects: PortalProject[];
-  tasks: PortalTask[];
-  timeEntries: PortalTimeEntry[];
-}) {
-  const running = timeEntries.find((entry) => entry.status === "running");
-  const firstProject = projects[0];
-  const [projectId, setProjectId] = useState(running?.projectId || firstProject?.id || "");
-  const projectTasks = tasks.filter((task) => task.projectId === projectId);
-  const [taskId, setTaskId] = useState(running?.taskId || projectTasks[0]?.id || "");
-  const activeProject = projects.find((project) => project.id === projectId) || firstProject;
-  const [description, setDescription] = useState(running?.description || "");
-  const [repositoryUrl, setRepositoryUrl] = useState(running?.repositoryUrl || activeProject?.repositoryUrl || activeProject?.githubUrl || "");
-  const [elapsed, setElapsed] = useState(running ? elapsedSeconds(running.startedAt) : 0);
-  const [status, setStatus] = useState("");
-  const [pending, setPending] = useState(false);
-
-  useEffect(() => {
-    if (!running) return;
-    const interval = window.setInterval(() => setElapsed(elapsedSeconds(running.startedAt)), 1000);
-    return () => window.clearInterval(interval);
-  }, [running]);
-
-  async function start() {
-    setPending(true);
-    setStatus("");
-    const response = await fetch("/developer/time-entries/start", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ projectId, taskId: taskId || undefined, repositoryUrl, description }),
-    });
-    const data = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
-    setPending(false);
-    if (!response.ok) {
-      setStatus(data.error?.message || "Nao foi possivel iniciar o timer.");
-      return;
-    }
-    window.location.reload();
-  }
-
-  async function stop() {
-    if (!running) return;
-    setPending(true);
-    setStatus("");
-    const response = await fetch(`/developer/time-entries/${running.id}/stop`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ repositoryUrl, description }),
-    });
-    const data = (await response.json().catch(() => ({}))) as { error?: { message?: string } };
-    setPending(false);
-    if (!response.ok) {
-      setStatus(data.error?.message || "Nao foi possivel parar o timer.");
-      return;
-    }
-    window.location.reload();
-  }
-
-  return (
-    <div className="grid gap-4">
-      <div className="grid gap-3 border border-black/10 bg-white p-4 dark:border-white/10 dark:bg-zinc-950">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm font-black uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
-            <TimerReset size={17} />
-            Rastreador de tempo
-          </div>
-          <strong className="font-mono text-2xl">{formatDuration(running ? elapsed : 0)}</strong>
-        </div>
-        <div className="grid gap-3 xl:grid-cols-[1.4fr_1fr_1fr_auto]">
-          <input
-            value={description}
-            onChange={(event) => setDescription(event.target.value)}
-            placeholder="No que voce esta trabalhando?"
-            className={inputClassName}
-          />
-          <select
-            value={projectId}
-            onChange={(event) => {
-              const nextProjectId = event.target.value;
-              const project = projects.find((item) => item.id === nextProjectId);
-              setProjectId(nextProjectId);
-              setTaskId(tasks.find((task) => task.projectId === nextProjectId)?.id || "");
-              if (!running) setRepositoryUrl(project?.repositoryUrl || project?.githubUrl || "");
-            }}
-            className={inputClassName}
-          >
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>{project.title}</option>
-            ))}
-          </select>
-          <select value={taskId} onChange={(event) => setTaskId(event.target.value)} className={inputClassName}>
-            <option value="">Sem tarefa vinculada</option>
-            {projectTasks.map((task) => (
-              <option key={task.id} value={task.id}>{task.title}</option>
-            ))}
-          </select>
-          {running ? (
-            <button onClick={stop} disabled={pending} className="inline-flex min-h-11 items-center justify-center gap-2 bg-red-500 px-5 font-black uppercase tracking-widest text-white disabled:opacity-60">
-              <Square size={16} />
-              Parar
-            </button>
-          ) : (
-            <button onClick={start} disabled={pending || !projectId} className="inline-flex min-h-11 items-center justify-center gap-2 bg-orange-400 px-5 font-black uppercase tracking-widest text-black disabled:opacity-60">
-              <Play size={16} />
-              Iniciar
-            </button>
-          )}
-        </div>
-        <input
-          value={repositoryUrl}
-          onChange={(event) => setRepositoryUrl(event.target.value)}
-          placeholder="Repositorio ou link tecnico"
-          className={inputClassName}
-        />
-        {status ? <p className="text-sm text-zinc-600 dark:text-zinc-300">{status}</p> : null}
-      </div>
-      <div className="grid gap-2 text-sm">
-        {timeEntries.slice(-6).reverse().map((entry) => (
-          <div key={entry.id} className="flex flex-wrap items-center justify-between gap-3 border border-black/10 bg-white p-3 dark:border-white/10 dark:bg-white/[0.04]">
-            <span>{entry.description}</span>
-            <strong>{formatDuration(entry.status === "running" ? elapsedSeconds(entry.startedAt) : entry.durationSeconds)}</strong>
-          </div>
-        ))}
-      </div>
-    </div>
   );
 }
 
@@ -438,15 +286,4 @@ function defaultSelectionsFor(category: (typeof pricingData)[number]) {
   return Object.fromEntries(
     category.variables.map((variable) => [variable.id, variable.options.find((option) => option.isDefault)?.id || variable.options[0]?.id || ""])
   );
-}
-
-function elapsedSeconds(startedAt: string) {
-  return Math.max(0, Math.floor((Date.now() - new Date(startedAt).getTime()) / 1000));
-}
-
-function formatDuration(seconds: number) {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = seconds % 60;
-  return [hours, minutes, secs].map((part) => String(part).padStart(2, "0")).join(":");
 }

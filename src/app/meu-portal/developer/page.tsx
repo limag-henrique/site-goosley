@@ -10,7 +10,7 @@ export default async function DeveloperPortalPage() {
       actor={actor}
       role="developer"
       title={`Ola, ${actor.user.name}`}
-      subtitle="Tarefas, comentarios, prazos, calendario, apontamento de horas e entregas tecnicas."
+      subtitle="Atualizacoes do projeto, comentarios, prazos, calendario e entregas tecnicas para o cliente."
       currentPath="/meu-portal/developer"
     >
       <DeveloperPortalContent actor={actor} />

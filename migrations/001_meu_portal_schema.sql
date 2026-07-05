@@ -28,8 +28,6 @@ CREATE TABLE programmer_profiles (
   display_name TEXT NOT NULL,
   skills TEXT NOT NULL DEFAULT '[]',
   github_username TEXT,
-  hourly_reference_rate_cents INTEGER NOT NULL DEFAULT 0,
-  payout_info TEXT,
   status TEXT NOT NULL,
   notes TEXT
 );
@@ -64,8 +62,6 @@ CREATE TABLE project_members (
   programmer_id TEXT NOT NULL REFERENCES users(id),
   role_in_project TEXT NOT NULL,
   assigned_by_admin_id TEXT NOT NULL REFERENCES users(id),
-  participation_weight_override REAL,
-  participation_notes TEXT,
   created_at TEXT NOT NULL,
   PRIMARY KEY (project_id, programmer_id)
 );
@@ -81,7 +77,6 @@ CREATE TABLE tasks (
   priority TEXT NOT NULL,
   source TEXT NOT NULL,
   due_date TEXT,
-  estimated_hours REAL,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
   completed_at TEXT
@@ -138,26 +133,6 @@ CREATE TABLE visual_comments (
   updated_at TEXT NOT NULL
 );
 
-CREATE TABLE time_entries (
-  id TEXT PRIMARY KEY,
-  programmer_id TEXT NOT NULL REFERENCES users(id),
-  project_id TEXT NOT NULL REFERENCES projects(id),
-  task_id TEXT REFERENCES tasks(id),
-  repository_url TEXT NOT NULL,
-  description TEXT NOT NULL,
-  started_at TEXT NOT NULL,
-  ended_at TEXT,
-  duration_seconds INTEGER NOT NULL DEFAULT 0,
-  status TEXT NOT NULL,
-  admin_review_notes TEXT,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-
-CREATE UNIQUE INDEX one_running_timer_per_programmer
-ON time_entries(programmer_id)
-WHERE status = 'running';
-
 CREATE TABLE github_repositories (
   id TEXT PRIMARY KEY,
   project_id TEXT NOT NULL REFERENCES projects(id),
@@ -168,24 +143,6 @@ CREATE TABLE github_repositories (
   added_by_user_id TEXT NOT NULL REFERENCES users(id),
   last_synced_at TEXT,
   sync_status TEXT NOT NULL,
-  created_at TEXT NOT NULL
-);
-
-CREATE TABLE github_commit_metrics (
-  id TEXT PRIMARY KEY,
-  project_id TEXT NOT NULL REFERENCES projects(id),
-  repository_id TEXT NOT NULL REFERENCES github_repositories(id),
-  programmer_id TEXT REFERENCES users(id),
-  github_author_name TEXT NOT NULL,
-  github_author_email TEXT NOT NULL,
-  commit_sha TEXT NOT NULL,
-  commit_date TEXT NOT NULL,
-  message TEXT NOT NULL,
-  effective_lines_added INTEGER NOT NULL DEFAULT 0,
-  effective_lines_deleted INTEGER NOT NULL DEFAULT 0,
-  effective_lines_modified INTEGER NOT NULL DEFAULT 0,
-  ignored_lines INTEGER NOT NULL DEFAULT 0,
-  ignored_reason TEXT,
   created_at TEXT NOT NULL
 );
 
@@ -216,49 +173,6 @@ CREATE TABLE budgets (
   status TEXT NOT NULL CHECK (status IN ('draft', 'submitted', 'approved', 'rejected', 'converted')),
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
-);
-
-CREATE TABLE earnings_calculations (
-  id TEXT PRIMARY KEY,
-  project_id TEXT NOT NULL REFERENCES projects(id),
-  gross_amount_cents INTEGER NOT NULL,
-  tax_and_fees_amount_cents INTEGER NOT NULL,
-  henrique_amount_cents INTEGER NOT NULL,
-  programmer_pool_amount_cents INTEGER NOT NULL,
-  calculation_version INTEGER NOT NULL,
-  calculated_by_user_id TEXT NOT NULL,
-  admin_override INTEGER NOT NULL DEFAULT 0,
-  finalized INTEGER NOT NULL DEFAULT 0,
-  notes TEXT,
-  created_at TEXT NOT NULL
-);
-
-CREATE TABLE programmer_earnings (
-  id TEXT PRIMARY KEY,
-  calculation_id TEXT NOT NULL REFERENCES earnings_calculations(id),
-  project_id TEXT NOT NULL REFERENCES projects(id),
-  programmer_id TEXT NOT NULL REFERENCES users(id),
-  participation_percent REAL NOT NULL,
-  github_effective_lines INTEGER NOT NULL DEFAULT 0,
-  manual_adjustment_amount_cents INTEGER NOT NULL DEFAULT 0,
-  manual_adjustment_reason TEXT,
-  final_amount_cents INTEGER NOT NULL,
-  status TEXT NOT NULL,
-  created_at TEXT NOT NULL,
-  updated_at TEXT NOT NULL
-);
-
-CREATE TABLE payout_requests (
-  id TEXT PRIMARY KEY,
-  programmer_id TEXT NOT NULL REFERENCES users(id),
-  amount_cents INTEGER NOT NULL,
-  currency TEXT NOT NULL,
-  status TEXT NOT NULL,
-  requested_at TEXT NOT NULL,
-  reviewed_by_admin_id TEXT REFERENCES users(id),
-  reviewed_at TEXT,
-  paid_at TEXT,
-  notes TEXT
 );
 
 CREATE TABLE system_settings (

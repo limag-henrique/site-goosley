@@ -3,7 +3,7 @@ import { PortalShell } from "@/components/portal/PortalShell";
 import { ClientPortalContent } from "@/components/portal/PortalPages";
 import { requirePortalPageActor } from "@/server/portal/page-auth";
 
-const sections = ["new-project", "solutions", "estimate", "budgets", "messages", "payments", "profile"];
+const sections = ["requests", "meetings", "new-project", "solutions", "estimate", "budgets", "messages", "payments", "profile"];
 
 type ClientSectionContext = {
   params: Promise<{ section: string }>;
@@ -30,6 +30,8 @@ export default async function ClientPortalSectionPage({ params }: ClientSectionC
 
 function titleFor(section: string) {
   const titles: Record<string, string> = {
+    requests: "Demandas",
+    meetings: "Reuniao",
     "new-project": "Novo projeto",
     solutions: "Solucoes",
     estimate: "Calculadora",

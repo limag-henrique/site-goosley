@@ -3,20 +3,17 @@ import assert from "node:assert/strict";
 import { resetPortalDatabaseForTests } from "../src/server/portal/store";
 import {
   createProgrammer,
+  createProjectUpdate,
+  createClientRequest,
   createProject,
   createVisualComment,
   getClientProject,
   listUsers,
   listVisualComments,
   parseGitHubRepositoryUrl,
-  recalculateEarnings,
   registerClient,
-  requestPayout,
   requireActor,
   shouldIgnoreGithubPath,
-  startTimeEntry,
-  stopTimeEntry,
-  updateEarning,
   convertVisualCommentToTask,
 } from "../src/server/portal/services";
 
@@ -75,55 +72,17 @@ test("RBAC prevents clients and unrelated programmers from reading projects", ()
   assert.equal(getClientProject(admin, project.id).id, project.id);
 });
 
-test("earnings calculator uses the default split and requires override reasons", () => {
-  const { admin, db } = actors();
-  const result = recalculateEarnings(admin, "prj_goosley", { notes: "test" });
-  assert.equal(result.calculation.taxAndFeesAmountCents, 500000);
-  assert.equal(result.calculation.henriqueAmountCents, 250000);
-  assert.equal(result.calculation.programmerPoolAmountCents, 250000);
-  assert.equal(result.earnings[0].finalAmountCents, 250000);
-
-  assert.throws(() => updateEarning(admin, result.earnings[0].id, { finalAmountCents: 200000 }), /reason is required/i);
-  updateEarning(admin, result.earnings[0].id, {
-    finalAmountCents: 200000,
-    manualAdjustmentReason: "Deployment work handled outside GitHub.",
+test("developers can publish project updates visible to clients", () => {
+  const { client, programmer } = actors();
+  const update = createProjectUpdate(programmer, "prj_goosley", {
+    title: "Homologacao liberada",
+    description: "A equipe publicou uma nova versao para revisao do cliente.",
+    status: "review",
+    visibleToClient: true,
   });
-  assert.ok(db.auditLogs.some((log) => log.action === "admin.updated_earning"));
-});
 
-test("time tracking is server calculated and prevents concurrent running timers", () => {
-  const { programmer } = actors();
-  assert.throws(
-    () =>
-      startTimeEntry(programmer, {
-        projectId: "prj_goosley",
-        repositoryUrl: "https://github.com/goosley/site-goosley",
-        description: "short",
-      }),
-    /at least 10/
-  );
-
-  const entry = startTimeEntry(programmer, {
-    projectId: "prj_goosley",
-    repositoryUrl: "https://github.com/goosley/site-goosley",
-    description: "Implementing portal backend services.",
-  });
-  assert.throws(
-    () =>
-      startTimeEntry(programmer, {
-        projectId: "prj_goosley",
-        repositoryUrl: "https://github.com/goosley/site-goosley",
-        description: "Trying to start another valid timer.",
-      }),
-    /Only one running timer/
-  );
-
-  const stopped = stopTimeEntry(programmer, entry.id, {
-    description: "Implemented portal backend services and tests.",
-    repositoryUrl: "https://github.com/goosley/site-goosley",
-  });
-  assert.equal(stopped.status, "submitted");
-  assert.ok(stopped.durationSeconds >= 0);
+  const project = getClientProject(client, "prj_goosley");
+  assert.equal(project.updates.some((item) => item.id === update.id), true);
 });
 
 test("visual comments are project scoped and convertible by admins", () => {
@@ -150,11 +109,16 @@ test("visual comments are project scoped and convertible by admins", () => {
   assert.equal(converted.task.source, "visual_comment");
 });
 
-test("payout requests cannot exceed available earnings", () => {
-  const { programmer } = actors();
-  const payout = requestPayout(programmer, { amountCents: 100000, currency: "BRL" });
-  assert.equal(payout.status, "requested");
-  assert.throws(() => requestPayout(programmer, { amountCents: 99999999, currency: "BRL" }), /exceeds available/);
+test("clients can request new demands for their project", () => {
+  const { client } = actors();
+  const task = createClientRequest(client, "prj_goosley", {
+    title: "Adicionar area de reunioes",
+    description: "Quero solicitar horarios com os desenvolvedores pelo portal.",
+    priority: "high",
+  });
+
+  assert.equal(task.source, "client_request");
+  assert.equal(task.createdByUserId, client.user.id);
 });
 
 test("GitHub URL validation and generated file ignores are centralized", () => {

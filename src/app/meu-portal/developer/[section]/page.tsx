@@ -3,7 +3,7 @@ import { PortalShell } from "@/components/portal/PortalShell";
 import { DeveloperPortalContent } from "@/components/portal/PortalPages";
 import { requirePortalPageActor } from "@/server/portal/page-auth";
 
-const sections = ["projects", "calendar", "time", "messages", "requests", "security", "profile"];
+const sections = ["projects", "calendar", "messages", "requests", "security", "profile"];
 
 type DeveloperSectionContext = {
   params: Promise<{ section: string }>;
@@ -31,7 +31,6 @@ function titleFor(section: string) {
   const titles: Record<string, string> = {
     projects: "Projetos",
     calendar: "Calendario",
-    time: "Horas",
     messages: "Mensagens",
     requests: "Pendencias",
     security: "Seguranca",

@@ -13,49 +13,37 @@ import {
   createProgrammer,
   createProject,
   createProjectMessage,
+  createProjectUpdate,
   createTask,
   createVisualComment,
   destroySession,
   findUserBySession,
   getClientProject,
-  getEarningsForProject,
   getMessages,
   getNotifications,
-  getSettings,
   listAuditLogs,
   listBudgetsForActor,
   listClientProjects,
-  listGithubMetrics,
   listPaymentsForActor,
-  listPayoutRequests,
   listProgrammerDashboard,
-  listProgrammerEarnings,
   listProgrammerProjects,
   listProjectTasksForActor,
   listProjectUpdates,
-  listTimeEntries,
   listUsers,
   listVisualComments,
   login,
   realtimeSnapshot,
-  recalculateEarnings,
   registerClient,
   requestPasswordReset,
   removeProgrammer,
-  requestPayout,
   requireActor,
   syncGithubRepository,
   toSafeUser,
   updateAdminTask,
-  updateEarning,
-  updateGithubMetric,
   updateOwnProfile,
   updatePayment,
-  updatePayoutRequest,
-  updateProgrammerRateApproval,
   updateProject,
   updateProgrammerTask,
-  updateSettings,
   updateUser,
   resetPassword,
   estimateBudget,
@@ -231,21 +219,13 @@ export async function handleProgrammer(request: NextRequest, segments: string[])
     if (segments[0] === "dashboard" && request.method === "GET") return NextResponse.json(listProgrammerDashboard(actor));
     if (segments[0] === "projects" && request.method === "GET") return NextResponse.json({ projects: listProgrammerProjects(actor) });
     if (segments[0] === "projects" && segments[1] && request.method === "PATCH") return NextResponse.json({ project: updateProject(actor, segments[1], await parseJson(request)) });
+    if (segments[0] === "projects" && segments[1] && segments[2] === "updates" && request.method === "POST") {
+      return NextResponse.json({ update: createProjectUpdate(actor, segments[1], await parseJson(request)) }, { status: 201 });
+    }
     if (segments[0] === "tasks" && segments.length === 1 && request.method === "GET") return NextResponse.json({ tasks: listProjectTasksForActor(actor) });
     if (segments[0] === "tasks" && segments[1] && request.method === "PATCH") {
       return NextResponse.json({ task: updateProgrammerTask(actor, segments[1], await parseJson(request)) });
     }
-    if (segments[0] === "earnings" && request.method === "GET") return NextResponse.json({ earnings: listProgrammerEarnings(actor) });
-    if (segments[0] === "time-entries" && segments.length === 1 && request.method === "GET") return NextResponse.json({ timeEntries: listTimeEntries(actor) });
-    if (segments[0] === "time-entries" && segments[1] === "start" && request.method === "POST") {
-      const { startTimeEntry } = await import("./services");
-      return NextResponse.json({ timeEntry: startTimeEntry(actor, await parseJson(request)) }, { status: 201 });
-    }
-    if (segments[0] === "time-entries" && segments[1] && segments[2] === "stop" && request.method === "POST") {
-      const { stopTimeEntry } = await import("./services");
-      return NextResponse.json({ timeEntry: stopTimeEntry(actor, segments[1], await parseJson(request)) });
-    }
-    if (segments[0] === "payout-requests" && request.method === "POST") return NextResponse.json({ payoutRequest: requestPayout(actor, await parseJson(request)) }, { status: 201 });
     if (segments[0] === "messages" && request.method === "GET") return NextResponse.json(getMessages(actor));
     if (segments[0] === "messages" && request.method === "POST") {
       const projectId = new URL(request.url).searchParams.get("projectId");
@@ -273,14 +253,14 @@ export async function handleAdmin(request: NextRequest, segments: string[]) {
       return NextResponse.json({ users: listUsers(actor, new URL(request.url).searchParams.get("search") || undefined) });
     }
     if (segments[0] === "users" && segments[1] === "programmers" && request.method === "POST") return NextResponse.json({ user: createProgrammer(actor, await body()) }, { status: 201 });
-    if (segments[0] === "users" && segments[1] && segments[2] === "programmer-profile" && request.method === "PATCH") {
-      return NextResponse.json({ programmerProfile: updateProgrammerRateApproval(actor, segments[1], await body()) });
-    }
     if (segments[0] === "users" && segments[1] && request.method === "PATCH") return NextResponse.json({ user: updateUser(actor, segments[1], await body()) });
 
     if (segments[0] === "projects" && segments.length === 1 && request.method === "GET") return NextResponse.json({ projects: listClientProjects(actor) });
     if (segments[0] === "projects" && segments.length === 1 && request.method === "POST") return NextResponse.json({ project: createProject(actor, await body()) }, { status: 201 });
     if (segments[0] === "projects" && segments[1] && segments.length === 2 && request.method === "PATCH") return NextResponse.json({ project: updateProject(actor, segments[1], await body()) });
+    if (segments[0] === "projects" && segments[1] && segments[2] === "updates" && request.method === "POST") {
+      return NextResponse.json({ update: createProjectUpdate(actor, segments[1], await body()) }, { status: 201 });
+    }
     if (segments[0] === "projects" && segments[1] && segments[2] === "programmers" && request.method === "POST") {
       return NextResponse.json({ member: assignProgrammer(actor, segments[1], await body()) }, { status: 201 });
     }
@@ -309,31 +289,11 @@ export async function handleAdmin(request: NextRequest, segments: string[]) {
     if (segments[0] === "payments" && segments.length === 1 && request.method === "POST") return NextResponse.json({ payment: createPayment(actor, await body()) }, { status: 201 });
     if (segments[0] === "payments" && segments[1] && request.method === "PATCH") return NextResponse.json({ payment: updatePayment(actor, segments[1], await body()) });
 
-    if (segments[0] === "earnings" && segments[1] === "projects" && segments[2] && segments.length === 3 && request.method === "GET") {
-      return NextResponse.json(getEarningsForProject(actor, segments[2]));
-    }
-    if (segments[0] === "earnings" && segments[1] === "projects" && segments[2] && segments[3] === "recalculate" && request.method === "POST") {
-      return NextResponse.json(recalculateEarnings(actor, segments[2], await body()));
-    }
-    if (segments[0] === "earnings" && segments[1] && request.method === "PATCH") return NextResponse.json({ earning: updateEarning(actor, segments[1], await body()) });
-
-    if (segments[0] === "payout-requests" && segments.length === 1 && request.method === "GET") return NextResponse.json({ payoutRequests: listPayoutRequests(actor) });
-    if (segments[0] === "payout-requests" && segments[1] && request.method === "PATCH") return NextResponse.json({ payoutRequest: updatePayoutRequest(actor, segments[1], await body()) });
-
     if (segments[0] === "github" && segments[1] === "projects" && segments[2] && segments[3] === "sync" && request.method === "POST") {
       return NextResponse.json(syncGithubRepository(actor, segments[2], await body()));
     }
-    if (segments[0] === "github" && segments[1] === "projects" && segments[2] && segments[3] === "metrics" && request.method === "GET") {
-      return NextResponse.json({ metrics: listGithubMetrics(actor, segments[2]) });
-    }
-    if (segments[0] === "github" && segments[1] === "metrics" && segments[2] && request.method === "PATCH") {
-      return NextResponse.json({ metric: updateGithubMetric(actor, segments[2], await body()) });
-    }
-
     if (segments[0] === "audit-logs" && request.method === "GET") return NextResponse.json({ auditLogs: listAuditLogs(actor) });
     if (segments[0] === "budgets" && request.method === "GET") return NextResponse.json({ budgets: listBudgetsForActor(actor) });
-    if (segments[0] === "settings" && request.method === "GET") return NextResponse.json({ settings: getSettings(actor) });
-    if (segments[0] === "settings" && request.method === "PATCH") return NextResponse.json({ settings: updateSettings(actor, await body()) });
     if (segments[0] === "notifications" && request.method === "GET") return NextResponse.json({ notifications: getNotifications(actor) });
     if (segments[0] === "realtime" && request.method === "GET") return NextResponse.json(realtimeSnapshot(actor));
 

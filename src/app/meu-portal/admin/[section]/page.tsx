@@ -3,7 +3,7 @@ import { PortalShell } from "@/components/portal/PortalShell";
 import { AdminPortalContent } from "@/components/portal/PortalPages";
 import { requirePortalPageActor } from "@/server/portal/page-auth";
 
-const sections = ["users", "projects", "tasks", "messages", "finance", "settings", "security"];
+const sections = ["users", "projects", "tasks", "messages", "finance", "security"];
 
 type AdminSectionContext = {
   params: Promise<{ section: string }>;
@@ -34,7 +34,6 @@ function titleFor(section: string) {
     tasks: "Tarefas",
     messages: "Mensagens",
     finance: "Financeiro",
-    settings: "Configuracoes",
     security: "Seguranca",
   };
   return titles[section] || "Admin";

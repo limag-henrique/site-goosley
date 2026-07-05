@@ -1,13 +1,10 @@
 import type {
   AuditLog,
-  EarningStatus,
-  GitHubCommitMetric,
   Notification,
-  ProgrammerEarning,
   Project,
+  ProjectUpdate,
   RequestActor,
   Task,
-  TimeEntry,
   User,
   UserRole,
   VisualComment,
@@ -23,15 +20,12 @@ import {
   integerCents,
   numberField,
   optionalStringArray,
-  safeJsonRecord,
   stringField,
 } from "./validation";
 
 const userStatuses = ["active", "invited", "suspended", "disabled"] as const;
 const taskStatuses = ["todo", "in_progress", "review", "done", "rejected", "cancelled"] as const;
 const paymentStatuses = ["pending", "paid", "verified", "failed", "refunded", "cancelled"] as const;
-const payoutStatuses = ["requested", "approved", "rejected", "paid", "cancelled"] as const;
-const earningStatuses = ["pending", "available", "payout_requested", "paid", "cancelled"] as const;
 const userRoles = ["client", "developer", "admin"] as const;
 
 export type SafeUser = Omit<User, "passwordHash">;
@@ -293,8 +287,6 @@ export function createProgrammer(actor: RequestActor, payload: unknown) {
     displayName: stringField(body, "displayName", { optional: true }) || name,
     skills: optionalStringArray(body, "skills"),
     githubUsername: stringField(body, "githubUsername", { optional: true }),
-    hourlyReferenceRateCents: integerCents(body, "hourlyReferenceRateCents", { optional: true, min: 0 }) || 0,
-    payoutInfo: safeJsonRecord(body.payoutInfo),
     status: "active",
     notes: stringField(body, "notes", { optional: true }),
   });
@@ -302,46 +294,6 @@ export function createProgrammer(actor: RequestActor, payload: unknown) {
   logAudit({ actorUserId: actor.user.id, action: "admin.created_programmer", entityType: "user", entityId: user.id, after: toSafeUser(user), actor });
   notify(user.id, "account.created", "Conta de desenvolvedor criada", "Seu acesso ao Meu Portal foi criado.", "/meu-portal/developer");
   return toSafeUser(user);
-}
-
-export function updateProgrammerRateApproval(actor: RequestActor, programmerId: string, payload: unknown) {
-  requireRole(actor, ["admin"]);
-  const body = asRecord(payload);
-  const db = getDb();
-  const user = findById(db.users, programmerId, "Developer");
-  if (!isDeveloperRole(user.role)) throw new PortalError("User must be a developer.", 422, "INVALID_DEVELOPER");
-
-  let profile = db.programmerProfiles.find((item) => item.userId === programmerId);
-  if (!profile) {
-    profile = {
-      userId: programmerId,
-      displayName: user.name,
-      skills: [],
-      hourlyReferenceRateCents: 0,
-      status: user.status,
-    };
-    db.programmerProfiles.push(profile);
-  }
-
-  const before = { ...profile };
-  const hourlyReferenceRateCents = integerCents(body, "hourlyReferenceRateCents", { optional: true, min: 0 });
-  const approveRate = typeof body.approveRate === "boolean" ? body.approveRate : String(body.approveRate || "") === "true";
-  const revokeRate = typeof body.revokeRate === "boolean" ? body.revokeRate : String(body.revokeRate || "") === "true";
-
-  if (hourlyReferenceRateCents != null) profile.hourlyReferenceRateCents = hourlyReferenceRateCents;
-  profile.notes = stringField(body, "notes", { optional: true, max: 1000 }) || profile.notes;
-  if (approveRate) {
-    profile.hourlyRateApprovedAt = nowIso();
-    profile.hourlyRateApprovedByAdminId = actor.user.id;
-  }
-  if (revokeRate) {
-    delete profile.hourlyRateApprovedAt;
-    delete profile.hourlyRateApprovedByAdminId;
-  }
-
-  logAudit({ actorUserId: actor.user.id, action: "admin.updated_programmer_rate", entityType: "programmerProfile", entityId: programmerId, before, after: profile, actor });
-  notify(programmerId, "rate.updated", "Valor/hora atualizado", profile.hourlyRateApprovedAt ? "Seu valor/hora foi aprovado." : "Seu valor/hora aguarda aprovacao.", "/meu-portal/developer/profile");
-  return profile;
 }
 
 export function updateUser(actor: RequestActor, userId: string, payload: unknown) {
@@ -394,6 +346,33 @@ export function listProjectUpdates(actor: RequestActor, projectId: string) {
   const db = getDb();
   findProjectForActor(actor, projectId);
   return db.projectUpdates.filter((update) => update.projectId === projectId && (actor.user.role !== "client" || update.visibleToClient));
+}
+
+export function createProjectUpdate(actor: RequestActor, projectId: string, payload: unknown) {
+  requireRole(actor, ["admin", "developer"]);
+  const body = asRecord(payload);
+  const db = getDb();
+  const project = findProjectForActor(actor, projectId);
+  const timestamp = nowIso();
+  const currentOrder = db.projectUpdates.filter((update) => update.projectId === projectId).length;
+  const update: ProjectUpdate = {
+    id: createId("upd"),
+    projectId,
+    title: stringField(body, "title", { min: 3, max: 160 }),
+    description: stringField(body, "description", { min: 5, max: 5000 }),
+    status: stringField(body, "status", { optional: true, max: 80 }) || project.status,
+    order: currentOrder + 1,
+    visibleToClient: body.visibleToClient == null ? true : body.visibleToClient === true || String(body.visibleToClient) === "true",
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  };
+
+  db.projectUpdates.push(update);
+  logAudit({ actorUserId: actor.user.id, action: "project_update.created", entityType: "projectUpdate", entityId: update.id, after: update, actor });
+  if (update.visibleToClient) {
+    notify(project.clientId, "project_update.created", "Nova atualizacao do projeto", update.title, "/meu-portal/client");
+  }
+  return update;
 }
 
 export function listProjectTasksForActor(actor: RequestActor, projectId?: string) {
@@ -608,8 +587,6 @@ export function listProgrammerDashboard(actor: RequestActor) {
   return {
     tasks: listProjectTasksForActor(actor).filter((task) => actor.user.role === "admin" || task.assignedToProgrammerId === userId),
     projects: listProgrammerProjects(actor),
-    earnings: listProgrammerEarnings(actor),
-    timeEntries: listTimeEntries(actor),
     notifications: db.notifications.filter((notification) => actor.user.role === "admin" || notification.userId === userId).slice(-20),
     programmerProfile:
       actor.user.role === "admin"
@@ -621,9 +598,6 @@ export function listProgrammerDashboard(actor: RequestActor) {
               skills: profile.skills,
               githubUsername: profile.githubUsername,
               status: profile.status,
-              hourlyReferenceRateCents: profile.hourlyRateApprovedAt ? profile.hourlyReferenceRateCents : undefined,
-              hourlyRateApprovedAt: profile.hourlyRateApprovedAt,
-              hourlyRatePendingCents: profile.hourlyRateApprovedAt ? undefined : profile.hourlyReferenceRateCents,
             }
           : undefined,
   };
@@ -660,115 +634,6 @@ export function updateProgrammerTask(actor: RequestActor, taskId: string, payloa
 
   notifyProjectParticipants(task.projectId, "task.updated", "Status de tarefa atualizado", task.title);
   return task;
-}
-
-export function startTimeEntry(actor: RequestActor, payload: unknown) {
-  requireRole(actor, ["developer"]);
-  const body = asRecord(payload);
-  const db = getDb();
-  if (db.timeEntries.some((entry) => entry.programmerId === actor.user.id && entry.status === "running")) {
-    throw new PortalError("Only one running timer is allowed per developer.", 409, "RUNNING_TIMER_EXISTS");
-  }
-
-  const projectId = stringField(body, "projectId", { min: 1 });
-  if (!isProjectMember(projectId, actor.user.id)) {
-    throw new ForbiddenError("Developer is not assigned to this project.");
-  }
-
-  const taskId = stringField(body, "taskId", { optional: true });
-  if (taskId) {
-    const task = findById(db.tasks, taskId, "Task");
-    if (task.projectId !== projectId || task.assignedToProgrammerId !== actor.user.id) {
-      throw new ForbiddenError("Task is not assigned to this developer on this project.");
-    }
-  }
-
-  const timestamp = nowIso();
-  const entry: TimeEntry = {
-    id: createId("tim"),
-    programmerId: actor.user.id,
-    projectId,
-    taskId,
-    repositoryUrl: stringField(body, "repositoryUrl", { min: 5, max: 1000 }),
-    description: stringField(body, "description", { min: 10, max: 5000 }),
-    startedAt: timestamp,
-    durationSeconds: 0,
-    status: "running",
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  };
-
-  db.timeEntries.push(entry);
-  return entry;
-}
-
-export function stopTimeEntry(actor: RequestActor, timeEntryId: string, payload: unknown) {
-  requireRole(actor, ["developer"]);
-  const body = asRecord(payload ?? {});
-  const db = getDb();
-  const entry = findById(db.timeEntries, timeEntryId, "Time entry");
-  if (entry.programmerId !== actor.user.id) {
-    throw new ForbiddenError("Time entry belongs to another developer.");
-  }
-
-  if (entry.status !== "running") {
-    throw new PortalError("Time entry is not running.", 409, "TIME_ENTRY_NOT_RUNNING");
-  }
-
-  const description = stringField(body, "description", { optional: true, min: 10, max: 5000 });
-  const repositoryUrl = stringField(body, "repositoryUrl", { optional: true, min: 5, max: 1000 });
-  if (description) entry.description = description;
-  if (repositoryUrl) entry.repositoryUrl = repositoryUrl;
-
-  const endedAt = nowIso();
-  entry.endedAt = endedAt;
-  entry.durationSeconds = Math.max(0, Math.round((new Date(endedAt).getTime() - new Date(entry.startedAt).getTime()) / 1000));
-  entry.status = "submitted";
-  entry.updatedAt = endedAt;
-
-  notifyAdmins("time_entry.submitted", "Apontamento enviado", `${actor.user.name} enviou ${entry.durationSeconds} segundos.`);
-  return entry;
-}
-
-export function listTimeEntries(actor: RequestActor) {
-  const db = getDb();
-  if (actor.user.role === "admin") return db.timeEntries;
-  requireRole(actor, ["developer"]);
-  return db.timeEntries.filter((entry) => entry.programmerId === actor.user.id);
-}
-
-export function listProgrammerEarnings(actor: RequestActor) {
-  const db = getDb();
-  if (actor.user.role === "admin") return db.programmerEarnings;
-  requireRole(actor, ["developer"]);
-  return db.programmerEarnings.filter((earning) => earning.programmerId === actor.user.id);
-}
-
-export function requestPayout(actor: RequestActor, payload: unknown) {
-  requireRole(actor, ["developer"]);
-  const body = asRecord(payload);
-  const amountCents = integerCents(body, "amountCents", { min: 1 });
-  const currency = stringField(body, "currency", { optional: true, min: 3, max: 3 }) || "BRL";
-  const available = listProgrammerEarnings(actor)
-    .filter((earning) => earning.status === "available")
-    .reduce((sum, earning) => sum + earning.finalAmountCents, 0);
-
-  if (amountCents > available) {
-    throw new PortalError("Payout amount exceeds available earnings.", 422, "INSUFFICIENT_EARNINGS");
-  }
-
-  const payout = {
-    id: createId("pyo"),
-    programmerId: actor.user.id,
-    amountCents,
-    currency,
-    status: "requested" as const,
-    requestedAt: nowIso(),
-    notes: stringField(body, "notes", { optional: true, max: 1000 }),
-  };
-  getDb().payoutRequests.push(payout);
-  notifyAdmins("payout.requested", "Novo pedido de saque", `${actor.user.name} solicitou ${amountCents / 100} ${currency}.`);
-  return payout;
 }
 
 export function createProject(actor: RequestActor, payload: unknown) {
@@ -860,8 +725,6 @@ export function assignProgrammer(actor: RequestActor, projectId: string, payload
     programmerId,
     roleInProject: stringField(body, "roleInProject", { optional: true, max: 120 }) || "developer",
     assignedByAdminId: actor.user.id,
-    participationWeightOverride: numberField(body, "participationWeightOverride", { optional: true, min: 0, max: 100 }),
-    participationNotes: stringField(body, "participationNotes", { optional: true, max: 1000 }),
     createdAt: nowIso(),
   };
 
@@ -898,7 +761,6 @@ export function createTask(actor: RequestActor, payload: unknown) {
     priority: enumField(body, "priority", ["low", "medium", "high", "urgent"] as const, { optional: true }) || "medium",
     source: enumField(body, "source", ["admin", "client_request", "visual_comment", "github", "system"] as const, { optional: true }) || "admin",
     dueDate: stringField(body, "dueDate", { optional: true }),
-    estimatedHours: numberField(body, "estimatedHours", { optional: true, min: 0 }),
     createdAt: timestamp,
     updatedAt: timestamp,
   };
@@ -966,7 +828,6 @@ export function createPayment(actor: RequestActor, payload: unknown) {
 
   db.payments.push(payment);
   logAudit({ actorUserId: actor.user.id, action: "admin.created_payment", entityType: "payment", entityId: payment.id, after: payment, actor });
-  if (payment.status === "verified") recalculateEarnings(actor, projectId, { notes: "Payment created as verified." });
   return payment;
 }
 
@@ -986,161 +847,7 @@ export function updatePayment(actor: RequestActor, paymentId: string, payload: u
   }
   payment.updatedAt = nowIso();
   logAudit({ actorUserId: actor.user.id, action: "admin.updated_payment", entityType: "payment", entityId: payment.id, before, after: payment, actor });
-  if (status === "verified") recalculateEarnings(actor, payment.projectId, { notes: "Payment verified." });
   return payment;
-}
-
-export function getEarningsForProject(actor: RequestActor, projectId: string) {
-  requireRole(actor, ["admin"]);
-  const db = getDb();
-  return {
-    calculations: db.earningsCalculations.filter((calculation) => calculation.projectId === projectId),
-    earnings: db.programmerEarnings.filter((earning) => earning.projectId === projectId),
-    metrics: db.githubCommitMetrics.filter((metric) => metric.projectId === projectId),
-  };
-}
-
-export function recalculateEarnings(actor: RequestActor, projectId: string, payload: unknown = {}) {
-  requireRole(actor, ["admin"]);
-  const body = asRecord(payload ?? {});
-  const db = getDb();
-  const project = findById(db.projects, projectId, "Project");
-  const settings = getRevenueSettings();
-  validateRevenueSettings(settings);
-  const verifiedGross = db.payments
-    .filter((payment) => payment.projectId === projectId && payment.status === "verified")
-    .reduce((sum, payment) => sum + payment.grossAmountCents, 0);
-  const grossAmountCents = verifiedGross || project.grossAmountPaidByClientCents;
-  const calculationVersion = db.earningsCalculations.filter((calculation) => calculation.projectId === projectId).length + 1;
-  const programmerPoolAmountCents = Math.round((grossAmountCents * settings.programmerPoolPercent) / 100);
-  const calculation = {
-    id: createId("calc"),
-    projectId,
-    grossAmountCents,
-    taxAndFeesAmountCents: Math.round((grossAmountCents * settings.taxAndFeesPercent) / 100),
-    henriqueAmountCents: Math.round((grossAmountCents * settings.henriquePercent) / 100),
-    programmerPoolAmountCents,
-    calculationVersion,
-    calculatedByUserId: actor.user.id,
-    adminOverride: false,
-    finalized: false,
-    notes: stringField(body, "notes", { optional: true, max: 1000 }),
-    createdAt: nowIso(),
-  };
-
-  db.earningsCalculations.push(calculation);
-
-  const members = db.projectMembers.filter((member) => member.projectId === projectId);
-  const contributions = members.map((member) => {
-    const lines = calculateEffectiveLines(
-      db.githubCommitMetrics.filter((metric) => metric.projectId === projectId && metric.programmerId === member.programmerId)
-    );
-    return {
-      programmerId: member.programmerId,
-      lines,
-      override: member.participationWeightOverride,
-    };
-  });
-  const overrideTotal = contributions.reduce((sum, contribution) => sum + (contribution.override || 0), 0);
-  const totalLines = contributions.reduce((sum, contribution) => sum + contribution.lines, 0);
-
-  const earnings: ProgrammerEarning[] = contributions.map((contribution, index) => {
-    const participationPercent =
-      contribution.override != null
-        ? contribution.override
-        : totalLines > 0
-          ? (contribution.lines / totalLines) * Math.max(0, 100 - overrideTotal)
-          : members.length > 0
-            ? 100 / members.length
-            : 0;
-    const finalAmountCents =
-      index === contributions.length - 1
-        ? programmerPoolAmountCents -
-          db.programmerEarnings
-            .filter((earning) => earning.calculationId === calculation.id)
-            .reduce((sum, earning) => sum + earning.finalAmountCents, 0)
-        : Math.round((programmerPoolAmountCents * participationPercent) / 100);
-
-    return {
-      id: createId("ern"),
-      calculationId: calculation.id,
-      projectId,
-      programmerId: contribution.programmerId,
-      participationPercent: Number(participationPercent.toFixed(4)),
-      githubEffectiveLines: contribution.lines,
-      manualAdjustmentAmountCents: 0,
-      finalAmountCents,
-      status: "pending" as EarningStatus,
-      createdAt: nowIso(),
-      updatedAt: nowIso(),
-    };
-  });
-
-  db.programmerEarnings.push(...earnings);
-  logAudit({ actorUserId: actor.user.id, action: "admin.recalculated_earnings", entityType: "project", entityId: projectId, after: { calculation, earnings }, actor });
-  notifyProjectMembers(projectId, "earnings.updated", "Ganhos recalculados", "Uma nova versao de calculo foi criada.");
-  return { calculation, earnings };
-}
-
-export function updateEarning(actor: RequestActor, earningId: string, payload: unknown) {
-  requireRole(actor, ["admin"]);
-  const body = asRecord(payload);
-  const db = getDb();
-  const earning = findById(db.programmerEarnings, earningId, "Earning");
-  const before = { ...earning };
-  const status = enumField(body, "status", earningStatuses, { optional: true });
-  const manualAdjustmentAmountCents = integerCents(body, "manualAdjustmentAmountCents", { optional: true });
-  const finalAmountCents = integerCents(body, "finalAmountCents", { optional: true, min: 0 });
-  const participationPercent = numberField(body, "participationPercent", { optional: true, min: 0, max: 100 });
-  const reason = stringField(body, "manualAdjustmentReason", { optional: true, min: 5, max: 1000 });
-
-  if ((manualAdjustmentAmountCents != null || finalAmountCents != null || participationPercent != null) && !reason) {
-    throw new PortalError("Override reason is required.", 422, "OVERRIDE_REASON_REQUIRED");
-  }
-
-  if (status) earning.status = status;
-  if (manualAdjustmentAmountCents != null) {
-    earning.manualAdjustmentAmountCents = manualAdjustmentAmountCents;
-    earning.manualAdjustmentReason = reason;
-    earning.finalAmountCents += manualAdjustmentAmountCents;
-  }
-  if (finalAmountCents != null) {
-    earning.finalAmountCents = finalAmountCents;
-    earning.manualAdjustmentReason = reason;
-  }
-  if (participationPercent != null) {
-    earning.participationPercent = participationPercent;
-    earning.manualAdjustmentReason = reason;
-  }
-  earning.updatedAt = nowIso();
-  logAudit({ actorUserId: actor.user.id, action: "admin.updated_earning", entityType: "programmerEarning", entityId: earning.id, before, after: earning, actor });
-  return earning;
-}
-
-export function listPayoutRequests(actor: RequestActor) {
-  const db = getDb();
-  if (actor.user.role === "admin") return db.payoutRequests;
-  requireRole(actor, ["developer"]);
-  return db.payoutRequests.filter((payout) => payout.programmerId === actor.user.id);
-}
-
-export function updatePayoutRequest(actor: RequestActor, payoutRequestId: string, payload: unknown) {
-  requireRole(actor, ["admin"]);
-  const body = asRecord(payload);
-  const db = getDb();
-  const payout = findById(db.payoutRequests, payoutRequestId, "Payout request");
-  const before = { ...payout };
-  const status = enumField(body, "status", payoutStatuses, { optional: true });
-  if (status) {
-    payout.status = status;
-    payout.reviewedByAdminId = actor.user.id;
-    payout.reviewedAt = nowIso();
-    if (status === "paid") payout.paidAt = nowIso();
-  }
-  payout.notes = stringField(body, "notes", { optional: true, max: 1000 }) || payout.notes;
-  logAudit({ actorUserId: actor.user.id, action: "admin.updated_payout", entityType: "payoutRequest", entityId: payout.id, before, after: payout, actor });
-  notify(payout.programmerId, `payout.${payout.status}`, "Pedido de saque atualizado", `Status: ${payout.status}`, "/meu-portal/developer");
-  return payout;
 }
 
 export function syncGithubRepository(actor: RequestActor, projectId: string, payload: unknown = {}) {
@@ -1169,90 +876,16 @@ export function syncGithubRepository(actor: RequestActor, projectId: string, pay
     db.githubRepositories.push(repository);
   }
 
-  const metric: GitHubCommitMetric = {
-    id: createId("ghm"),
-    projectId,
-    repositoryId: repository.id,
-    programmerId: isDeveloperRole(actor.user.role) ? actor.user.id : stringField(body, "programmerId", { optional: true }),
-    githubAuthorName: stringField(body, "githubAuthorName", { optional: true }) || actor.user.name,
-    githubAuthorEmail: stringField(body, "githubAuthorEmail", { optional: true }) || actor.user.email,
-    commitSha: stringField(body, "commitSha", { optional: true }) || createId("sha"),
-    commitDate: stringField(body, "commitDate", { optional: true }) || timestamp,
-    message: stringField(body, "message", { optional: true }) || "Manual GitHub sync snapshot",
-    effectiveLinesAdded: numberField(body, "effectiveLinesAdded", { optional: true, min: 0 }) || 0,
-    effectiveLinesDeleted: numberField(body, "effectiveLinesDeleted", { optional: true, min: 0 }) || 0,
-    effectiveLinesModified: numberField(body, "effectiveLinesModified", { optional: true, min: 0 }) || 0,
-    ignoredLines: numberField(body, "ignoredLines", { optional: true, min: 0 }) || 0,
-    ignoredReason: stringField(body, "ignoredReason", { optional: true, max: 1000 }),
-    createdAt: timestamp,
-  };
-
   repository.lastSyncedAt = timestamp;
   repository.syncStatus = "synced";
-  db.githubCommitMetrics.push(metric);
-  logAudit({ actorUserId: actor.user.id, action: "github.synced", entityType: "project", entityId: projectId, after: { repository, metric }, actor });
+  logAudit({ actorUserId: actor.user.id, action: "github.synced", entityType: "project", entityId: projectId, after: { repository }, actor });
   notifyProjectParticipants(projectId, "github.sync_completed", "GitHub sincronizado", repository.repositoryUrl);
-  return { repository, metric };
-}
-
-export function listGithubMetrics(actor: RequestActor, projectId: string) {
-  requireRole(actor, ["admin"]);
-  return getDb().githubCommitMetrics.filter((metric) => metric.projectId === projectId);
-}
-
-export function updateGithubMetric(actor: RequestActor, metricId: string, payload: unknown) {
-  requireRole(actor, ["admin"]);
-  const body = asRecord(payload);
-  const metric = findById(getDb().githubCommitMetrics, metricId, "GitHub metric");
-  const before = { ...metric };
-  metric.effectiveLinesAdded = numberField(body, "effectiveLinesAdded", { optional: true, min: 0 }) ?? metric.effectiveLinesAdded;
-  metric.effectiveLinesDeleted = numberField(body, "effectiveLinesDeleted", { optional: true, min: 0 }) ?? metric.effectiveLinesDeleted;
-  metric.effectiveLinesModified = numberField(body, "effectiveLinesModified", { optional: true, min: 0 }) ?? metric.effectiveLinesModified;
-  metric.ignoredLines = numberField(body, "ignoredLines", { optional: true, min: 0 }) ?? metric.ignoredLines;
-  metric.ignoredReason = stringField(body, "ignoredReason", { optional: true, min: 5, max: 1000 }) || metric.ignoredReason;
-  if (!metric.ignoredReason) {
-    throw new PortalError("A reason is required when overriding GitHub metrics.", 422, "OVERRIDE_REASON_REQUIRED");
-  }
-  logAudit({ actorUserId: actor.user.id, action: "admin.updated_github_metric", entityType: "githubCommitMetric", entityId: metric.id, before, after: metric, actor });
-  return metric;
+  return { repository };
 }
 
 export function listAuditLogs(actor: RequestActor) {
   requireRole(actor, ["admin"]);
   return getDb().auditLogs.slice().reverse();
-}
-
-export function getSettings(actor: RequestActor) {
-  requireRole(actor, ["admin"]);
-  return getDb().systemSettings;
-}
-
-export function updateSettings(actor: RequestActor, payload: unknown) {
-  requireRole(actor, ["admin"]);
-  const body = asRecord(payload);
-  const db = getDb();
-  const updates = safeJsonRecord(body.settings) || body;
-  const before = db.systemSettings.map((setting) => ({ ...setting }));
-  Object.entries(updates).forEach(([key, value]) => {
-    let setting = db.systemSettings.find((item) => item.key === key);
-    if (!setting) {
-      setting = {
-        key,
-        value,
-        description: stringField(body, "description", { optional: true }) || "Custom system setting.",
-        updatedByAdminId: actor.user.id,
-        updatedAt: nowIso(),
-      };
-      db.systemSettings.push(setting);
-    } else {
-      setting.value = value;
-      setting.updatedByAdminId = actor.user.id;
-      setting.updatedAt = nowIso();
-    }
-  });
-  validateRevenueSettings(getRevenueSettings());
-  logAudit({ actorUserId: actor.user.id, action: "admin.updated_settings", entityType: "systemSetting", entityId: "bulk", before, after: db.systemSettings, actor });
-  return db.systemSettings;
 }
 
 export function getNotifications(actor: RequestActor) {
@@ -1282,9 +915,7 @@ export function adminDashboard(actor: RequestActor) {
     tasks: db.tasks,
     payments: db.payments,
     budgets: db.budgets,
-    payoutRequests: db.payoutRequests,
     auditLogCount: db.auditLogs.length,
-    settings: db.systemSettings,
   };
 }
 
@@ -1311,33 +942,6 @@ export function shouldIgnoreGithubPath(path: string) {
   ];
   const ignoredExtensions = [".lock", ".min.js", ".min.css", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg", ".ico", ".pdf", ".zip"];
   return ignoredSegments.some((segment) => normalized.includes(segment)) || ignoredExtensions.some((extension) => normalized.endsWith(extension));
-}
-
-function calculateEffectiveLines(metrics: GitHubCommitMetric[]) {
-  return metrics.reduce(
-    (sum, metric) => sum + metric.effectiveLinesAdded + metric.effectiveLinesModified + Math.max(0, Math.round(metric.effectiveLinesDeleted * 0.25)),
-    0
-  );
-}
-
-function getRevenueSettings() {
-  const settingValue = (key: string, fallback: number) => {
-    const value = getDb().systemSettings.find((setting) => setting.key === key)?.value;
-    return typeof value === "number" ? value : fallback;
-  };
-
-  return {
-    taxAndFeesPercent: settingValue("revenue.taxAndFeesPercent", 50),
-    henriquePercent: settingValue("revenue.henriquePercent", 25),
-    programmerPoolPercent: settingValue("revenue.programmerPoolPercent", 25),
-  };
-}
-
-function validateRevenueSettings(settings: ReturnType<typeof getRevenueSettings>) {
-  const total = settings.taxAndFeesPercent + settings.henriquePercent + settings.programmerPoolPercent;
-  if (total !== 100) {
-    throw new PortalError("Revenue percentages must add up to 100.", 422, "INVALID_REVENUE_SETTINGS");
-  }
 }
 
 function estimateBudgetCents(body: Record<string, unknown>) {
