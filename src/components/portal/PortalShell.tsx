@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { LucideIcon } from "lucide-react";
 import {
   Bell,
@@ -84,7 +85,16 @@ export function PortalShell({
       <div className="grid min-h-screen lg:grid-cols-[280px_1fr]">
         <aside className="border-b border-black/10 bg-white px-4 py-4 dark:border-white/10 dark:bg-zinc-950 lg:border-b-0 lg:border-r">
           <Link href="/meu-portal" className="flex items-center gap-3 px-2 py-3">
-            <span className="grid h-10 w-10 place-items-center bg-orange-400 font-black text-black">G</span>
+            <span className="relative h-10 w-10 overflow-hidden bg-white">
+              <Image
+                src="/images/logo com fundo.png"
+                alt="Logo Goosley"
+                fill
+                sizes="40px"
+                className="object-contain"
+                priority
+              />
+            </span>
             <span>
               <span className="block text-sm font-black uppercase tracking-[0.24em]">Goosley</span>
               <span className="text-xs text-zinc-500 dark:text-zinc-400">Portal operacional</span>

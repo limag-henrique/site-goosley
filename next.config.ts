@@ -46,3 +46,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
+if (process.env.ENABLE_OPENNEXT_DEV_PROXY === "1") {
+  void import("@opennextjs/cloudflare").then((module) => module.initOpenNextCloudflareForDev());
+}

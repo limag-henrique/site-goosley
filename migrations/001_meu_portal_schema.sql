@@ -10,26 +10,26 @@ CREATE TABLE users (
   avatar TEXT,
   theme_preference TEXT DEFAULT 'system',
   status TEXT NOT NULL CHECK (status IN ('active', 'invited', 'suspended', 'disabled')),
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL,
-  last_login_at TIMESTAMPTZ
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  last_login_at TEXT
 );
 
 CREATE TABLE client_profiles (
   user_id TEXT PRIMARY KEY REFERENCES users(id),
   company_name TEXT,
   phone TEXT,
-  billing_info JSONB,
+  billing_info TEXT,
   notes TEXT
 );
 
 CREATE TABLE programmer_profiles (
   user_id TEXT PRIMARY KEY REFERENCES users(id),
   display_name TEXT NOT NULL,
-  skills JSONB NOT NULL DEFAULT '[]',
+  skills TEXT NOT NULL DEFAULT '[]',
   github_username TEXT,
   hourly_reference_rate_cents INTEGER NOT NULL DEFAULT 0,
-  payout_info JSONB,
+  payout_info TEXT,
   status TEXT NOT NULL,
   notes TEXT
 );
@@ -53,10 +53,10 @@ CREATE TABLE projects (
   live_url TEXT,
   repository_url TEXT,
   performance_url TEXT,
-  start_date TIMESTAMPTZ,
-  due_date TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  start_date TEXT,
+  due_date TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE project_members (
@@ -64,9 +64,9 @@ CREATE TABLE project_members (
   programmer_id TEXT NOT NULL REFERENCES users(id),
   role_in_project TEXT NOT NULL,
   assigned_by_admin_id TEXT NOT NULL REFERENCES users(id),
-  participation_weight_override NUMERIC,
+  participation_weight_override REAL,
   participation_notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL,
+  created_at TEXT NOT NULL,
   PRIMARY KEY (project_id, programmer_id)
 );
 
@@ -80,11 +80,11 @@ CREATE TABLE tasks (
   status TEXT NOT NULL,
   priority TEXT NOT NULL,
   source TEXT NOT NULL,
-  due_date TIMESTAMPTZ,
-  estimated_hours NUMERIC,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL,
-  completed_at TIMESTAMPTZ
+  due_date TEXT,
+  estimated_hours REAL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  completed_at TEXT
 );
 
 CREATE TABLE project_updates (
@@ -94,18 +94,18 @@ CREATE TABLE project_updates (
   description TEXT NOT NULL,
   status TEXT NOT NULL,
   sort_order INTEGER NOT NULL,
-  visible_to_client BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  visible_to_client INTEGER NOT NULL DEFAULT 1,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE conversations (
   id TEXT PRIMARY KEY,
   project_id TEXT REFERENCES projects(id),
-  participant_ids JSONB NOT NULL DEFAULT '[]',
+  participant_ids TEXT NOT NULL DEFAULT '[]',
   created_by_user_id TEXT NOT NULL REFERENCES users(id),
   type TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE messages (
@@ -113,9 +113,9 @@ CREATE TABLE messages (
   conversation_id TEXT NOT NULL REFERENCES conversations(id),
   sender_id TEXT NOT NULL REFERENCES users(id),
   body TEXT NOT NULL,
-  attachments JSONB NOT NULL DEFAULT '[]',
-  read_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL
+  attachments TEXT NOT NULL DEFAULT '[]',
+  read_at TEXT,
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE visual_comments (
@@ -124,8 +124,8 @@ CREATE TABLE visual_comments (
   client_id TEXT NOT NULL REFERENCES users(id),
   url TEXT NOT NULL,
   page_title TEXT,
-  x_percent NUMERIC NOT NULL,
-  y_percent NUMERIC NOT NULL,
+  x_percent REAL NOT NULL,
+  y_percent REAL NOT NULL,
   viewport_width INTEGER NOT NULL,
   viewport_height INTEGER NOT NULL,
   css_selector TEXT,
@@ -134,8 +134,8 @@ CREATE TABLE visual_comments (
   comment TEXT NOT NULL,
   status TEXT NOT NULL,
   linked_task_id TEXT REFERENCES tasks(id),
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE time_entries (
@@ -145,13 +145,13 @@ CREATE TABLE time_entries (
   task_id TEXT REFERENCES tasks(id),
   repository_url TEXT NOT NULL,
   description TEXT NOT NULL,
-  started_at TIMESTAMPTZ NOT NULL,
-  ended_at TIMESTAMPTZ,
+  started_at TEXT NOT NULL,
+  ended_at TEXT,
   duration_seconds INTEGER NOT NULL DEFAULT 0,
   status TEXT NOT NULL,
   admin_review_notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE UNIQUE INDEX one_running_timer_per_programmer
@@ -166,9 +166,9 @@ CREATE TABLE github_repositories (
   repo TEXT NOT NULL,
   default_branch TEXT NOT NULL,
   added_by_user_id TEXT NOT NULL REFERENCES users(id),
-  last_synced_at TIMESTAMPTZ,
+  last_synced_at TEXT,
   sync_status TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE github_commit_metrics (
@@ -179,14 +179,14 @@ CREATE TABLE github_commit_metrics (
   github_author_name TEXT NOT NULL,
   github_author_email TEXT NOT NULL,
   commit_sha TEXT NOT NULL,
-  commit_date TIMESTAMPTZ NOT NULL,
+  commit_date TEXT NOT NULL,
   message TEXT NOT NULL,
   effective_lines_added INTEGER NOT NULL DEFAULT 0,
   effective_lines_deleted INTEGER NOT NULL DEFAULT 0,
   effective_lines_modified INTEGER NOT NULL DEFAULT 0,
   ignored_lines INTEGER NOT NULL DEFAULT 0,
   ignored_reason TEXT,
-  created_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE payments (
@@ -196,14 +196,14 @@ CREATE TABLE payments (
   gross_amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL,
   status TEXT NOT NULL,
-  due_date TIMESTAMPTZ,
+  due_date TEXT,
   payment_provider TEXT,
   provider_reference TEXT,
-  paid_at TIMESTAMPTZ,
+  paid_at TEXT,
   verified_by_admin_id TEXT REFERENCES users(id),
   notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE budgets (
@@ -214,8 +214,8 @@ CREATE TABLE budgets (
   description TEXT NOT NULL,
   estimated_value_cents INTEGER NOT NULL,
   status TEXT NOT NULL CHECK (status IN ('draft', 'submitted', 'approved', 'rejected', 'converted')),
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE earnings_calculations (
@@ -227,10 +227,10 @@ CREATE TABLE earnings_calculations (
   programmer_pool_amount_cents INTEGER NOT NULL,
   calculation_version INTEGER NOT NULL,
   calculated_by_user_id TEXT NOT NULL,
-  admin_override BOOLEAN NOT NULL DEFAULT FALSE,
-  finalized BOOLEAN NOT NULL DEFAULT FALSE,
+  admin_override INTEGER NOT NULL DEFAULT 0,
+  finalized INTEGER NOT NULL DEFAULT 0,
   notes TEXT,
-  created_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE programmer_earnings (
@@ -238,14 +238,14 @@ CREATE TABLE programmer_earnings (
   calculation_id TEXT NOT NULL REFERENCES earnings_calculations(id),
   project_id TEXT NOT NULL REFERENCES projects(id),
   programmer_id TEXT NOT NULL REFERENCES users(id),
-  participation_percent NUMERIC NOT NULL,
+  participation_percent REAL NOT NULL,
   github_effective_lines INTEGER NOT NULL DEFAULT 0,
   manual_adjustment_amount_cents INTEGER NOT NULL DEFAULT 0,
   manual_adjustment_reason TEXT,
   final_amount_cents INTEGER NOT NULL,
   status TEXT NOT NULL,
-  created_at TIMESTAMPTZ NOT NULL,
-  updated_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE payout_requests (
@@ -254,19 +254,19 @@ CREATE TABLE payout_requests (
   amount_cents INTEGER NOT NULL,
   currency TEXT NOT NULL,
   status TEXT NOT NULL,
-  requested_at TIMESTAMPTZ NOT NULL,
+  requested_at TEXT NOT NULL,
   reviewed_by_admin_id TEXT REFERENCES users(id),
-  reviewed_at TIMESTAMPTZ,
-  paid_at TIMESTAMPTZ,
+  reviewed_at TEXT,
+  paid_at TEXT,
   notes TEXT
 );
 
 CREATE TABLE system_settings (
   key TEXT PRIMARY KEY,
-  value JSONB NOT NULL,
+  value TEXT NOT NULL,
   description TEXT NOT NULL,
   updated_by_admin_id TEXT REFERENCES users(id),
-  updated_at TIMESTAMPTZ NOT NULL
+  updated_at TEXT NOT NULL
 );
 
 CREATE TABLE audit_logs (
@@ -275,11 +275,11 @@ CREATE TABLE audit_logs (
   action TEXT NOT NULL,
   entity_type TEXT NOT NULL,
   entity_id TEXT NOT NULL,
-  before JSONB,
-  after JSONB,
+  before TEXT,
+  after TEXT,
   ip_address TEXT,
   user_agent TEXT,
-  created_at TIMESTAMPTZ NOT NULL
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE notifications (
@@ -289,18 +289,24 @@ CREATE TABLE notifications (
   title TEXT NOT NULL,
   body TEXT NOT NULL,
   link TEXT,
-  read_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL
+  read_at TEXT,
+  created_at TEXT NOT NULL
 );
 
 CREATE TABLE password_reset_tokens (
   id TEXT PRIMARY KEY,
   user_id TEXT NOT NULL REFERENCES users(id),
   token_hash TEXT NOT NULL,
-  expires_at TIMESTAMPTZ NOT NULL,
-  used_at TIMESTAMPTZ,
-  created_at TIMESTAMPTZ NOT NULL
+  expires_at TEXT NOT NULL,
+  used_at TEXT,
+  created_at TEXT NOT NULL
 );
 
 CREATE INDEX password_reset_tokens_lookup
 ON password_reset_tokens(user_id, token_hash, expires_at);
+
+CREATE TABLE portal_state (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);

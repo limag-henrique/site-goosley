@@ -1,3 +1,5 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
+
 type EmailInput = {
   to: string;
   subject: string;
@@ -5,9 +7,32 @@ type EmailInput = {
   html?: string;
 };
 
+type SendEmailBinding = {
+  send(message: {
+    to: string;
+    from: string | { email: string; name?: string };
+    subject: string;
+    text: string;
+    html?: string;
+  }): Promise<unknown>;
+};
+
 export async function sendEmail(input: EmailInput) {
+  const cloudflareEmail = getCloudflareEmailBinding();
   const apiKey = process.env.EMAIL_API_KEY;
-  const from = process.env.EMAIL_FROM || "Goosley <no-reply@goosley.com>";
+  const from = process.env.EMAIL_FROM || "Goosley <goosleytech@gmail.com>";
+
+  if (cloudflareEmail) {
+    await cloudflareEmail.send({
+      from: parseEmailFrom(from),
+      to: input.to,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+    });
+
+    return { queued: true, provider: "cloudflare-email" };
+  }
 
   if (!apiKey) {
     console.info("[email:development]", { from, to: input.to, subject: input.subject });
@@ -34,6 +59,25 @@ export async function sendEmail(input: EmailInput) {
   }
 
   return { queued: true, provider: "resend" };
+}
+
+function getCloudflareEmailBinding() {
+  try {
+    const context = getCloudflareContext({ async: false });
+    return (context.env as CloudflareEnv & { EMAIL?: SendEmailBinding }).EMAIL;
+  } catch {
+    return undefined;
+  }
+}
+
+function parseEmailFrom(value: string) {
+  const match = value.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (!match) return value;
+
+  return {
+    name: match[1],
+    email: match[2],
+  };
 }
 
 export async function sendPasswordResetEmail(email: string, resetUrl: string) {

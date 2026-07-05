@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { toErrorResponse } from "./errors";
 import { checkRateLimit, clearSessionCookie, getClientIp, SESSION_COOKIE_NAME, setSessionCookie, verifyTurnstileToken } from "./security";
+import { withPortalPersistence } from "./store";
 import {
   adminDashboard,
   assignProgrammer,
@@ -82,7 +83,8 @@ export function actorFromRequest(request: NextRequest) {
 }
 
 export async function handleAuth(request: NextRequest, segments: string[]) {
-  try {
+  return withPortalPersistence(async () => {
+    try {
     const action = segments[0] || "me";
     const ip = getClientIp(request);
     if (["login", "register", "invite-programmer", "forgot-password", "reset-password"].includes(action)) {
@@ -151,13 +153,15 @@ export async function handleAuth(request: NextRequest, segments: string[]) {
     }
 
     return notFound();
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  }, { persist: shouldPersistPortalRequest(request) });
 }
 
 export async function handleClient(request: NextRequest, segments: string[]) {
-  try {
+  return withPortalPersistence(async () => {
+    try {
     const actor = actorFromRequest(request);
     const projectId = segments[1];
 
@@ -213,13 +217,15 @@ export async function handleClient(request: NextRequest, segments: string[]) {
     }
 
     return notFound();
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  }, { persist: shouldPersistPortalRequest(request) });
 }
 
 export async function handleProgrammer(request: NextRequest, segments: string[]) {
-  try {
+  return withPortalPersistence(async () => {
+    try {
     const actor = actorFromRequest(request);
 
     if (segments[0] === "dashboard" && request.method === "GET") return NextResponse.json(listProgrammerDashboard(actor));
@@ -250,13 +256,15 @@ export async function handleProgrammer(request: NextRequest, segments: string[])
     if (segments[0] === "realtime" && request.method === "GET") return NextResponse.json(realtimeSnapshot(actor));
 
     return notFound();
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  }, { persist: shouldPersistPortalRequest(request) });
 }
 
 export async function handleAdmin(request: NextRequest, segments: string[]) {
-  try {
+  return withPortalPersistence(async () => {
+    try {
     const actor = actorFromRequest(request);
     const body = async () => parseJson(request);
 
@@ -330,9 +338,10 @@ export async function handleAdmin(request: NextRequest, segments: string[]) {
     if (segments[0] === "realtime" && request.method === "GET") return NextResponse.json(realtimeSnapshot(actor));
 
     return notFound();
-  } catch (error) {
-    return toErrorResponse(error);
-  }
+    } catch (error) {
+      return toErrorResponse(error);
+    }
+  }, { persist: shouldPersistPortalRequest(request) });
 }
 
 function roleRedirect(role: string) {
@@ -349,4 +358,8 @@ async function verifyTurnstileFromPayload(payload: unknown, ip: string) {
 
 function notFound() {
   return NextResponse.json({ error: { code: "NOT_FOUND", message: "Route not found" } }, { status: 404 });
+}
+
+function shouldPersistPortalRequest(request: NextRequest) {
+  return !["GET", "HEAD", "OPTIONS"].includes(request.method);
 }

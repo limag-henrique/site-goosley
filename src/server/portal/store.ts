@@ -1,9 +1,31 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import type { PortalDatabase, SystemSetting } from "./types";
 import { createId, hashPassword, nowIso } from "./security";
 
 declare global {
   var goosleyPortalDatabase: PortalDatabase | undefined;
 }
+
+type D1Result<T = unknown> = {
+  results?: T[];
+};
+
+type D1Statement = {
+  bind(...values: unknown[]): D1Statement;
+  first<T = unknown>(): Promise<T | null>;
+  all<T = unknown>(): Promise<D1Result<T>>;
+  run(): Promise<unknown>;
+};
+
+type D1DatabaseBinding = {
+  prepare(query: string): D1Statement;
+};
+
+type PortalStateRow = {
+  value: string;
+};
+
+const PORTAL_STATE_KEY = "default";
 
 const defaultSettings = (adminId: string, timestamp: string): SystemSetting[] => [
   {
@@ -43,7 +65,7 @@ const defaultSettings = (adminId: string, timestamp: string): SystemSetting[] =>
   },
 ];
 
-function createSeedDatabase(): PortalDatabase {
+export function createSeedDatabase(): PortalDatabase {
   const timestamp = nowIso();
   const adminId = "usr_admin";
   const clientId = "usr_client";
@@ -396,7 +418,84 @@ export function getDb() {
   return globalThis.goosleyPortalDatabase;
 }
 
+export async function loadPortalDatabaseFromD1() {
+  const d1 = getD1Binding();
+  if (!d1) {
+    return getDb();
+  }
+
+  await ensurePortalStateTable(d1);
+  const row = await d1
+    .prepare("SELECT value FROM portal_state WHERE key = ?")
+    .bind(PORTAL_STATE_KEY)
+    .first<PortalStateRow>();
+
+  if (row?.value) {
+    globalThis.goosleyPortalDatabase = JSON.parse(row.value) as PortalDatabase;
+    return globalThis.goosleyPortalDatabase;
+  }
+
+  if (process.env.PORTAL_ALLOW_DEMO_SEED === "1") {
+    const seeded = getDb();
+    await savePortalDatabaseToD1(seeded, d1);
+    return seeded;
+  }
+
+  throw new Error("Portal D1 state is empty. Generate and apply migrations/seed.sql before using the portal.");
+}
+
+export async function savePortalDatabaseToD1(database = getDb(), existingD1?: D1DatabaseBinding) {
+  const d1 = existingD1 || getD1Binding();
+  if (!d1) {
+    return;
+  }
+
+  await ensurePortalStateTable(d1);
+  await d1
+    .prepare(
+      `INSERT INTO portal_state (key, value, updated_at)
+       VALUES (?, ?, ?)
+       ON CONFLICT(key) DO UPDATE SET
+         value = excluded.value,
+         updated_at = excluded.updated_at`
+    )
+    .bind(PORTAL_STATE_KEY, JSON.stringify(database), nowIso())
+    .run();
+}
+
+export async function withPortalPersistence<T>(operation: () => T | Promise<T>, options: { persist?: boolean } = {}) {
+  await loadPortalDatabaseFromD1();
+  const result = await operation();
+
+  if (options.persist) {
+    await savePortalDatabaseToD1();
+  }
+
+  return result;
+}
+
 export function resetPortalDatabaseForTests() {
   globalThis.goosleyPortalDatabase = createSeedDatabase();
   return globalThis.goosleyPortalDatabase;
+}
+
+function getD1Binding() {
+  try {
+    const context = getCloudflareContext({ async: false });
+    return (context.env as CloudflareEnv & { DB?: D1DatabaseBinding }).DB;
+  } catch {
+    return undefined;
+  }
+}
+
+async function ensurePortalStateTable(d1: D1DatabaseBinding) {
+  await d1
+    .prepare(
+      `CREATE TABLE IF NOT EXISTS portal_state (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )`
+    )
+    .run();
 }
