@@ -1,4 +1,4 @@
-export type PricingOption = {
+type PricingOption = {
   id: string;
   label: string;
   setupMin: number;
@@ -12,7 +12,7 @@ export type PricingOption = {
   isDefault?: boolean;
 };
 
-export type PricingVariable = {
+type PricingVariable = {
   id: string;
   name: string;
   options: PricingOption[];

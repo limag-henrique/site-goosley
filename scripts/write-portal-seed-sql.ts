@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import { hashPassword, nowIso } from "../src/server/portal/security";
 import { createSeedDatabase } from "../src/server/portal/store";
 
-const outputPath = resolve("migrations", "seed.sql");
+const outputPath = resolve("scripts", "portal-seed.sql");
 const adminEmail = process.env.PORTAL_ADMIN_EMAIL;
 const adminPassword = process.env.PORTAL_ADMIN_PASSWORD;
 

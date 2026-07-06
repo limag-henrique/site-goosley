@@ -81,43 +81,6 @@ export function ActionForm({
   );
 }
 
-export function EstimateCalculator() {
-  const [result, setResult] = useState<{ estimatedValueCents: number; estimatedDays: number; scopeScore: number } | null>(null);
-
-  async function submit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    const formData = new FormData(event.currentTarget);
-    const response = await fetch("/client/estimate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        features: Number(formData.get("features")),
-        complexity: Number(formData.get("complexity")),
-        integrations: Number(formData.get("integrations")),
-      }),
-    });
-    if (response.ok) setResult(await response.json());
-  }
-
-  return (
-    <form onSubmit={submit} className="grid gap-3">
-      <div className="grid gap-3 sm:grid-cols-3">
-        <NumberInput name="features" label="Funcionalidades" value={6} />
-        <NumberInput name="complexity" label="Complexidade" value={3} />
-        <NumberInput name="integrations" label="Integracoes" value={2} />
-      </div>
-      <button className="min-h-11 bg-orange-400 px-4 font-black uppercase tracking-widest text-black">Calcular</button>
-      {result ? (
-        <div className="grid gap-2 border border-black/10 bg-white p-4 text-sm dark:border-white/10 dark:bg-white/5">
-          <strong>{money(result.estimatedValueCents)}</strong>
-          <span>{result.estimatedDays} dias estimados</span>
-          <span>Escopo: {result.scopeScore}</span>
-        </div>
-      ) : null}
-    </form>
-  );
-}
-
 type PortalTask = {
   id: string;
   projectId: string;
@@ -250,15 +213,6 @@ export function PortalProjectEstimator() {
         </aside>
       </div>
     </div>
-  );
-}
-
-function NumberInput({ name, label, value }: { name: string; label: string; value: number }) {
-  return (
-    <label className="grid gap-1 text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-      {label}
-      <input name={name} type="number" min={0} defaultValue={value} className={inputClassName} />
-    </label>
   );
 }
 

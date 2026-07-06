@@ -79,13 +79,13 @@ export function requireActor(user?: User, meta: Pick<RequestActor, "ipAddress" |
   return { user, ...meta };
 }
 
-export function requireRole(actor: RequestActor, roles: UserRole[]) {
+function requireRole(actor: RequestActor, roles: UserRole[]) {
   if (!roleAllowed(actor.user.role, roles)) {
     throw new ForbiddenError(`Requires role: ${roles.join(" or ")}`);
   }
 }
 
-export function createSession(userId: string) {
+function createSession(userId: string) {
   const db = getDb();
   const createdAt = nowIso();
   const expiresAt = addDays(new Date(), 7).toISOString();

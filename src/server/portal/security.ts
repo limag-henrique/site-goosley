@@ -45,10 +45,6 @@ export function verifyPassword(password: string, passwordHash: string) {
   return stored.length === key.length && timingSafeEqual(stored, key);
 }
 
-export function publicHash(value: string) {
-  return createHash("sha256").update(value).digest("hex").slice(0, 16);
-}
-
 export function getClientIp(request: NextRequest) {
   return (
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||

@@ -125,9 +125,3 @@ export function optionalStringArray(body: JsonRecord, key: string) {
 
   return value.map((item) => item.trim()).filter(Boolean);
 }
-
-export function safeJsonRecord(value: unknown) {
-  return value && typeof value === "object" && !Array.isArray(value)
-    ? (value as Record<string, unknown>)
-    : undefined;
-}

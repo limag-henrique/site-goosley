@@ -1,12 +1,12 @@
 export type UserRole = "client" | "developer" | "programmer" | "admin";
-export type UserStatus = "active" | "invited" | "suspended" | "disabled";
-export type ProjectStatus = "draft" | "active" | "paused" | "completed" | "cancelled";
-export type TaskStatus = "todo" | "in_progress" | "review" | "done" | "rejected" | "cancelled";
-export type TaskPriority = "low" | "medium" | "high" | "urgent";
-export type TaskSource = "admin" | "client_request" | "visual_comment" | "github" | "system";
-export type ConversationType = "direct" | "project" | "support" | "broadcast";
-export type VisualCommentStatus = "open" | "acknowledged" | "converted_to_task" | "resolved" | "rejected";
-export type PaymentStatus = "pending" | "paid" | "verified" | "failed" | "refunded" | "cancelled";
+type UserStatus = "active" | "invited" | "suspended" | "disabled";
+type ProjectStatus = "draft" | "active" | "paused" | "completed" | "cancelled";
+type TaskStatus = "todo" | "in_progress" | "review" | "done" | "rejected" | "cancelled";
+type TaskPriority = "low" | "medium" | "high" | "urgent";
+type TaskSource = "admin" | "client_request" | "visual_comment" | "github" | "system";
+type ConversationType = "direct" | "project" | "support" | "broadcast";
+type VisualCommentStatus = "open" | "acknowledged" | "converted_to_task" | "resolved" | "rejected";
+type PaymentStatus = "pending" | "paid" | "verified" | "failed" | "refunded" | "cancelled";
 
 export interface User {
   id: string;
@@ -22,7 +22,7 @@ export interface User {
   lastLoginAt?: string;
 }
 
-export interface ClientProfile {
+interface ClientProfile {
   userId: string;
   companyName?: string;
   phone?: string;
@@ -30,7 +30,7 @@ export interface ClientProfile {
   notes?: string;
 }
 
-export interface ProgrammerProfile {
+interface ProgrammerProfile {
   userId: string;
   displayName: string;
   skills: string[];
@@ -64,7 +64,7 @@ export interface Project {
   updatedAt: string;
 }
 
-export interface ProjectMember {
+interface ProjectMember {
   projectId: string;
   programmerId: string;
   roleInProject: string;
@@ -100,7 +100,7 @@ export interface ProjectUpdate {
   updatedAt: string;
 }
 
-export interface Conversation {
+interface Conversation {
   id: string;
   projectId?: string;
   participantIds: string[];
@@ -109,7 +109,7 @@ export interface Conversation {
   createdAt: string;
 }
 
-export interface Message {
+interface Message {
   id: string;
   conversationId: string;
   senderId: string;
@@ -139,7 +139,7 @@ export interface VisualComment {
   updatedAt: string;
 }
 
-export interface GitHubRepository {
+interface GitHubRepository {
   id: string;
   projectId: string;
   repositoryUrl: string;
@@ -152,7 +152,7 @@ export interface GitHubRepository {
   createdAt: string;
 }
 
-export interface Payment {
+interface Payment {
   id: string;
   projectId: string;
   clientId: string;
@@ -169,7 +169,7 @@ export interface Payment {
   updatedAt: string;
 }
 
-export interface Budget {
+interface Budget {
   id: string;
   clientId: string;
   projectId?: string;
@@ -189,7 +189,7 @@ export interface SystemSetting {
   updatedAt: string;
 }
 
-export interface PasswordResetToken {
+interface PasswordResetToken {
   id: string;
   userId: string;
   tokenHash: string;
@@ -222,7 +222,7 @@ export interface Notification {
   createdAt: string;
 }
 
-export interface Session {
+interface Session {
   id: string;
   userId: string;
   createdAt: string;

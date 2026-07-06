@@ -17,7 +17,7 @@ type SendEmailBinding = {
   }): Promise<unknown>;
 };
 
-export async function sendEmail(input: EmailInput) {
+async function sendEmail(input: EmailInput) {
   const cloudflareEmail = getCloudflareEmailBinding();
   const apiKey = process.env.EMAIL_API_KEY;
   const from = process.env.EMAIL_FROM || "Goosley <goosleytech@gmail.com>";

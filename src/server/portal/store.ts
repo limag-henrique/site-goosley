@@ -340,10 +340,10 @@ export async function loadPortalDatabaseFromD1() {
     return seeded;
   }
 
-  throw new Error("Portal D1 state is empty. Generate and apply migrations/seed.sql before using the portal.");
+  throw new Error("Portal D1 state is empty. Generate a seed with npm run seed:d1:sql and execute it before using the portal.");
 }
 
-export async function savePortalDatabaseToD1(database = getDb(), existingD1?: D1DatabaseBinding) {
+async function savePortalDatabaseToD1(database = getDb(), existingD1?: D1DatabaseBinding) {
   const d1 = existingD1 || getD1Binding();
   if (!d1) {
     return;

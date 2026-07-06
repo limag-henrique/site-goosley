@@ -16,7 +16,7 @@ import {
   Users,
   Wrench,
 } from "lucide-react";
-import type { RequestActor, UserRole } from "@/server/portal/types";
+import type { RequestActor } from "@/server/portal/types";
 import { PortalTopActions } from "./PortalTopActions";
 
 type NavItem = {
@@ -138,10 +138,4 @@ export function PortalShell({
     </main>
     </div>
   );
-}
-
-export function roleLabel(role: UserRole) {
-  if (role === "admin") return "Administrador";
-  if (role === "client") return "Cliente";
-  return "Desenvolvedor";
 }

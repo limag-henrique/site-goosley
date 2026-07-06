@@ -49,7 +49,7 @@ import {
   estimateBudget,
 } from "./services";
 
-export async function parseJson(request: NextRequest) {
+async function parseJson(request: NextRequest) {
   if (request.method === "GET" || request.method === "HEAD") {
     return {};
   }
@@ -62,7 +62,7 @@ export async function parseJson(request: NextRequest) {
   return JSON.parse(text) as unknown;
 }
 
-export function actorFromRequest(request: NextRequest) {
+function actorFromRequest(request: NextRequest) {
   const user = findUserBySession(request.cookies.get(SESSION_COOKIE_NAME)?.value);
   return requireActor(user, {
     ipAddress: getClientIp(request),

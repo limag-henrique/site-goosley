@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { useRef } from "react";
-import Image from "next/image";
 import { Hero } from "@/components/Hero";
 import dynamic from "next/dynamic";
 
@@ -12,15 +11,6 @@ const InfiniteMarquee = dynamic(() => import("@/components/InfiniteMarquee").the
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"]
-  });
-
-  // Parallax transforms for the gallery
-  const y1 = useTransform(scrollYProgress, [0, 1], ["0%", "-20%"]);
-  const y2 = useTransform(scrollYProgress, [0, 1], ["0%", "-50%"]);
-  const y3 = useTransform(scrollYProgress, [0, 1], ["0%", "-10%"]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground" ref={containerRef}>
@@ -241,4 +231,3 @@ export default function Home() {
     </div>
   );
 }
-
