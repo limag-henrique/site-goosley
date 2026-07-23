@@ -12,7 +12,7 @@ export function CustomCursor() {
   const cursorX = useMotionValue(-100);
   const cursorY = useMotionValue(-100);
 
-  const springConfig = { damping: 25, stiffness: 300, mass: 0.5 };
+  const springConfig = { damping: 28, stiffness: 350, mass: 0.4 };
   const cursorXSpring = useSpring(cursorX, springConfig);
   const cursorYSpring = useSpring(cursorY, springConfig);
 
@@ -24,54 +24,56 @@ export function CustomCursor() {
     window.addEventListener("resize", checkMobile);
     
     const moveCursor = (e: MouseEvent) => {
-      cursorX.set(e.clientX - 32); // Offset by half of cursor width (64/2)
-      cursorY.set(e.clientY - 32);
+      cursorX.set(e.clientX - 24); // Centered offset for 48px base size
+      cursorY.set(e.clientY - 24);
+      if (!isVisible) setIsVisible(true);
     };
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const shouldBeVisible = !!target.closest("[data-custom-cursor]");
-      const shouldBeHovering = !!(target.closest("a") || target.closest("button"));
+      const isInteractive = !!(
+        target.closest("a") || 
+        target.closest("button") || 
+        target.closest("[role='button']") ||
+        target.closest("[data-custom-cursor]") ||
+        target.closest(".group")
+      );
 
-      setIsVisible(prev => prev !== shouldBeVisible ? shouldBeVisible : prev);
-      setIsHovering(prev => prev !== shouldBeHovering ? shouldBeHovering : prev);
+      setIsHovering(isInteractive);
+    };
+
+    const handleMouseLeaveWindow = () => {
+      setIsVisible(false);
     };
 
     window.addEventListener("mousemove", moveCursor);
     window.addEventListener("mouseover", handleMouseOver);
+    document.addEventListener("mouseleave", handleMouseLeaveWindow);
 
     return () => {
       window.removeEventListener("resize", checkMobile);
       window.removeEventListener("mousemove", moveCursor);
       window.removeEventListener("mouseover", handleMouseOver);
+      document.removeEventListener("mouseleave", handleMouseLeaveWindow);
     };
-  }, [cursorX, cursorY]);
-
-  useEffect(() => {
-    if (isVisible) {
-      document.body.classList.add("no-cursor");
-    } else {
-      document.body.classList.remove("no-cursor");
-    }
-    return () => document.body.classList.remove("no-cursor");
-  }, [isVisible]);
+  }, [cursorX, cursorY, isVisible]);
 
   if (isMobile) return null;
 
   return (
     <motion.div
-      className="fixed top-0 left-0 w-16 h-16 bg-blue-600 rounded-full pointer-events-none z-[100] flex items-center justify-center mix-blend-difference text-white"
+      className="fixed top-0 left-0 w-12 h-12 bg-white rounded-full pointer-events-none z-[100] flex items-center justify-center mix-blend-difference text-black shadow-2xl"
       style={{
         x: cursorXSpring,
         y: cursorYSpring,
         opacity: isVisible ? 1 : 0,
-        scale: isVisible ? (isHovering ? 1.5 : 1) : 0,
+        scale: isVisible ? (isHovering ? 1.8 : 0.6) : 0,
       }}
       initial={{ opacity: 0, scale: 0 }}
-      animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? (isHovering ? 1.5 : 1) : 0 }}
+      animate={{ opacity: isVisible ? 1 : 0, scale: isVisible ? (isHovering ? 1.8 : 0.6) : 0 }}
       transition={{ opacity: { duration: 0.2 }, scale: { duration: 0.2 } }}
     >
-      <ArrowUpRight className="w-6 h-6" />
+      <ArrowUpRight className={`w-5 h-5 transition-opacity duration-200 ${isHovering ? "opacity-100" : "opacity-0"}`} />
     </motion.div>
   );
 }

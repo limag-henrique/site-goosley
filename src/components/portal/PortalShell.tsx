@@ -106,21 +106,27 @@ export function PortalShell({
                 <span className="text-xs text-zinc-500 dark:text-zinc-400">Portal operacional</span>
               </span>
             </Link>
-            <nav className="mt-8 grid gap-1">
+            <nav className="mt-8 grid gap-1.5">
               {nav.map((item) => {
                 const Icon = item.icon;
+                const isActive = currentPath === item.href;
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex min-h-11 items-center gap-3 px-3 rounded-lg text-sm font-semibold transition ${
-                      currentPath === item.href
-                        ? "bg-zinc-100 text-zinc-950 dark:bg-white/10 dark:text-white"
-                        : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-white/5"
+                    className={`flex min-h-11 items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                      isActive
+                        ? "bg-zinc-900 text-white shadow-md dark:bg-white dark:text-zinc-950 font-bold scale-[1.02]"
+                        : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white"
                     }`}
                   >
-                    <Icon size={18} />
-                    <span>{item.label}</span>
+                    <div className="flex items-center gap-3">
+                      <Icon size={18} className={isActive ? "text-orange-500 dark:text-orange-600" : ""} />
+                      <span>{item.label}</span>
+                    </div>
+                    {isActive && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-orange-500 dark:bg-orange-600" />
+                    )}
                   </Link>
                 );
               })}

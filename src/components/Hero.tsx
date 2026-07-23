@@ -128,6 +128,50 @@ export function Hero() {
           </motion.div>
         </div>
 
+        {/* Desktop Description & Action Buttons */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
+          className="hidden md:flex items-center justify-between w-full mt-12 pt-8 border-t border-white/10"
+        >
+          <div className="flex items-center gap-6">
+            <a 
+              href="/precos" 
+              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:bg-orange-500 hover:text-white hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
+            >
+              <span>Simule seu Projeto</span>
+              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <a 
+              href="https://wa.me/5531994217926" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:scale-105 backdrop-blur-md"
+            >
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              <span>WhatsApp Direto</span>
+            </a>
+          </div>
+
+          <div className="flex items-center gap-8 text-xs font-semibold uppercase tracking-widest text-white/60">
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
+              100% Personalizado
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              Performance & IA
+            </span>
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              Atendimento Global
+            </span>
+          </div>
+        </motion.div>
+
         {/* Mobile Description */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

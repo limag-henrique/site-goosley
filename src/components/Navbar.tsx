@@ -61,13 +61,31 @@ export function Navbar() {
 
           {/* Desktop Menu */}
           <nav className={cn(
-            "hidden md:flex items-center gap-8 text-sm font-bold tracking-widest uppercase transition-colors duration-300 text-white"
+            "hidden md:flex items-center gap-8 text-xs lg:text-sm font-bold tracking-widest uppercase transition-colors duration-300 text-white"
           )}>
-            <Link href="/a-solucao" className="hover:opacity-50 transition-opacity min-h-[44px] flex items-center">Nossas Soluções</Link>
-            <Link href="/precos" className="hover:opacity-50 transition-opacity min-h-[44px] flex items-center">Simule seu Projeto</Link>
-            <Link href="/portfolio" className="hover:opacity-50 transition-opacity min-h-[44px] flex items-center">Portfólio</Link>
-            <Link href="/contato" className="hover:opacity-50 transition-opacity min-h-[44px] flex items-center">Contato</Link>
-            <Link href="/meu-portal" className="hover:opacity-50 transition-opacity min-h-[44px] flex items-center">Meu Portal</Link>
+            <Link href="/a-solucao" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
+              <span>Nossas Soluções</span>
+              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+            </Link>
+            <Link href="/precos" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
+              <span>Simule seu Projeto</span>
+              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+            </Link>
+            <Link href="/portfolio" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
+              <span>Portfólio</span>
+              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+            </Link>
+            <Link href="/contato" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
+              <span>Contato</span>
+              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+            </Link>
+            <Link 
+              href="/meu-portal" 
+              className="px-5 py-2.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 backdrop-blur-md text-white transition-all shadow-lg hover:shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:scale-105 min-h-[40px] flex items-center gap-2"
+            >
+              <span className="relative z-10">Meu Portal</span>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            </Link>
           </nav>
 
           {/* Mobile Menu Toggle */}

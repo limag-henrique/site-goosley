@@ -113,7 +113,7 @@ function EstimatorInner() {
       <div className="w-full lg:w-2/3 flex flex-col gap-12">
         
         {/* Category Tabs */}
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
           {pricingData.map((category) => (
             <button
               key={category.id}
@@ -126,10 +126,10 @@ function EstimatorInner() {
                 router.replace(`?${params.toString()}`, { scroll: false });
               }}
               className={cn(
-                "w-full text-left px-6 py-4 rounded-2xl text-sm font-bold uppercase tracking-widest transition-all",
+                "px-6 py-3.5 rounded-2xl text-xs lg:text-sm font-bold uppercase tracking-widest transition-all duration-300 flex-1 min-w-[200px] text-center shadow-sm",
                 activeCategory.id === category.id
-                  ? "bg-foreground text-background"
-                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10"
+                  ? "bg-foreground text-background shadow-lg scale-[1.02]"
+                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
               )}
             >
               {category.title}
