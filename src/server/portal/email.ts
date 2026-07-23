@@ -17,14 +17,58 @@ type SendEmailBinding = {
   }): Promise<unknown>;
 };
 
-async function sendEmail(input: EmailInput) {
+function getEnvVar(key: string): string | undefined {
+  try {
+    const context = getCloudflareContext({ async: false });
+    const env = context?.env as Record<string, string> | undefined;
+    if (env && env[key]) {
+      return env[key];
+    }
+  } catch {
+    // Fallback to process.env if outside Cloudflare context
+  }
+  return process.env[key];
+}
+
+export async function sendEmail(input: EmailInput) {
   const cloudflareEmail = getCloudflareEmailBinding();
-  const apiKey = process.env.EMAIL_API_KEY;
-  const from = process.env.EMAIL_FROM || "Goosley <goosleytech@gmail.com>";
+  const gmailPass = getEnvVar("GMAIL_APP_PASSWORD") || getEnvVar("SMTP_PASS");
+  const from = getEnvVar("EMAIL_FROM") || "Goosley <goosleytech@gmail.com>";
+  const parsedFrom = parseEmailFrom(from);
+  const gmailUser =
+    getEnvVar("SMTP_USER") ||
+    getEnvVar("GMAIL_USER") ||
+    (typeof parsedFrom === "object" ? parsedFrom.email : parsedFrom) ||
+    "goosleytech@gmail.com";
+
+  if (gmailPass) {
+    const nodemailer = await import("nodemailer");
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: gmailUser,
+        pass: gmailPass.replace(/\s+/g, ""), // Remove any accidental spaces in Google app password
+      },
+    });
+
+    await transporter.sendMail({
+      from,
+      to: input.to,
+      subject: input.subject,
+      text: input.text,
+      html: input.html,
+    });
+
+    return { queued: true, provider: "gmail-smtp" };
+  }
+
+  const apiKey = getEnvVar("EMAIL_API_KEY") || getEnvVar("RESEND_API_KEY");
 
   if (cloudflareEmail) {
     await cloudflareEmail.send({
-      from: parseEmailFrom(from),
+      from: parsedFrom,
       to: input.to,
       subject: input.subject,
       text: input.text,
