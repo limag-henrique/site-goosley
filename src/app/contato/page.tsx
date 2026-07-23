@@ -1,18 +1,70 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Send, MapPin, Phone, MessageCircle, Mail } from "lucide-react";
+import { Send, MapPin, Phone, MessageCircle, Mail, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
+
+const countryCodes = [
+  { code: "+55", country: "Brasil 🇧🇷" },
+  { code: "+1", country: "EUA / Canadá 🇺🇸" },
+  { code: "+351", country: "Portugal 🇵🇹" },
+  { code: "+34", country: "Espanha 🇪🇸" },
+  { code: "+44", country: "Reino Unido 🇬🇧" },
+  { code: "+49", country: "Alemanha 🇩🇪" },
+  { code: "+54", country: "Argentina 🇦🇷" },
+  { code: "+56", country: "Chile 🇨🇱" },
+  { code: "+57", country: "Colômbia 🇨🇴" },
+  { code: "+52", country: "México 🇲🇽" },
+  { code: "+39", country: "Itália 🇮🇹" },
+  { code: "+33", country: "França 🇫🇷" },
+];
 
 export default function Contato() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [countryCode, setCountryCode] = useState("+55");
+  const [phone, setPhone] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const bodyText = `Nome: ${name}\nEmail: ${email}\n\nMensagem:\n${message}`;
-    window.location.href = `mailto:henriquelimagusmao@gmail.com?subject=Contato%20Projeto%20-${encodeURIComponent(name || 'Goosley')}&body=${encodeURIComponent(bodyText)}`;
+    setIsSubmitting(true);
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/contato", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          countryCode,
+          phone,
+          message,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Erro ao enviar a mensagem");
+      }
+
+      setIsSubmitted(true);
+    } catch (err: unknown) {
+      const errText = err instanceof Error ? err.message : "Ocorreu um erro ao enviar sua mensagem.";
+      setErrorMessage(errText);
+
+      // Fallback: open mailto if server request fails
+      const fullPhone = phone ? `${countryCode} ${phone}` : "Não informado";
+      const bodyText = `Nome: ${name}\nEmail: ${email}\nTelefone: ${fullPhone}\n\nMensagem:\n${message}`;
+      window.location.href = `mailto:henriquelimagusmao@gmail.com?subject=Contato%20Projeto%20-${encodeURIComponent(name || 'Goosley')}&body=${encodeURIComponent(bodyText)}`;
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -85,57 +137,130 @@ export default function Contato() {
           >
             <h3 className="text-2xl sm:text-3xl font-bold mb-6 tracking-tight">Envie uma mensagem</h3>
             
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-              <div>
-                <label htmlFor="name" className="block text-sm font-semibold mb-2">Seu Nome</label>
-                <input 
-                  type="text"
-                  id="name"
-                  required
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-base"
-                  placeholder="Seu nome completo"
-                  autoComplete="name"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="block text-sm font-semibold mb-2">Seu E-mail</label>
-                <input 
-                  type="email"
-                  id="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-base"
-                  placeholder="seuemail@exemplo.com"
-                  autoComplete="email"
-                  inputMode="email"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="block text-sm font-semibold mb-2">Detalhes do Projeto</label>
-                <textarea 
-                  id="message"
-                  required
-                  rows={5}
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none text-base"
-                  placeholder="Como podemos te ajudar?"
-                />
-              </div>
-              
-              <button 
-                type="submit"
-                className="w-full bg-blue-600 text-white font-semibold text-base sm:text-lg py-4 rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg"
+            {isSubmitted ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center text-center p-8 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl gap-4 text-emerald-600 dark:text-emerald-400"
               >
-                Enviar Solicitação
-                <Send className="w-5 h-5" />
-              </button>
-            </form>
+                <CheckCircle2 className="w-16 h-16" />
+                <h4 className="text-2xl font-bold">Solicitação Enviada!</h4>
+                <p className="text-sm font-medium text-foreground/80">
+                  Sua mensagem foi entregue com sucesso para <strong>henriquelimagusmao@gmail.com</strong>. Nossa equipe entrará em contato em breve!
+                </p>
+                <button
+                  onClick={() => {
+                    setIsSubmitted(false);
+                    setName("");
+                    setEmail("");
+                    setPhone("");
+                    setMessage("");
+                  }}
+                  className="mt-4 px-6 py-2.5 rounded-xl bg-foreground text-background font-bold text-xs uppercase tracking-wider hover:opacity-90"
+                >
+                  Enviar outra mensagem
+                </button>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                {errorMessage && (
+                  <div className="p-4 bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 rounded-xl text-sm flex items-center gap-3">
+                    <AlertCircle className="w-5 h-5 shrink-0" />
+                    <span>{errorMessage} (aberto cliente de e-mail como alternativa).</span>
+                  </div>
+                )}
+
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold mb-2">Seu Nome *</label>
+                  <input 
+                    type="text"
+                    id="name"
+                    required
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-base"
+                    placeholder="Seu nome completo"
+                    autoComplete="name"
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold mb-2">Seu E-mail *</label>
+                  <input 
+                    type="email"
+                    id="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-base"
+                    placeholder="seuemail@exemplo.com"
+                    autoComplete="email"
+                    inputMode="email"
+                  />
+                </div>
+
+                {/* Country Code (DDI) & Phone Input */}
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold mb-2">Telefone / WhatsApp</label>
+                  <div className="flex gap-2">
+                    <select
+                      value={countryCode}
+                      onChange={(e) => setCountryCode(e.target.value)}
+                      className="px-3 py-3 sm:px-4 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-sm font-bold shrink-0 cursor-pointer"
+                      aria-label="Código do País (DDI)"
+                    >
+                      {countryCodes.map((c) => (
+                        <option key={c.code} value={c.code} className="bg-background text-foreground">
+                          {c.code} ({c.country})
+                        </option>
+                      ))}
+                    </select>
+
+                    <input 
+                      type="tel"
+                      id="phone"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all text-base"
+                      placeholder="(31) 99999-9999"
+                      autoComplete="tel"
+                      inputMode="tel"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-semibold mb-2">Detalhes do Projeto *</label>
+                  <textarea 
+                    id="message"
+                    required
+                    rows={5}
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    className="w-full px-4 py-3 sm:px-5 sm:py-4 rounded-xl bg-accent/50 border border-transparent focus:bg-background focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 outline-none transition-all resize-none text-base"
+                    placeholder="Como podemos te ajudar?"
+                  />
+                </div>
+                
+                <button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full bg-blue-600 text-white font-semibold text-base sm:text-lg py-4 rounded-xl hover:bg-blue-700 active:scale-[0.99] transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <span>Enviando...</span>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                    </>
+                  ) : (
+                    <>
+                      <span>Enviar Solicitação</span>
+                      <Send className="w-5 h-5" />
+                    </>
+                  )}
+                </button>
+              </form>
+            )}
           </motion.div>
 
         </div>

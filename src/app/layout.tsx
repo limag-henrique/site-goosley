@@ -7,12 +7,12 @@ import { cn } from "@/lib/utils";
 
 const inter = Inter({
   variable: "--font-inter",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const dancingScript = Dancing_Script({
   variable: "--font-cursive",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 export const metadata: Metadata = {

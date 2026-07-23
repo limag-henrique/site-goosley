@@ -31,7 +31,7 @@ export function Hero() {
   return (
     <section 
       ref={containerRef}
-      className="relative min-h-[50vh] md:min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white pt-24 pb-12"
+      className="relative min-h-[50vh] md:min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-black text-white pt-24 pb-20 md:pb-36 mb-8 md:mb-16"
     >
       {/* Fluid Background with Parallax */}
       <motion.div 
@@ -128,48 +128,31 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Desktop Description & Action Buttons */}
+        {/* Centered Desktop & Mobile Action Buttons */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-          className="hidden md:flex items-center justify-between w-full mt-12 pt-8 border-t border-white/10"
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full mt-12 md:mt-16 pt-8 border-t border-white/10"
         >
-          <div className="flex items-center gap-6">
-            <a 
-              href="/precos" 
-              className="group relative inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:bg-orange-500 hover:text-white hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.2)]"
-            >
-              <span>Simule seu Projeto</span>
-              <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </a>
-            <a 
-              href="https://wa.me/5531994217926" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-7 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:scale-105 backdrop-blur-md"
-            >
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              <span>WhatsApp Direto</span>
-            </a>
-          </div>
-
-          <div className="flex items-center gap-8 text-xs font-semibold uppercase tracking-widest text-white/60">
-            <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-orange-500" />
-              100% Personalizado
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
-              Performance & IA
-            </span>
-            <span className="flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-              Atendimento Global
-            </span>
-          </div>
+          <a 
+            href="/precos" 
+            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:bg-orange-500 hover:text-white hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.2)] w-full sm:w-auto text-center"
+          >
+            <span>Simule seu Projeto</span>
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+          </a>
+          <a 
+            href="https://wa.me/5531994217926" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:scale-105 backdrop-blur-md w-full sm:w-auto text-center"
+          >
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span>WhatsApp Direto</span>
+          </a>
         </motion.div>
 
         {/* Mobile Description */}
@@ -177,10 +160,10 @@ export function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
-          className="md:hidden w-full mt-6 pl-1"
+          className="md:hidden w-full mt-6 text-center"
         >
           <p className="text-sm sm:text-base font-medium leading-relaxed text-white/80">
-            A Goosley Digital é uma consultoria que adapta à necessidade do seu negócio para desenvolver soluções criativas que geram impacto.
+            A Goosley Digital é uma consultoria que se adapta à necessidade do seu negócio para desenvolver soluções criativas que geram impacto.
           </p>
         </motion.div>
       </motion.div>
