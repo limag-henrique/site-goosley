@@ -3,8 +3,8 @@
 import { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 interface HoverRevealProps {
   text: string;
@@ -29,21 +29,25 @@ export function HoverReveal({ text, imageSrc, href, description, ctaText }: Hove
   const content = (
     <div
       ref={containerRef}
-      className="relative w-full py-6 border-b border-foreground/10 group cursor-pointer overflow-visible"
+      className="relative w-full py-6 md:py-8 border-b border-foreground/10 group cursor-pointer overflow-visible"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="flex flex-col md:flex-row md:items-center justify-between w-full">
-        <h3 className="text-4xl md:text-6xl font-bold tracking-tighter group-hover:pl-8 transition-all duration-300">
-          {text}
-        </h3>
+      <div className="flex flex-col md:flex-row md:items-center justify-between w-full gap-2 md:gap-0">
+        <div className="flex items-center justify-between w-full md:w-auto">
+          <h3 className="text-2xl sm:text-4xl md:text-6xl font-bold tracking-tighter group-hover:pl-4 md:group-hover:pl-8 transition-all duration-300">
+            {text}
+          </h3>
+          <ArrowUpRight className="w-6 h-6 md:hidden text-foreground/50 group-hover:text-foreground transition-colors shrink-0 ml-4" />
+        </div>
+
         {description && (
-          <div className="mt-4 md:mt-0 md:text-right flex flex-col items-start md:items-end group-hover:pr-8 transition-all duration-300">
-            <p className="text-lg md:text-xl font-medium tracking-tight text-foreground/70 mb-2">
+          <div className="mt-2 md:mt-0 md:text-right flex flex-col items-start md:items-end group-hover:pr-4 md:group-hover:pr-8 transition-all duration-300">
+            <p className="text-base md:text-xl font-medium tracking-tight text-foreground/70 mb-1">
               {description}
             </p>
             {ctaText && (
-              <span className="text-sm font-bold uppercase tracking-widest text-foreground underline underline-offset-4">
+              <span className="text-xs md:text-sm font-bold uppercase tracking-widest text-foreground underline underline-offset-4">
                 {ctaText}
               </span>
             )}
@@ -51,8 +55,9 @@ export function HoverReveal({ text, imageSrc, href, description, ctaText }: Hove
         )}
       </div>
 
+      {/* Desktop Hover Floating Image */}
       <motion.div
-        className="absolute top-1/2 -translate-y-1/2 right-0 md:right-8 h-[200px] rounded-xl overflow-hidden pointer-events-none z-10 shadow-2xl origin-right"
+        className="hidden md:block absolute top-1/2 -translate-y-1/2 right-0 md:right-8 h-[200px] rounded-xl overflow-hidden pointer-events-none z-10 shadow-2xl origin-right"
         initial={false}
         animate={{
           width: isHovered ? 300 : 0,

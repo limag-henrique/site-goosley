@@ -215,74 +215,109 @@ function EstimatorInner() {
         </AnimatePresence>
       </div>
 
-      {/* Sticky Summary Bar */}
+      {/* Summary Container */}
       <div className="w-full lg:w-1/3 relative">
-        {isComplete && (
-          <div className="sticky top-32 glass-panel p-8 rounded-3xl flex flex-col gap-8 shadow-2xl">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2 block">
-                Resumo da Estimativa
-              </span>
-              <h3 className="text-2xl font-black tracking-tight leading-tight mb-6">
-                Investimento Projetado
-              </h3>
-              
-              <div className="flex flex-col gap-4 border-b border-foreground/10 pb-6 mb-6">
-                <div className="flex flex-col">
-                  <span className="text-sm text-foreground/60 mb-1">Custo de Desenvolvimento (Setup)</span>
-                  <span className="text-3xl font-black">
-                    {setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta"}
-                  </span>
-                  {variableCosts.length > 0 && (
-                    <div className="mt-2 flex flex-col gap-1">
-                      {variableCosts.map((vc, i) => (
-                        <span key={i} className="text-xs text-foreground/60">• {vc}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
+        {!isComplete && (
+          <div className="glass-panel p-6 rounded-2xl flex flex-col gap-3 border border-orange-500/20 bg-orange-500/5 mb-24 lg:mb-0">
+            <span className="text-xs font-bold uppercase tracking-widest text-orange-500">
+              Passo a Passo da Estimativa
+            </span>
+            <p className="text-sm text-foreground/80 font-medium">
+              Selecione todas as opções acima ({activeCategory.variables.length - missingSelections.length}/{activeCategory.variables.length} concluídos) para ver a estimativa de preço e prazo.
+            </p>
+          </div>
+        )}
 
-                {(recurringMaxTotal > 0 || recurringCosts.length > 0) && (
-                  <div className="flex flex-col mt-4">
-                    <span className="text-sm text-foreground/60 mb-1">Custo Recorrente (Infra/Licenças)</span>
-                    <span className="text-2xl font-bold">
-                      {recurringMaxTotal > 0 ? formatRange(recurringMinTotal, recurringMaxTotal) + " / mês" : "Variável"}
+        {isComplete && (
+          <>
+            {/* Desktop Sticky Summary Bar */}
+            <div className="hidden lg:flex sticky top-32 glass-panel p-8 rounded-3xl flex-col gap-8 shadow-2xl">
+              <div>
+                <span className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2 block">
+                  Resumo da Estimativa
+                </span>
+                <h3 className="text-2xl font-black tracking-tight leading-tight mb-6">
+                  Investimento Projetado
+                </h3>
+                
+                <div className="flex flex-col gap-4 border-b border-foreground/10 pb-6 mb-6">
+                  <div className="flex flex-col">
+                    <span className="text-sm text-foreground/60 mb-1">Custo de Desenvolvimento (Setup)</span>
+                    <span className="text-3xl font-black">
+                      {setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta"}
                     </span>
-                    {recurringCosts.length > 0 && (
+                    {variableCosts.length > 0 && (
                       <div className="mt-2 flex flex-col gap-1">
-                        {recurringCosts.map((rc, i) => (
-                          <span key={i} className="text-xs text-foreground/60">• {rc}</span>
+                        {variableCosts.map((vc, i) => (
+                          <span key={i} className="text-xs text-foreground/60">• {vc}</span>
                         ))}
                       </div>
                     )}
                   </div>
-                )}
 
-                {timeMaxTotal > 0 && (
-                  <div className="flex flex-col mt-4 border-t border-foreground/10 pt-4">
-                    <span className="text-sm text-foreground/60 mb-1">Prazo de Entrega Estimado</span>
-                    <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                      {timeMinTotal === timeMaxTotal 
-                        ? `${timeMinTotal} dias úteis` 
-                        : `${timeMinTotal} a ${timeMaxTotal} dias úteis`}
-                    </span>
-                  </div>
-                )}
-              </div>
+                  {(recurringMaxTotal > 0 || recurringCosts.length > 0) && (
+                    <div className="flex flex-col mt-4">
+                      <span className="text-sm text-foreground/60 mb-1">Custo Recorrente (Infra/Licenças)</span>
+                      <span className="text-2xl font-bold">
+                        {recurringMaxTotal > 0 ? formatRange(recurringMinTotal, recurringMaxTotal) + " / mês" : "Variável"}
+                      </span>
+                      {recurringCosts.length > 0 && (
+                        <div className="mt-2 flex flex-col gap-1">
+                          {recurringCosts.map((rc, i) => (
+                            <span key={i} className="text-xs text-foreground/60">• {rc}</span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-              <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl text-sm">
-                <span className="font-bold block mb-1">Atenção:</span>
-                Estes valores são apenas uma estimativa inicial. Os projetos dependem inteiramente do grau de complexidade, podendo ter escopo maior ou menor do que o simulado aqui.
+                  {timeMaxTotal > 0 && (
+                    <div className="flex flex-col mt-4 border-t border-foreground/10 pt-4">
+                      <span className="text-sm text-foreground/60 mb-1">Prazo de Entrega Estimado</span>
+                      <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
+                        {timeMinTotal === timeMaxTotal 
+                          ? `${timeMinTotal} dias úteis` 
+                          : `${timeMinTotal} a ${timeMaxTotal} dias úteis`}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl text-sm">
+                  <span className="font-bold block mb-1">Atenção:</span>
+                  Estes valores são apenas uma estimativa inicial. Os projetos dependem inteiramente do grau de complexidade.
+                </div>
               </div>
+              
+              <button 
+                onClick={handleWhatsAppRedirect}
+                className="w-full py-4 rounded-xl font-bold uppercase tracking-widest transition-all bg-foreground text-background hover:scale-[1.02]"
+              >
+                Solicitar Proposta
+              </button>
             </div>
-            
-            <button 
-              onClick={handleWhatsAppRedirect}
-              className="w-full py-4 rounded-xl font-bold uppercase tracking-widest transition-all bg-foreground text-background hover:scale-[1.02]"
-            >
-              Solicitar Proposta
-            </button>
-          </div>
+
+            {/* Mobile Fixed Floating Bottom Bar */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-foreground/10 p-4 shadow-2xl flex items-center justify-between gap-4">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">Investimento Estimado</span>
+                <span className="text-lg font-black text-foreground">
+                  {setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta"}
+                </span>
+                {timeMaxTotal > 0 && (
+                  <span className="text-xs font-semibold text-emerald-500">
+                    Prazo: {timeMinTotal === timeMaxTotal ? `${timeMinTotal} dias` : `${timeMinTotal}-${timeMaxTotal} dias`}
+                  </span>
+                )}
+              </div>
+              <button 
+                onClick={handleWhatsAppRedirect}
+                className="px-5 py-3 rounded-xl font-bold uppercase tracking-wider text-xs bg-emerald-600 text-white shadow-lg active:scale-95 transition-all shrink-0"
+              >
+                WhatsApp Proposta
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
