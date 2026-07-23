@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
+import kitchleanImage from "@/components/portfolio/kitchlean.png";
 
 export default function Portfolio() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -49,6 +50,13 @@ export default function Portfolio() {
       description: "Plataforma de e-commerce de livros com Node.js, React e SQLite. Demonstração de loja virtual literária completa. Entregue em 2 semanas.",
       link: "https://gusli-books.onrender.com",
       image: "/images/portfolio/gusli-books.png"
+    },
+    {
+      title: "Kitchlean",
+      category: "Sistemas Web Complexos",
+      description: "Plataforma SaaS que ajuda restaurantes a transformar capacidade ociosa em marcas virtuais para delivery, com diagnóstico, recomendações de IA e projeções financeiras.",
+      link: "https://kitchlean-064bc.goskip.app/",
+      image: kitchleanImage
     },
     {
       title: "Gusmão Madeiras",
