@@ -17,13 +17,13 @@ const dancingScript = Dancing_Script({
 
 export const metadata: Metadata = {
   title: "Goosley Digital",
-  description: "A Goosley Digital é uma empresa premium de tecnologia focada em criação de aplicativos, sistemas web complexos e automações.",
+  description: "A Goosley Digital é uma empresa premium de tecnologia focada em aplicativos, sistemas web, automações, IA, analytics e BI.",
   icons: {
     icon: "/images/logo com fundo.png",
   },
   openGraph: {
     title: "Goosley Digital",
-    description: "Criamos as melhores soluções em web e mobile.",
+    description: "Criamos soluções digitais, automações, agentes de IA, analytics e dashboards sob medida.",
     type: "website",
     locale: "pt_BR",
   },

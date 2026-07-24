@@ -23,6 +23,8 @@ const questions: Record<string, Question> = {
       { text: "Automatizar e organizar processos internos.", nextId: "q2b" },
       { text: "Ter uma plataforma robusta ou um app próprio.", nextId: "q2c" },
       { text: "Criar uma experiência foda de atendimento com IA.", nextId: "q2d" },
+      { text: "Entender quais processos valem automatizar primeiro.", resultUrl: "/diagnostico-automacao-ia" },
+      { text: "Medir resultados, funis e indicadores em dashboards.", resultUrl: "/analytics-dashboards-bi" },
     ],
   },
   q2a: {
@@ -45,6 +47,7 @@ const questions: Record<string, Question> = {
       { text: "Preciso de um sistema interno para organizar tudo isso do zero.", resultUrl: "/sistemas-web" },
       { text: "Quero um Agente de IA para ler documentos e ajudar a equipe.", resultUrl: "/agentes-corporativos" },
       { text: "Quero integrar ferramentas que uso hoje e não se conversam.", resultUrl: "/workflows" },
+      { text: "Ainda preciso mapear gargalos e priorizar o que automatizar.", resultUrl: "/diagnostico-automacao-ia" },
     ],
   },
   q2c: {
@@ -55,7 +58,7 @@ const questions: Record<string, Question> = {
       { text: "Precisa ser um app nativo baixado na loja (Android/iOS).", resultUrl: "/aplicativos" },
       { text: "Quero uma Landing Page foda antes de lançar o sistema.", resultUrl: "/landing-pages" },
       { text: "O acesso vai ser só interno pela minha equipe.", resultUrl: "/sistemas-web" },
-      { text: "Preciso de um painel de controle (dashboard) interativo para gerenciar dados.", resultUrl: "/sistemas-web" },
+      { text: "Preciso de um painel de controle (dashboard) interativo para gerenciar dados.", resultUrl: "/analytics-dashboards-bi" },
     ],
   },
   q2d: {

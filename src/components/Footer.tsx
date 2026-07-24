@@ -27,7 +27,9 @@ export function Footer() {
               <li><Link href="/e-commerce" className="hover:opacity-50 transition-opacity">E-commerce</Link></li>
               <li><Link href="/aplicativos" className="hover:opacity-50 transition-opacity">Aplicativos</Link></li>
               <li><Link href="/automacoes" className="hover:opacity-50 transition-opacity">Automações & Voice Tuning</Link></li>
+              <li><Link href="/diagnostico-automacao-ia" className="hover:opacity-50 transition-opacity">Diagnóstico de Automação e IA</Link></li>
               <li><Link href="/sistemas-web" className="hover:opacity-50 transition-opacity">Sistemas Web & Backend</Link></li>
+              <li><Link href="/analytics-dashboards-bi" className="hover:opacity-50 transition-opacity">Analytics, Dashboards e BI</Link></li>
               <li><Link href="/agentes-corporativos" className="hover:opacity-50 transition-opacity">Agentes IA Corporativos</Link></li>
               <li><Link href="/workflows" className="hover:opacity-50 transition-opacity">Workflows Autônomos</Link></li>
             </ul>

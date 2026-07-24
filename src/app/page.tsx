@@ -24,6 +24,8 @@ export default function Home() {
           <span>E-commerces</span>
           <span>Aplicativos</span>
           <span>Automações</span>
+          <span>Diagnóstico IA</span>
+          <span>Analytics & BI</span>
           <span>Voice Tuning</span>
           <span>Sistemas Web</span>
           <span>Agentes IA</span>
@@ -66,9 +68,19 @@ export default function Home() {
               href="/automacoes"
             />
             <HoverReveal 
+              text="DIAGNÓSTICO DE AUTOMAÇÃO E IA" 
+              imageSrc="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=3270&auto=format&fit=crop" 
+              href="/diagnostico-automacao-ia"
+            />
+            <HoverReveal 
               text="SISTEMAS WEB & BACKEND" 
               imageSrc="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=3270&auto=format&fit=crop" 
               href="/sistemas-web"
+            />
+            <HoverReveal 
+              text="ANALYTICS, DASHBOARDS & BI" 
+              imageSrc="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=3270&auto=format&fit=crop" 
+              href="/analytics-dashboards-bi"
             />
             <HoverReveal 
               text="AGENTES IA CORPORATIVOS" 
