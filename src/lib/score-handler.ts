@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { FetchLike, PublicScoreResponse } from "@/lib/criminalidadefacial";
+import { isCriminalidadeFacialDeactivated } from "@/lib/criminalidadefacial-schedule";
 
 const ALLOWED_CONTENT_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
@@ -39,6 +40,10 @@ export function createScoreHandler({
   attempts = 2,
 }: ScoreHandlerOptions = {}) {
   return async function score(request: NextRequest) {
+    if (isCriminalidadeFacialDeactivated()) {
+      return errorResponse("Esta página foi desativada.", 410);
+    }
+
     const contentType = (request.headers.get("content-type") || "").split(";")[0].trim().toLowerCase();
     if (!ALLOWED_CONTENT_TYPES.has(contentType)) {
       return errorResponse("Escolha uma imagem JPEG, PNG ou WebP válida.", 400);

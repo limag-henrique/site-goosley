@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { verifyBirthYear } from "@/server/criminalidadefacial/people";
+import { isCriminalidadeFacialDeactivated } from "@/lib/criminalidadefacial-schedule";
 
 export const runtime = "nodejs";
 
 const responseHeaders = { "Cache-Control": "no-store" };
 
 export async function POST(request: NextRequest) {
+  if (isCriminalidadeFacialDeactivated()) {
+    return NextResponse.json({ ok: false, error: "Esta página foi desativada." }, { status: 410, headers: responseHeaders });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

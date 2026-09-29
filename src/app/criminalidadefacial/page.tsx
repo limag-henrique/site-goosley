@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
 
-import { CriminalidadeFacialExperience } from "@/components/CriminalidadeFacialExperience";
+import { CriminalidadeFacialDeactivated, CriminalidadeFacialExperience } from "@/components/CriminalidadeFacialExperience";
+import { CRIMINALIDADE_FACIAL_DEACTIVATION_AT, isCriminalidadeFacialDeactivated } from "@/lib/criminalidadefacial-schedule";
 import { getPeopleIndex } from "@/server/criminalidadefacial/people";
 
 export const metadata: Metadata = {
@@ -8,6 +10,9 @@ export const metadata: Metadata = {
   description: "Demonstração acadêmica de similaridade facial calibrada em uma galeria de referência.",
 };
 
-export default function CriminalidadeFacialPage() {
-  return <CriminalidadeFacialExperience people={getPeopleIndex()} />;
+export default async function CriminalidadeFacialPage() {
+  await connection();
+  if (isCriminalidadeFacialDeactivated()) return <CriminalidadeFacialDeactivated />;
+
+  return <CriminalidadeFacialExperience people={getPeopleIndex()} deactivationAt={CRIMINALIDADE_FACIAL_DEACTIVATION_AT} />;
 }

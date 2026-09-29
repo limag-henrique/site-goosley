@@ -36,7 +36,7 @@ const loadingMessages = [
 ] as const;
 
 const disclaimer =
-  "Ao utilizar esse sistema, você concorda em participar da brincadeira e não irá me processar. Todos os dados aqui disponíveis e sua foto não serão enviados para o servidor e não guardaremos seu rosto. Os dados aqui presentes estavam presentes em bases públicas.";
+  "Ao utilizar esse sistema, você concorda em participar da brincadeira e não irá me processar. Todos os dados aqui disponíveis e sua foto não serão enviados para o servidor e não guardaremos seu rosto. Os dados aqui presentes estavam presentes em bases públicas. Esta página será apresentada como desativada às 16h55 de hoje.";
 
 function normalize(value: string) {
   return value.normalize("NFD").replace(/[\u0300-\u036f]/gu, "").toLocaleLowerCase("pt-BR").trim();
@@ -95,7 +95,7 @@ function Screen({ children, scroll = false }: { children: React.ReactNode; scrol
   );
 }
 
-export function CriminalidadeFacialExperience({ people }: { people: PersonIndexEntry[] }) {
+export function CriminalidadeFacialExperience({ people, deactivationAt }: { people: PersonIndexEntry[]; deactivationAt: number }) {
   useImmersiveMode();
 
   const galleryInput = useRef<HTMLInputElement>(null);
@@ -111,6 +111,12 @@ export function CriminalidadeFacialExperience({ people }: { people: PersonIndexE
   const [busy, setBusy] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
   const [error, setError] = useState("");
+  const [deactivated, setDeactivated] = useState(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDeactivated(true), Math.max(0, deactivationAt - Date.now()));
+    return () => window.clearTimeout(timer);
+  }, [deactivationAt]);
 
   const suggestions = useMemo(() => {
     const terms = normalize(query).split(/\s+/u).filter(Boolean);
@@ -230,6 +236,7 @@ export function CriminalidadeFacialExperience({ people }: { people: PersonIndexE
   }
 
   return (
+    deactivated ? <CriminalidadeFacialDeactivated /> :
     <AnimatePresence mode="wait">
       {step === "identity" && (
         <Screen key="identity">
@@ -458,6 +465,24 @@ export function CriminalidadeFacialExperience({ people }: { people: PersonIndexE
         </Screen>
       )}
     </AnimatePresence>
+  );
+}
+
+export function CriminalidadeFacialDeactivated() {
+  return (
+    <Screen scroll>
+      <div className="relative flex min-h-[100dvh] flex-col items-center justify-center overflow-hidden px-6 py-12 text-center">
+        <Ambient />
+        <section className="relative max-w-xl">
+          <ShieldCheck className="mx-auto text-zinc-600" size={42} />
+          <p className="mt-7 text-xs font-bold uppercase tracking-[0.28em] text-orange-400">goosley digital</p>
+          <h1 className="mt-4 text-4xl font-black tracking-tighter sm:text-6xl">página desativada</h1>
+          <p className="mt-5 text-base leading-7 text-zinc-400">
+            Esta demonstração foi encerrada em 29 de setembro de 2026, às 16h55 (horário de Brasília).
+          </p>
+        </section>
+      </div>
+    </Screen>
   );
 }
 

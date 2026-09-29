@@ -1,4 +1,5 @@
 import type { FetchLike } from "@/lib/criminalidadefacial";
+import { isCriminalidadeFacialDeactivated } from "@/lib/criminalidadefacial-schedule";
 
 const DEFAULT_ARCFACE_BACKEND = "https://criminalidadefacial-api.henriquelimagusmao.workers.dev";
 
@@ -22,6 +23,8 @@ export function createReferenceHandler({
   attempts = 2,
 }: ReferenceHandlerOptions = {}) {
   return async function reference(_request: Request, context: ReferenceContext) {
+    if (isCriminalidadeFacialDeactivated()) return jsonError("Esta página foi desativada.", 410);
+
     const { matchId } = await context.params;
     if (!/^\d+$/u.test(matchId)) return jsonError("Referência inválida.", 400);
 
