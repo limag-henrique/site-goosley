@@ -137,7 +137,7 @@ export function Hero() {
         >
           <a 
             href="/precos" 
-            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:bg-orange-500 hover:text-white hover:scale-105 shadow-[0_0_30px_rgba(255,255,255,0.2)] w-full sm:w-auto text-center"
+            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-sm transition-colors duration-300 hover:bg-orange-500 hover:text-white w-full sm:w-auto text-center"
           >
             <span>Simule seu Projeto</span>
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,9 +148,8 @@ export function Hero() {
             href="https://wa.me/5531994217926" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold uppercase tracking-widest text-sm transition-all duration-300 hover:scale-105 backdrop-blur-md w-full sm:w-auto text-center"
+            className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-full border border-white/20 bg-transparent text-white font-bold uppercase tracking-widest text-sm transition-colors duration-300 hover:bg-white/10 w-full sm:w-auto text-center"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
             <span>WhatsApp Direto</span>
           </a>
         </motion.div>
@@ -170,4 +169,3 @@ export function Hero() {
     </section>
   );
 }
-

@@ -1,0 +1,622 @@
+{
+  "criminalidadefacial-service/container_api.py": {
+    "mtime": 1790647351.447201,
+    "ast_hash": "de56ecd39a5ede4023772d9f3e998d7e",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/__init__.py": {
+    "mtime": 1782398909.4756742,
+    "ast_hash": "3ab2093806b503f5762f9b1a1438ff16",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/bootstrap_ci.py": {
+    "mtime": 1787714564.9710846,
+    "ast_hash": "f12d511138a17d4648cc04dfb09dbf46",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/calibration.py": {
+    "mtime": 1782398909.492882,
+    "ast_hash": "c087f24c6d508fe9e803f90d71c9ea40",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/cli.py": {
+    "mtime": 1787709602.8712587,
+    "ast_hash": "9931c51e68ff5f1e4fa6d480ca65a740",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/clustering_backends.py": {
+    "mtime": 1787751721.6648264,
+    "ast_hash": "efb960a1007cb9e17e21370289518a8d",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/cross_validation.py": {
+    "mtime": 1787767532.7388265,
+    "ast_hash": "21bc1570777e21f37914cf2512f0797a",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/endogenous_target.py": {
+    "mtime": 1787709507.647192,
+    "ast_hash": "de80da1e0c399389871e49a3981f1aa2",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/experiment_cache.py": {
+    "mtime": 1787768856.244647,
+    "ast_hash": "984ef8827527b4a2852c977e8e101dcd",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/experiment_runner.py": {
+    "mtime": 1787767743.9818594,
+    "ast_hash": "4ee2eaeea74ecde9b79ddb1dca594074",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/experiment_specs.py": {
+    "mtime": 1787750816.9273798,
+    "ast_hash": "d8aaa3c686d0c015e4f5acfaa02a1c1d",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/extractor.py": {
+    "mtime": 1782860207.896919,
+    "ast_hash": "a1d0269cea2e8fbb1226fa99fb33c4a7",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/fairness.py": {
+    "mtime": 1785161192.9420638,
+    "ast_hash": "ec767fbb434d5992583bf407a0c2b8f0",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/gallery_calibration.py": {
+    "mtime": 1790647100.4423263,
+    "ast_hash": "f339888569a3dffdfa78c46fbb3ddc3a",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/grouping.py": {
+    "mtime": 1787709859.1074452,
+    "ast_hash": "8b9fada68e9d2734813d408626b60b3d",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/manifest.py": {
+    "mtime": 1782398979.3963597,
+    "ast_hash": "23867ffa37fea393c214696c54d96d44",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/metrics.py": {
+    "mtime": 1782398909.5020027,
+    "ast_hash": "201c10e74c189a74e3eb226600d894e4",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/profile.py": {
+    "mtime": 1782398909.4828267,
+    "ast_hash": "4f9666d165fbbd28ce5eb955603ae44c",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/target_rules.py": {
+    "mtime": 1787752313.2631836,
+    "ast_hash": "4dddbdf3836a56b7ffa6fe1b37cf6bbb",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/utils.py": {
+    "mtime": 1782406803.74221,
+    "ast_hash": "64f1ccb893cc8ed4376299cd6a1f98ce",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/face_profile_ml/variance_decomposition.py": {
+    "mtime": 1787709460.7469153,
+    "ast_hash": "f6bfadf09f7ee0018023518922c38ca7",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/pyproject.toml": {
+    "mtime": 1787709859.1375632,
+    "ast_hash": "79dc3b43bcebedae02c4552eb62eef8b",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/serve_similarity_app.py": {
+    "mtime": 1790647157.324286,
+    "ast_hash": "c34a3b166c36a00397dc9ad1aa12cf77",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/package.json": {
+    "mtime": 1790647512.6942656,
+    "ast_hash": "c98fc8dfd5eb9d2252012a1397d823b3",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/src/container.ts": {
+    "mtime": 1790647485.2084813,
+    "ast_hash": "be719074b481bb867304fa0b465be2b1",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/src/index.ts": {
+    "mtime": 1790647824.6431625,
+    "ast_hash": "a19ffa0458a2659f46ea2f418ef9c13e",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/src/rate_limiter.ts": {
+    "mtime": 1790647824.6421602,
+    "ast_hash": "d2106273bab9bfb13733fbaace9be1cc",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/src/worker.ts": {
+    "mtime": 1790647824.6444385,
+    "ast_hash": "51c0a00a07198cd788008f560d5174f5",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/test/api-contract.test.ts": {
+    "mtime": 1790647701.3797407,
+    "ast_hash": "dcd1ac7463bd0405bba0eaba7c0a0d5f",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/worker/tsconfig.json": {
+    "mtime": 1790647485.206479,
+    "ast_hash": "7cbfde8c07128a9f9ac077101783eebb",
+    "semantic_hash": ""
+  },
+  "eslint.config.mjs": {
+    "mtime": 1783289676.498603,
+    "ast_hash": "6baea0d926125322a9f8395aac81b66a",
+    "semantic_hash": ""
+  },
+  "migrations/001_meu_portal_schema.sql": {
+    "mtime": 1783287998.0085516,
+    "ast_hash": "f732ec0ffb9e6eae8132f9f3bf5ba7ba",
+    "semantic_hash": ""
+  },
+  "migrations/002_drop_unused_portal_tables.sql": {
+    "mtime": 1783292774.9166965,
+    "ast_hash": "4deb416a1c2a47f5ed993bba1570151d",
+    "semantic_hash": ""
+  },
+  "next.config.ts": {
+    "mtime": 1790648052.5432365,
+    "ast_hash": "8b821c999c194ee1eec9d95a7714ca5a",
+    "semantic_hash": ""
+  },
+  "open-next.config.ts": {
+    "mtime": 1783293394.157431,
+    "ast_hash": "6b313493f5694135593ba7e90c5f098d",
+    "semantic_hash": ""
+  },
+  "package.json": {
+    "mtime": 1790648870.2338398,
+    "ast_hash": "8c38c09bf933f3edda9eb6b05f50eea7",
+    "semantic_hash": ""
+  },
+  "postcss.config.mjs": {
+    "mtime": 1780148362.4572754,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": ""
+  },
+  "scripts/seed-portal.ts": {
+    "mtime": 1782868657.6984215,
+    "ast_hash": "294bbd6a14994565bdf989be214609f9",
+    "semantic_hash": ""
+  },
+  "scripts/write-portal-seed-sql.ts": {
+    "mtime": 1783292870.508379,
+    "ast_hash": "24285f9a2d5835d21d53c84eb5741ffa",
+    "semantic_hash": ""
+  },
+  "server.mjs": {
+    "mtime": 1782570599.0700128,
+    "ast_hash": "5f339269d785da8314e8d1ea6bf7f132",
+    "semantic_hash": ""
+  },
+  "src/app/a-solucao/page.tsx": {
+    "mtime": 1784901344.74999,
+    "ast_hash": "6d77c0495e2ba6a9f1961e92673caef7",
+    "semantic_hash": ""
+  },
+  "src/app/admin/[...admin]/route.ts": {
+    "mtime": 1782868344.9381492,
+    "ast_hash": "ac177d7845ff4368c822f69ce26b2000",
+    "semantic_hash": ""
+  },
+  "src/app/agentes-corporativos/page.tsx": {
+    "mtime": 1780172351.838591,
+    "ast_hash": "137760d90edd16a20797c4aa564413d7",
+    "semantic_hash": ""
+  },
+  "src/app/analytics-dashboards-bi/page.tsx": {
+    "mtime": 1784901319.3624692,
+    "ast_hash": "b23d23b9655805f4242dea2d935342b5",
+    "semantic_hash": ""
+  },
+  "src/app/api/contato/route.ts": {
+    "mtime": 1784830179.8445835,
+    "ast_hash": "2e78759ba1575698df954260975fcef3",
+    "semantic_hash": ""
+  },
+  "src/app/aplicativos/page.tsx": {
+    "mtime": 1780175775.9153717,
+    "ast_hash": "cd2ade3c287390f01afef602194de6ef",
+    "semantic_hash": ""
+  },
+  "src/app/auth/[...auth]/route.ts": {
+    "mtime": 1782873099.810495,
+    "ast_hash": "2dfe499566747bd6868c05115f28f248",
+    "semantic_hash": ""
+  },
+  "src/app/automacoes/page.tsx": {
+    "mtime": 1780172331.6952603,
+    "ast_hash": "68f60bfe371eb3464e94ffbce100eb9a",
+    "semantic_hash": ""
+  },
+  "src/app/client/[...client]/route.ts": {
+    "mtime": 1782868332.4087183,
+    "ast_hash": "b18f6fe0b3b9f99c170a36c191c7f0f8",
+    "semantic_hash": ""
+  },
+  "src/app/contato/page.tsx": {
+    "mtime": 1784830194.511457,
+    "ast_hash": "f1ae800d43dae9bb06e17cdd5113123c",
+    "semantic_hash": ""
+  },
+  "src/app/criminalidadefacial/page.tsx": {
+    "mtime": 1790648052.5407364,
+    "ast_hash": "e030246898db32a912c3ce2ce9f27445",
+    "semantic_hash": ""
+  },
+  "src/app/developer/[...developer]/route.ts": {
+    "mtime": 1782873106.532816,
+    "ast_hash": "085212a6481cfb17ae9855be7b92f1a4",
+    "semantic_hash": ""
+  },
+  "src/app/diagnostico-automacao-ia/page.tsx": {
+    "mtime": 1784901319.3502038,
+    "ast_hash": "eed2f5319169a5eb66ce0dad81d9f632",
+    "semantic_hash": ""
+  },
+  "src/app/e-commerce/page.tsx": {
+    "mtime": 1780175773.415683,
+    "ast_hash": "102de4e36d3da16c2cb13c444074ccef",
+    "semantic_hash": ""
+  },
+  "src/app/error.tsx": {
+    "mtime": 1783279310.2131228,
+    "ast_hash": "669ae85bbaf1b66c77c70803aa7226dc",
+    "semantic_hash": ""
+  },
+  "src/app/landing-pages/page.tsx": {
+    "mtime": 1780175771.3414657,
+    "ast_hash": "c520808caea93b80fb6c39b1c1eec00c",
+    "semantic_hash": ""
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1784901414.8169172,
+    "ast_hash": "e753e2a3eb47caadd20de5e408adfc02",
+    "semantic_hash": ""
+  },
+  "src/app/metodologia/page.tsx": {
+    "mtime": 1780171271.4447315,
+    "ast_hash": "2b04b9b4c79e1bae0757768b54fb3db2",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/admin/[section]/page.tsx": {
+    "mtime": 1783287597.165603,
+    "ast_hash": "30b957835656fa7e9500e0ac49686457",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/admin/page.tsx": {
+    "mtime": 1782904501.744803,
+    "ast_hash": "e81954458b5f3ba32d424e84d350ff7f",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/client/[section]/page.tsx": {
+    "mtime": 1783287601.5263932,
+    "ast_hash": "8a597e299c9d260fb2efeaf7402717e4",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/client/page.tsx": {
+    "mtime": 1782904511.2411673,
+    "ast_hash": "6e015ab00541f639c903de348478ff06",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/developer/[section]/page.tsx": {
+    "mtime": 1783287605.5407522,
+    "ast_hash": "26f04d57e471761be80c2d2141f90acd",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/developer/page.tsx": {
+    "mtime": 1783287609.603717,
+    "ast_hash": "682b94fcac62211a39c47aae42a21595",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/page.tsx": {
+    "mtime": 1782868382.8456428,
+    "ast_hash": "80281a68bae10fe6a630a78ad89cc152",
+    "semantic_hash": ""
+  },
+  "src/app/meu-portal/programmer/page.tsx": {
+    "mtime": 1782873459.2077448,
+    "ast_hash": "b7f38680939b58e53f04de6397a67758",
+    "semantic_hash": ""
+  },
+  "src/app/not-found.tsx": {
+    "mtime": 1783279310.2111208,
+    "ast_hash": "0c4b001b1c75f595aa60546853da3721",
+    "semantic_hash": ""
+  },
+  "src/app/page.tsx": {
+    "mtime": 1784901432.4973688,
+    "ast_hash": "5d0fc1235f554746228a32327f47e163",
+    "semantic_hash": ""
+  },
+  "src/app/portfolio/cases-de-sucesso/page.tsx": {
+    "mtime": 1780171277.4821548,
+    "ast_hash": "a0075fa202bac8bca03acda4039539ec",
+    "semantic_hash": ""
+  },
+  "src/app/portfolio/page.tsx": {
+    "mtime": 1784828548.2380278,
+    "ast_hash": "ac209cd7bfee9f7d2a461196e1427a7c",
+    "semantic_hash": ""
+  },
+  "src/app/precos/page.tsx": {
+    "mtime": 1780172294.821452,
+    "ast_hash": "8d1f062faf721e91cb691f1885f08f5e",
+    "semantic_hash": ""
+  },
+  "src/app/programmer/[...programmer]/route.ts": {
+    "mtime": 1782868338.4310305,
+    "ast_hash": "d9ef17d27ed3675ccc6dea47c11fbef7",
+    "semantic_hash": ""
+  },
+  "src/app/quiz/page.tsx": {
+    "mtime": 1784901358.033865,
+    "ast_hash": "4c2b19abbf4c36632dd33d0f0043cb50",
+    "semantic_hash": ""
+  },
+  "src/app/sistemas-web/page.tsx": {
+    "mtime": 1780172341.2398484,
+    "ast_hash": "3291a23a981616592d8a5c34f359c738",
+    "semantic_hash": ""
+  },
+  "src/app/workflows/page.tsx": {
+    "mtime": 1780172361.663163,
+    "ast_hash": "ee97257383b3ae8969a3689e1a8690e1",
+    "semantic_hash": ""
+  },
+  "src/components/CostEstimator.tsx": {
+    "mtime": 1784829048.9417074,
+    "ast_hash": "3f66a848748e0c737518955714443a36",
+    "semantic_hash": ""
+  },
+  "src/components/CriminalidadeFacialClient.tsx": {
+    "mtime": 1790648071.291464,
+    "ast_hash": "11cd29ba1f372bfa0da8320de2ea3c85",
+    "semantic_hash": ""
+  },
+  "src/components/CustomCursor.tsx": {
+    "mtime": 1784828992.8075461,
+    "ast_hash": "01e2566b481573fc71d952d14ba45384",
+    "semantic_hash": ""
+  },
+  "src/components/ErrorState.tsx": {
+    "mtime": 1783279446.1511965,
+    "ast_hash": "da7b39cd418ef5a552d7531a8339b9eb",
+    "semantic_hash": ""
+  },
+  "src/components/Footer.tsx": {
+    "mtime": 1784901344.754942,
+    "ast_hash": "c794e27ac03b2bea3ddf9e21b7f3f9d4",
+    "semantic_hash": ""
+  },
+  "src/components/Hero.tsx": {
+    "mtime": 1790648984.2873428,
+    "ast_hash": "c969a896b3f45bce761dac7e010ead54",
+    "semantic_hash": ""
+  },
+  "src/components/HoverReveal.tsx": {
+    "mtime": 1784829033.3938606,
+    "ast_hash": "45de823bcba0d025d68a657b3c3b01e7",
+    "semantic_hash": ""
+  },
+  "src/components/InfiniteMarquee.tsx": {
+    "mtime": 1780153155.7375648,
+    "ast_hash": "2b49ff6a9419567e50eb0059750e02be",
+    "semantic_hash": ""
+  },
+  "src/components/Navbar.tsx": {
+    "mtime": 1790648984.2898822,
+    "ast_hash": "2ea5b1c2a35d99dc7d2f5d553b0e74ab",
+    "semantic_hash": ""
+  },
+  "src/components/PublicChrome.tsx": {
+    "mtime": 1782873116.9595742,
+    "ast_hash": "7607fd839e529050dd4fae98ae560886",
+    "semantic_hash": ""
+  },
+  "src/components/SmoothScrollProvider.tsx": {
+    "mtime": 1782869018.238473,
+    "ast_hash": "321a18989069bc5a2111ba4e38299c37",
+    "semantic_hash": ""
+  },
+  "src/components/portal/PortalEntry.tsx": {
+    "mtime": 1782904240.402661,
+    "ast_hash": "d49d7ab947092176690674e4b280e3ba",
+    "semantic_hash": ""
+  },
+  "src/components/portal/PortalForms.tsx": {
+    "mtime": 1783292774.883943,
+    "ast_hash": "124de1da9f18a5f77bf031e22f400325",
+    "semantic_hash": ""
+  },
+  "src/components/portal/PortalPages.tsx": {
+    "mtime": 1783288103.8104973,
+    "ast_hash": "a2c6f49c44e7dd4eb3e4f569ab4c77df",
+    "semantic_hash": ""
+  },
+  "src/components/portal/PortalShell.tsx": {
+    "mtime": 1784829060.0545075,
+    "ast_hash": "8259bef664e9e3d4f0dc3cc3ffe54c21",
+    "semantic_hash": ""
+  },
+  "src/components/portal/PortalTopActions.tsx": {
+    "mtime": 1782904229.7622135,
+    "ast_hash": "beac234ceb4e0e3329246be868f4a50e",
+    "semantic_hash": ""
+  },
+  "src/data/pricingData.ts": {
+    "mtime": 1784902505.141909,
+    "ast_hash": "e0c03122323620113671f4a96e6bbcd6",
+    "semantic_hash": ""
+  },
+  "src/lib/criminalidadefacial.ts": {
+    "mtime": 1790647953.4928906,
+    "ast_hash": "297d34f0e0e6d448fc04dba635a3e892",
+    "semantic_hash": ""
+  },
+  "src/lib/utils.ts": {
+    "mtime": 1780148551.548529,
+    "ast_hash": "d9837f38cc05303254571985e3164050",
+    "semantic_hash": ""
+  },
+  "src/server/portal/email.ts": {
+    "mtime": 1784827461.3989697,
+    "ast_hash": "e5007ddf0fb5062fdb07c30075fb1a7e",
+    "semantic_hash": ""
+  },
+  "src/server/portal/errors.ts": {
+    "mtime": 1782867892.8139682,
+    "ast_hash": "5087c47909f679b0c1b5768469bfabc0",
+    "semantic_hash": ""
+  },
+  "src/server/portal/http.ts": {
+    "mtime": 1783292774.8899412,
+    "ast_hash": "ae08c1417b5bfec3f41f0a405fbae8fc",
+    "semantic_hash": ""
+  },
+  "src/server/portal/page-auth.ts": {
+    "mtime": 1783111583.503215,
+    "ast_hash": "583abb92bfda6b2bb5edcbf8e841b1bb",
+    "semantic_hash": ""
+  },
+  "src/server/portal/security.ts": {
+    "mtime": 1783292774.891937,
+    "ast_hash": "f2754bc9a05049dd7082d5778b56adc5",
+    "semantic_hash": ""
+  },
+  "src/server/portal/services.ts": {
+    "mtime": 1783292774.8939373,
+    "ast_hash": "23f0ca33c09be6a4ebc584da1ed106c3",
+    "semantic_hash": ""
+  },
+  "src/server/portal/store.ts": {
+    "mtime": 1783292870.512394,
+    "ast_hash": "d702f59d00008d7f3b986a9379a80313",
+    "semantic_hash": ""
+  },
+  "src/server/portal/types.ts": {
+    "mtime": 1783292774.9013116,
+    "ast_hash": "8f5f5dbc845952f51fd7b027efadd306",
+    "semantic_hash": ""
+  },
+  "src/server/portal/validation.ts": {
+    "mtime": 1783292774.8980854,
+    "ast_hash": "1667f42ab37df282ea8e11a6d44b4f09",
+    "semantic_hash": ""
+  },
+  "tests/criminalidadefacial.test.ts": {
+    "mtime": 1790647915.0003786,
+    "ast_hash": "5bdd07f16e4e29c912a5fdee1063fabc",
+    "semantic_hash": ""
+  },
+  "tests/marketing-ctas.test.ts": {
+    "mtime": 1790648957.1915603,
+    "ast_hash": "5638b50b1f671b72b8aa27e747c79e57",
+    "semantic_hash": ""
+  },
+  "tests/portal.test.ts": {
+    "mtime": 1783287969.4206617,
+    "ast_hash": "fb4abb359fa890a09d5c603b0aa0eab3",
+    "semantic_hash": ""
+  },
+  "tsconfig.json": {
+    "mtime": 1790649054.206596,
+    "ast_hash": "ec73a45ac1b3f50192fc9a93f3c3ad69",
+    "semantic_hash": ""
+  },
+  "AGENTS.md": {
+    "mtime": 1785074640.262884,
+    "ast_hash": "5461920228469619132e08d8ebe3a2e1",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1780148445.5263216,
+    "ast_hash": "5c27369b226fcf2be8a6cfe52224e767",
+    "semantic_hash": ""
+  },
+  "IMPLEMENTATION_NOTES.md": {
+    "mtime": 1782873564.878847,
+    "ast_hash": "39c2bd4360163316b090b498629f439a",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1784826765.6560404,
+    "ast_hash": "84249102a175832543760ff4fe0dd644",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/README.md": {
+    "mtime": 1790648870.2288342,
+    "ast_hash": "16f168cb6a90a9e2bbf6e44ff390d34b",
+    "semantic_hash": ""
+  },
+  "criminalidadefacial-service/container-requirements.txt": {
+    "mtime": 1790647351.4482017,
+    "ast_hash": "602637fd7d3d22d4414d270b59168fee",
+    "semantic_hash": ""
+  },
+  "public/images/logo branco transparente.png": {
+    "mtime": 1780235871.1419778,
+    "ast_hash": "0ae16e2bede639887235d68ab2acd36f",
+    "semantic_hash": ""
+  },
+  "public/images/logo com fundo.png": {
+    "mtime": 1780235157.7377315,
+    "ast_hash": "f3c3ea4bcadf4392ac0348dde1a394c6",
+    "semantic_hash": ""
+  },
+  "public/images/logo preto transparente.png": {
+    "mtime": 1780235073.2482607,
+    "ast_hash": "8de4543d4014ccf24519353a1da10b21",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/entreparagrafos.png": {
+    "mtime": 1782568758.0660899,
+    "ast_hash": "844db8207bf5058fcd83333f2a9825dc",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/gusli-books.png": {
+    "mtime": 1782568733.2887597,
+    "ast_hash": "8508c32d3f4c8767f55e578cb55fb786",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/gusmao-madeiras.png": {
+    "mtime": 1782568009.186327,
+    "ast_hash": "59918758137c20c47ddb737755352c47",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/gweb.png": {
+    "mtime": 1782569860.9088435,
+    "ast_hash": "866a12d0325a09cdbad5e51ae053e189",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/machine-learning.png": {
+    "mtime": 1782568647.7594554,
+    "ast_hash": "950fe2428e7b5b820098471886945477",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/meliora.png": {
+    "mtime": 1782568103.5636346,
+    "ast_hash": "0da47f4c77e825451e63c6409ce08ad6",
+    "semantic_hash": ""
+  },
+  "public/images/portfolio/sistema-financeiro.png": {
+    "mtime": 1782568045.3759246,
+    "ast_hash": "912914ef9a70e3b3996d50db6a3f76b5",
+    "semantic_hash": ""
+  },
+  "src/components/portfolio/kitchlean.png": {
+    "mtime": 1784825879.106487,
+    "ast_hash": "ae79a45bb7102e8fd0eff8a325d07eb5",
+    "semantic_hash": ""
+  }
+}
