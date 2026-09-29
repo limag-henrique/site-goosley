@@ -36,3 +36,23 @@ test("scorePhoto converts HTTP 429 and 503 into Portuguese actionable errors", a
     /temporariamente indisponível/,
   );
 });
+
+test("scorePhoto defaults to relative /api/score when apiOrigin is empty", async () => {
+  let requestUrl = "";
+  await scorePhoto(
+    photo,
+    async (input: RequestInfo | URL) => {
+      requestUrl = input instanceof Request ? input.url : String(input);
+      return Response.json({
+        ok: true,
+        aggregate_relative_percent: 85.0,
+        best_cosine: 0.75,
+        top_matches: [],
+      });
+    },
+    "",
+  );
+
+  assert.equal(new URL(requestUrl).pathname, "/api/score");
+});
+

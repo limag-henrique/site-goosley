@@ -117,3 +117,26 @@ test("serves only a versioned WebP object for a numeric reference id", async () 
   assert.equal(response.headers.get("Content-Type"), "image/webp");
   assert.match(response.headers.get("Cache-Control") ?? "", /immutable/);
 });
+
+test("allows a score request without Turnstile header from localhost origin", async () => {
+  let containerCalls = 0;
+  const response = await handleRequest(
+    new Request("https://api.example.test/api/score", {
+      method: "POST",
+      headers: { Origin: "http://localhost:3000", "Content-Type": "image/jpeg" },
+      body: "jpeg",
+    }),
+    {
+      ALLOWED_ORIGIN: "https://goosley.com.br",
+      RATE_LIMITER: { limit: async () => ({ success: true }) },
+      FACE_SIMILARITY_CONTAINER: { fetch: async () => { containerCalls += 1; return new Response(JSON.stringify({ ok: true })) } },
+      GALLERY_RELEASE: { get: async () => new Response(JSON.stringify(release)) },
+      REFERENCES: { get: async () => null },
+    },
+  );
+
+  assert.equal(response.status, 200);
+  assert.equal(containerCalls, 1);
+  assert.equal(response.headers.get("Access-Control-Allow-Origin"), "http://localhost:3000");
+});
+

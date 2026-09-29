@@ -51,12 +51,18 @@ export async function scorePhoto(
   fetchImpl: FetchLike = fetch,
   apiOrigin = getFacialApiOrigin(),
 ): Promise<PublicScoreResponse> {
-  if (!apiOrigin) throw new Error("A análise ainda não foi configurada neste ambiente.");
   if (!file.type || !["image/jpeg", "image/png", "image/webp"].includes(file.type.toLowerCase())) {
     throw new Error("Escolha uma imagem JPEG, PNG ou WebP válida.");
   }
 
-  const response = await fetchImpl(new Request(`${apiOrigin}/api/score`, {
+  const endpoint = apiOrigin ? `${apiOrigin}/api/score` : "/api/score";
+  const requestUrl = endpoint.startsWith("http://") || endpoint.startsWith("https://")
+    ? endpoint
+    : typeof window !== "undefined"
+      ? endpoint
+      : `http://localhost${endpoint}`;
+
+  const response = await fetchImpl(new Request(requestUrl, {
     method: "POST",
     headers: {
       "Content-Type": file.type,

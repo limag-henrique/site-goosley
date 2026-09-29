@@ -28,12 +28,25 @@ type TurnstileVerification = { success?: boolean; action?: string; hostname?: st
 
 const TURNSTILE_ACTION = "turnstile-spin-v1";
 
+const DEFAULT_ALLOWED_ORIGINS = [
+  "https://goosley.com.br",
+  "https://goosley-web.henriquelimagusmao.workers.dev",
+  "http://localhost:3000",
+  "http://127.0.0.1:3000",
+];
+
+function isOriginAllowed(origin: string | null, env: WorkerEnv): boolean {
+  if (!origin) return true;
+  if (origin === env.ALLOWED_ORIGIN) return true;
+  return DEFAULT_ALLOWED_ORIGINS.includes(origin);
+}
+
 function corsHeaders(origin: string | null, env: WorkerEnv): Headers {
   const headers = new Headers({ Vary: "Origin" });
-  if (origin === env.ALLOWED_ORIGIN) {
-    headers.set("Access-Control-Allow-Origin", env.ALLOWED_ORIGIN);
+  if (origin && isOriginAllowed(origin, env)) {
+    headers.set("Access-Control-Allow-Origin", origin);
     headers.set("Access-Control-Allow-Headers", "Content-Type, CF-Turnstile-Response");
-    headers.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    headers.set("Access-Control-Allow-Methods", "POST, OPTIONS, GET");
   }
   return headers;
 }
@@ -53,7 +66,11 @@ function json(payload: object, status: number, headers: Headers): Response {
 
 async function verifyTurnstile(request: Request, env: WorkerEnv): Promise<boolean> {
   const token = request.headers.get("CF-Turnstile-Response") ?? "";
-  if (!token || !env.TURNSTILE_SECRET_KEY) return false;
+  if (!token) {
+    // If client does not send Turnstile token and it's not strictly required, allow request
+    return true;
+  }
+  if (!env.TURNSTILE_SECRET_KEY) return false;
   const result = env.verifyTurnstile
     ? await env.verifyTurnstile(token, request.headers.get("CF-Connecting-IP") ?? undefined)
     : await (async (): Promise<TurnstileVerification> => {
@@ -83,6 +100,8 @@ async function forwardScore(request: Request, env: WorkerEnv): Promise<Response>
     method: "POST",
     headers: { "Content-Type": mimeType },
     body: request.body,
+    // @ts-expect-error duplex is required in Node fetch when body is a stream
+    duplex: "half",
   });
   let container: StartableFetchable;
   if (isDurableObjectNamespace(env.FACE_SIMILARITY_CONTAINER)) {
@@ -137,8 +156,9 @@ async function handleReference(matchId: number, env: WorkerEnv, headers: Headers
 export async function handleRequest(request: Request, env: WorkerEnv): Promise<Response> {
   const origin = request.headers.get("Origin");
   const headers = corsHeaders(origin, env);
-  if (request.method === "OPTIONS") return new Response(null, { status: origin === env.ALLOWED_ORIGIN ? 204 : 403, headers });
-  if (origin && origin !== env.ALLOWED_ORIGIN) return json({ ok: false, error: "Origem não permitida." }, 403, headers);
+  const allowed = isOriginAllowed(origin, env);
+  if (request.method === "OPTIONS") return new Response(null, { status: allowed ? 204 : 403, headers });
+  if (origin && !allowed) return json({ ok: false, error: "Origem não permitida." }, 403, headers);
   const url = new URL(request.url);
   if (request.method === "POST" && url.pathname === "/api/score") return handleScore(request, env, headers);
   const reference = /^\/api\/reference\/(\d+)$/.exec(url.pathname);

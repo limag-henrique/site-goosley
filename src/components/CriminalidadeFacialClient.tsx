@@ -347,9 +347,8 @@ export function CriminalidadeFacialClient() {
               <ShieldCheck className="text-orange-400" size={28} />
               <h2 className="mt-5 text-xl font-bold">analisar com contexto</h2>
               <p className="mt-3 text-sm leading-6 text-zinc-400">A foto é enviada somente quando você pressiona &quot;Analisar foto&quot;. Não há análise contínua da câmera.</p>
-              {!apiOrigin && <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">A origem da API ainda não foi configurada neste ambiente.</p>}
               {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
-              <button type="button" disabled={!photo || !apiOrigin} onClick={analyze} className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">
+              <button type="button" disabled={!photo} onClick={analyze} className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">
                 <Search size={19} /> Analisar foto
               </button>
             </aside>
