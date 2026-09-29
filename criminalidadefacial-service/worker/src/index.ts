@@ -16,7 +16,7 @@ export type WorkerEnv = {
   FACE_SIMILARITY_CONTAINER: DurableObjectNamespace<FaceSimilarityContainer> | StartableFetchable;
   GALLERY_RELEASE: R2Readable;
   REFERENCES: R2Readable;
-  verifyTurnstile?: (token: string, remoteIp?: string) => Promise<boolean>;
+  verifyTurnstile?: (token: string, remoteIp?: string) => Promise<boolean | TurnstileVerification>;
   selectContainer?: (
     binding: DurableObjectNamespace<FaceSimilarityContainer>,
   ) => Promise<StartableFetchable>;
@@ -24,6 +24,9 @@ export type WorkerEnv = {
 
 type ReleaseEntry = { match_id: number; r2_key: string };
 type GalleryRelease = { entries: ReleaseEntry[] };
+type TurnstileVerification = { success?: boolean; action?: string; hostname?: string };
+
+const TURNSTILE_ACTION = "turnstile-spin-v1";
 
 function corsHeaders(origin: string | null, env: WorkerEnv): Headers {
   const headers = new Headers({ Vary: "Origin" });
@@ -51,12 +54,21 @@ function json(payload: object, status: number, headers: Headers): Response {
 async function verifyTurnstile(request: Request, env: WorkerEnv): Promise<boolean> {
   const token = request.headers.get("CF-Turnstile-Response") ?? "";
   if (!token || !env.TURNSTILE_SECRET_KEY) return false;
-  if (env.verifyTurnstile) return env.verifyTurnstile(token, request.headers.get("CF-Connecting-IP") ?? undefined);
-  const body = new FormData();
-  body.set("secret", env.TURNSTILE_SECRET_KEY);
-  body.set("response", token);
-  const result = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
-  return Boolean((await result.json() as { success?: boolean }).success);
+  const result = env.verifyTurnstile
+    ? await env.verifyTurnstile(token, request.headers.get("CF-Connecting-IP") ?? undefined)
+    : await (async (): Promise<TurnstileVerification> => {
+      const body = new FormData();
+      body.set("secret", env.TURNSTILE_SECRET_KEY!);
+      body.set("response", token);
+      const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body });
+      return response.json() as Promise<TurnstileVerification>;
+    })();
+
+  // The boolean form exists only for isolated contract tests; siteverify always returns an object.
+  if (typeof result === "boolean") return result;
+  return result.success === true
+    && result.action === TURNSTILE_ACTION
+    && result.hostname === new URL(env.ALLOWED_ORIGIN).hostname;
 }
 
 function isDurableObjectNamespace(

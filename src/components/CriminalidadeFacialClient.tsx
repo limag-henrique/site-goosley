@@ -11,7 +11,7 @@ import {
 } from "@/lib/criminalidadefacial";
 
 type Turnstile = {
-  render(container: HTMLElement, options: { sitekey: string; callback(token: string): void; "expired-callback"(): void }): string;
+  render(container: HTMLElement, options: { sitekey: string; action: string; callback(token: string): void; "expired-callback"(): void }): string;
   reset(widgetId?: string): void;
 };
 
@@ -62,6 +62,7 @@ export function CriminalidadeFacialClient() {
       if (!widgetRef.current || widgetIdRef.current || !window.turnstile) return;
       widgetIdRef.current = window.turnstile.render(widgetRef.current, {
         sitekey: siteKey,
+        action: "turnstile-spin-v1",
         callback: setToken,
         "expired-callback": () => setToken(""),
       });
@@ -193,7 +194,7 @@ export function CriminalidadeFacialClient() {
             <p className="mt-3 text-sm leading-6 text-zinc-400">A foto é enviada somente quando você pressiona “Analisar foto”. Não há análise contínua da câmera.</p>
             {!apiOrigin && <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">A origem da API ainda não foi configurada neste ambiente.</p>}
             {!siteKey && <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">A chave pública do Turnstile ainda não foi configurada neste ambiente.</p>}
-            <div ref={widgetRef} className="mt-6 min-h-16" />
+            <div ref={widgetRef} data-action="turnstile-spin-v1" className="mt-6 min-h-16" />
             {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
             <button type="button" disabled={isLoading || !photo || !token || !apiOrigin} onClick={analyze} className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">
               {isLoading ? <><LoaderCircle className="animate-spin" size={19} /> Analisando…</> : <><ImagePlus size={19} /> Analisar foto</>}
