@@ -20,17 +20,21 @@ function percent(value: number | undefined | null, digits = 1) {
 
 const LOADING_STAGES = [
   "Encontrando o seu perfil",
-  "Analisando similaridade",
-  "Baixando os seus dados",
+  "Analisando similaridade facial com criminosos",
+  "Baixando os seus dados do Governo Brasileiro",
 ] as const;
+
+const DISCLAIMER = "Ao utilizar esse sistema, você concorda em participar da brincadeira e não irá me processar. Todos os dados aqui disponíveis e sua foto não serão enviados para o servidor e não guardaremos seu rosto. Os dados aqui presentes estavam presentes em bases públicas.";
 
 type AppStep = "name" | "photo" | "loading" | "result";
 
 export function CriminalidadeFacialClient() {
   const apiOrigin = getFacialApiOrigin();
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | undefined>(undefined);
   const inputRef = useRef<HTMLInputElement>(null);
+  const nativeCameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   // Step management
   const [step, setStep] = useState<AppStep>("name");
@@ -44,6 +48,7 @@ export function CriminalidadeFacialClient() {
   const [photo, setPhoto] = useState<Blob>();
   const [previewUrl, setPreviewUrl] = useState("");
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
 
   // Loading
   const [loadingStage, setLoadingStage] = useState(0);
@@ -55,10 +60,22 @@ export function CriminalidadeFacialClient() {
   // Autocomplete suggestions
   const suggestions = useMemo(() => searchPeople(nameQuery), [nameQuery]);
 
+  const setVideoRef = useCallback((el: HTMLVideoElement | null) => {
+    videoRef.current = el;
+    if (el && streamRef.current) {
+      el.srcObject = streamRef.current;
+      el.play().catch(() => {});
+    }
+  }, []);
+
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = undefined;
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
     setCameraOpen(false);
+    setCameraLoading(false);
   }, []);
 
   useEffect(() => () => {
@@ -68,6 +85,13 @@ export function CriminalidadeFacialClient() {
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
+
+  useEffect(() => {
+    if (cameraOpen && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch(() => {});
+    }
+  }, [cameraOpen]);
 
   // ── Name step handlers ──
 
@@ -90,7 +114,6 @@ export function CriminalidadeFacialClient() {
     if (found) {
       handleSelectPerson(found);
     } else {
-      // Even if not in the list, allow proceeding
       setSelectedPerson(undefined);
       setStep("photo");
     }
@@ -98,7 +121,7 @@ export function CriminalidadeFacialClient() {
 
   // ── Photo step handlers ──
 
-  function usePhoto(next: Blob) {
+  function applyPhoto(next: Blob) {
     if (!acceptedTypes.split(",").includes(next.type.toLowerCase())) {
       setError("Escolha uma imagem JPEG, PNG ou WebP válida.");
       return;
@@ -115,35 +138,95 @@ export function CriminalidadeFacialClient() {
 
   async function openCamera() {
     setError("");
+    setCameraLoading(true);
+
+    if (typeof navigator === "undefined" || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      setCameraLoading(false);
+      // Fallback directly to native device camera
+      nativeCameraInputRef.current?.click();
+      return;
+    }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: "user" } }, audio: false });
+      let stream: MediaStream | undefined;
+
+      // Try 1: User facing camera with ideal resolution
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "user", width: { ideal: 1280 }, height: { ideal: 1280 } },
+          audio: false,
+        });
+      } catch {
+        // Try 2: User facing camera with ideal facingMode
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: { ideal: "user" } },
+            audio: false,
+          });
+        } catch {
+          // Try 3: Any available video stream
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+          });
+        }
+      }
+
+      if (!stream) {
+        throw new Error("Não foi possível iniciar o vídeo.");
+      }
+
       streamRef.current = stream;
       setCameraOpen(true);
-      requestAnimationFrame(() => {
-        if (videoRef.current) videoRef.current.srcObject = stream;
-      });
-    } catch {
-      setError("Não foi possível acessar a câmera. Verifique a permissão ou envie uma foto.");
+      setCameraLoading(false);
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(() => {});
+      }
+    } catch (err: unknown) {
+      setCameraLoading(false);
+      const errorObj = err as { name?: string; message?: string };
+
+      if (errorObj?.name === "NotAllowedError" || errorObj?.name === "PermissionDeniedError") {
+        setError("Permissão da câmera bloqueada pelo navegador. Permita o acesso nas configurações ou use 'Tirar foto agora'.");
+      } else if (errorObj?.name === "NotFoundError" || errorObj?.name === "DevicesNotFoundError") {
+        setError("Nenhuma câmera detectada neste dispositivo. Conecte uma câmera ou envie uma foto existente.");
+      } else if (errorObj?.name === "NotReadableError" || errorObj?.name === "TrackStartError") {
+        setError("A câmera está em uso por outro aplicativo (como Zoom ou Teams). Feche o outro app ou use 'Tirar foto agora'.");
+      } else {
+        setError("Não foi possível acessar a câmera ao vivo no navegador. Use o botão 'Tirar foto agora' para acionar a câmera nativa do dispositivo.");
+      }
     }
   }
 
   function capturePhoto() {
     const video = videoRef.current;
-    if (!video || !video.videoWidth || !video.videoHeight) return setError("A câmera ainda não está pronta. Tente novamente.");
+    if (!video) return setError("A câmera ainda não está pronta. Tente novamente.");
+    const width = video.videoWidth || video.clientWidth || 640;
+    const height = video.videoHeight || video.clientHeight || 640;
+    if (!width || !height) {
+      return setError("A câmera ainda está carregando a imagem. Aguarde 1 segundo e tente capturar novamente.");
+    }
     const canvas = document.createElement("canvas");
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-    canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return setError("Não foi possível processar a foto. Tente novamente.");
+    ctx.drawImage(video, 0, 0, width, height);
     canvas.toBlob((blob) => {
       if (!blob) return setError("Não foi possível capturar a foto. Tente novamente.");
-      usePhoto(blob);
+      applyPhoto(blob);
       stopCamera();
-    }, "image/jpeg", 0.9);
+    }, "image/jpeg", 0.92);
   }
 
   function chooseFile(event: ChangeEvent<HTMLInputElement>) {
     const selected = event.target.files?.[0];
-    if (selected) usePhoto(selected);
+    if (selected) {
+      applyPhoto(selected);
+      if (cameraOpen) stopCamera();
+    }
     event.target.value = "";
   }
 
@@ -155,24 +238,35 @@ export function CriminalidadeFacialClient() {
     setLoadingStage(0);
     setError("");
 
-    // Animate through loading stages
-    const stageTimers: ReturnType<typeof setTimeout>[] = [];
-    stageTimers.push(setTimeout(() => setLoadingStage(1), 2000));
-    stageTimers.push(setTimeout(() => setLoadingStage(2), 4500));
-
     try {
-      const result = await scorePhoto(photo);
-      stageTimers.forEach(clearTimeout);
+      const scorePromise = scorePhoto(photo);
+
+      // Etapa 1: Encontrando o seu perfil (3.2s)
+      await new Promise<void>((resolve) => setTimeout(resolve, 3200));
+      setLoadingStage(1);
+
+      // Etapa 2: Analisando similaridade facial com criminosos (3.5s)
+      await new Promise<void>((resolve) => setTimeout(resolve, 3500));
+      setLoadingStage(2);
+
+      // Etapa 3: Baixando os seus dados do Governo Brasileiro (3.5s)
+      await new Promise<void>((resolve) => setTimeout(resolve, 3500));
+      setLoadingStage(3);
+
+      // Pausa breve para exibir todas as etapas concluídas com sucesso
+      await new Promise<void>((resolve) => setTimeout(resolve, 1200));
+
+      const result = await scorePromise;
       setScore(result);
       setStep("result");
     } catch (reason) {
-      stageTimers.forEach(clearTimeout);
       setError(reason instanceof Error ? reason.message : "Não foi possível concluir a análise. Tente novamente.");
       setStep("photo");
     }
   }
 
   function reset() {
+    stopCamera();
     setStep("name");
     setNameQuery("");
     setSelectedPerson(undefined);
@@ -180,11 +274,10 @@ export function CriminalidadeFacialClient() {
     setPreviewUrl("");
     setScore(undefined);
     setError("");
-    stopCamera();
   }
 
   // ══════════════════════════════════════════
-  // STEP 1: Full-screen name entry
+  // STEP 1: Name search with autocomplete
   // ══════════════════════════════════════════
   if (step === "name") {
     return (
@@ -236,7 +329,7 @@ export function CriminalidadeFacialClient() {
               />
             </div>
 
-            {/* Suggestions dropdown */}
+            {/* Suggestions dropdown without city */}
             {showSuggestions && suggestions.length > 0 && (
               <div className="absolute left-0 right-0 top-full z-10 mt-2 max-h-72 overflow-y-auto rounded-2xl border border-white/10 bg-zinc-900/95 shadow-2xl shadow-black/60 backdrop-blur-xl">
                 {suggestions.map((person) => (
@@ -251,9 +344,6 @@ export function CriminalidadeFacialClient() {
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-semibold text-white">{person.fullName}</p>
-                      {person.fields["NATURALIDADE"] && (
-                        <p className="truncate text-xs text-zinc-500">{person.fields["NATURALIDADE"]}</p>
-                      )}
                     </div>
                     <ChevronRight size={16} className="shrink-0 text-zinc-600" />
                   </button>
@@ -273,10 +363,10 @@ export function CriminalidadeFacialClient() {
           </div>
         </div>
 
-        {/* Bottom hint */}
-        <div className="relative px-5 pb-8 text-center">
-          <p className="text-xs text-zinc-600">
-            Os nomes são sugeridos com base na lista de perfis cadastrados.
+        {/* Bottom disclaimer */}
+        <div className="relative mx-auto max-w-xl px-5 pb-8 text-center">
+          <p className="text-xs leading-relaxed text-zinc-500">
+            {DISCLAIMER}
           </p>
         </div>
       </main>
@@ -284,7 +374,7 @@ export function CriminalidadeFacialClient() {
   }
 
   // ══════════════════════════════════════════
-  // STEP 2: Photo capture (existing flow, adapted)
+  // STEP 2: Photo capture
   // ══════════════════════════════════════════
   if (step === "photo") {
     return (
@@ -318,41 +408,118 @@ export function CriminalidadeFacialClient() {
                 <h2 className="text-xl font-bold">foto de consulta</h2>
                 <span className="rounded-full border border-orange-500/30 bg-orange-500/10 px-3 py-1 text-xs text-orange-300">máx. 5 MB</span>
               </div>
+
               {cameraOpen ? (
-                <div className="mt-5 overflow-hidden rounded-2xl bg-black">
-                  <video ref={videoRef} autoPlay playsInline muted className="aspect-square w-full object-cover" />
+                <div className="relative mt-5 aspect-square w-full overflow-hidden rounded-2xl bg-black">
+                  <video
+                    ref={setVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    onLoadedMetadata={() => {
+                      videoRef.current?.play().catch(() => {});
+                    }}
+                    className="h-full w-full object-cover"
+                  />
+                  {cameraLoading && (
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80">
+                      <LoaderCircle className="animate-spin text-orange-400" size={32} />
+                      <p className="text-xs text-zinc-300">Iniciando câmera...</p>
+                    </div>
+                  )}
                 </div>
               ) : previewUrl ? (
-                <img src={previewUrl} alt="Prévia local da foto selecionada" className="mt-5 aspect-square w-full rounded-2xl object-cover" />
+                <div className="relative mt-5 aspect-square w-full overflow-hidden rounded-2xl bg-black">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={previewUrl} alt="Prévia local da foto selecionada" className="h-full w-full object-cover" />
+                  <div className="absolute right-3 top-3 rounded-full bg-emerald-500/90 px-3 py-1 text-xs font-bold text-black backdrop-blur-md">
+                    Foto pronta
+                  </div>
+                </div>
               ) : (
-                <div className="mt-5 flex aspect-square items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] text-center text-sm text-zinc-400">
-                  A prévia permanece neste dispositivo durante a análise.
+                <div className="mt-5 flex aspect-square items-center justify-center rounded-2xl border border-dashed border-white/20 bg-white/[0.03] p-6 text-center text-sm text-zinc-400">
+                  Tire uma foto ao vivo com a câmera ou escolha um arquivo do dispositivo.
                 </div>
               )}
-              <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                {cameraOpen ? (
-                  <button type="button" onClick={capturePhoto} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 font-bold text-black transition hover:bg-orange-400"><Camera size={18} /> Capturar foto</button>
-                ) : (
-                  <button type="button" onClick={openCamera} className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 font-bold text-black transition hover:bg-orange-400"><Camera size={18} /> Usar câmera</button>
-                )}
-                {cameraOpen ? (
-                  <button type="button" onClick={stopCamera} className="min-h-12 rounded-xl border border-white/15 px-4 font-semibold text-zinc-200 transition hover:bg-white/10">Cancelar câmera</button>
-                ) : (
-                  <label className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/15 px-4 font-semibold text-zinc-200 transition hover:bg-white/10"><Upload size={18} /> Enviar foto<input className="sr-only" type="file" accept={acceptedTypes} capture="user" onChange={chooseFile} /></label>
-                )}
-              </div>
+
+              {cameraOpen ? (
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={capturePhoto}
+                    className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 font-bold text-black transition hover:bg-orange-400 active:scale-95"
+                  >
+                    <Camera size={18} /> Capturar foto
+                  </button>
+                  <button
+                    type="button"
+                    onClick={stopCamera}
+                    className="min-h-12 rounded-xl border border-white/15 px-4 font-semibold text-zinc-200 transition hover:bg-white/10"
+                  >
+                    Cancelar câmera
+                  </button>
+                </div>
+              ) : (
+                <div className="mt-5 flex flex-col gap-3">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={openCamera}
+                      disabled={cameraLoading}
+                      className="flex min-h-12 items-center justify-center gap-2 rounded-xl bg-orange-500 px-4 font-bold text-black transition hover:bg-orange-400 disabled:opacity-50"
+                    >
+                      {cameraLoading ? (
+                        <LoaderCircle className="animate-spin" size={18} />
+                      ) : (
+                        <Camera size={18} />
+                      )}
+                      <span>{cameraLoading ? "Iniciando..." : "Abrir câmera ao vivo"}</span>
+                    </button>
+                    <label className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-orange-500/40 bg-orange-500/10 px-4 font-semibold text-orange-300 transition hover:bg-orange-500/20 active:scale-95">
+                      <Camera size={18} />
+                      <span>Tirar foto agora</span>
+                      <input ref={nativeCameraInputRef} className="sr-only" type="file" accept={acceptedTypes} capture="user" onChange={chooseFile} />
+                    </label>
+                  </div>
+                  <label className="flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/15 bg-white/5 px-4 text-xs font-semibold text-zinc-300 transition hover:bg-white/10">
+                    <Upload size={16} />
+                    <span>Escolher foto da galeria / arquivo</span>
+                    <input ref={galleryInputRef} className="sr-only" type="file" accept={acceptedTypes} onChange={chooseFile} />
+                  </label>
+                </div>
+              )}
             </section>
 
             <aside className="rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-950 to-zinc-900 p-5 sm:p-7">
               <ShieldCheck className="text-orange-400" size={28} />
               <h2 className="mt-5 text-xl font-bold">analisar com contexto</h2>
               <p className="mt-3 text-sm leading-6 text-zinc-400">A foto é enviada somente quando você pressiona &quot;Analisar foto&quot;. Não há análise contínua da câmera.</p>
-              {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
-              <button type="button" disabled={!photo} onClick={analyze} className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">
+              {error && (
+                <div role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3.5 text-sm text-red-200">
+                  <p>{error}</p>
+                  <button
+                    type="button"
+                    onClick={() => nativeCameraInputRef.current?.click()}
+                    className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-xs font-bold text-black transition hover:bg-orange-400"
+                  >
+                    <Camera size={14} /> Tirar foto com a câmera do celular
+                  </button>
+                </div>
+              )}
+              <button
+                type="button"
+                disabled={!photo}
+                onClick={analyze}
+                className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40"
+              >
                 <Search size={19} /> Analisar foto
               </button>
             </aside>
           </div>
+
+          <p className="mt-12 text-center text-xs leading-relaxed text-zinc-600 max-w-xl mx-auto">
+            {DISCLAIMER}
+          </p>
         </section>
       </main>
     );
@@ -452,7 +619,8 @@ export function CriminalidadeFacialClient() {
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
               {score.top_matches.slice(0, 5).map((match) => (
                 <article key={match.match_id} className="overflow-hidden rounded-2xl border border-white/10 bg-black">
-                  <img src={referenceImageUrl(match.image_url)} alt={`Referência ${match.match_id}`} className="aspect-square w-full object-cover" />
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={referenceImageUrl(match.image_url, apiOrigin)} alt={`Referência ${match.match_id}`} className="aspect-square w-full object-cover" />
                   <div className="p-3">
                     <p className="font-mono text-xs text-zinc-400">ID {match.match_id}</p>
                     <p className="mt-1 text-sm font-bold">{percent(match.relative_percent)}</p>

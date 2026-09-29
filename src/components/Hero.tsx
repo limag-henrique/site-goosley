@@ -128,31 +128,8 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Centered Desktop & Mobile Action Buttons */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 w-full mt-12 md:mt-16 pt-8 border-t border-white/10"
-        >
-          <a 
-            href="/precos" 
-            className="group relative inline-flex items-center justify-center gap-3 px-8 py-4 rounded-full bg-white text-black font-bold uppercase tracking-widest text-sm transition-colors duration-300 hover:bg-orange-500 hover:text-white w-full sm:w-auto text-center"
-          >
-            <span>Simule seu Projeto</span>
-            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-          <a 
-            href="https://wa.me/5531994217926" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-3 px-7 py-4 rounded-full border border-white/20 bg-transparent text-white font-bold uppercase tracking-widest text-sm transition-colors duration-300 hover:bg-white/10 w-full sm:w-auto text-center"
-          >
-            <span>WhatsApp Direto</span>
-          </a>
-        </motion.div>
+        {/* Anchor point: once this heading block is scrolled past, Navbar is revealed */}
+        <div id="hero-heading-trigger" className="w-full h-px pointer-events-none" />
 
         {/* Mobile Description */}
         <motion.div 

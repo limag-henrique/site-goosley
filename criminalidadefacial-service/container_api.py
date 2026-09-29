@@ -108,17 +108,21 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main() -> int:
-    from scripts.serve_similarity_app import GallerySimilarityScorer
+def create_scorer(args: argparse.Namespace) -> ImageScorer:
+    from serve_similarity_app import GallerySimilarityScorer
 
-    args = parse_args()
-    scorer = GallerySimilarityScorer(
+    return GallerySimilarityScorer(
         args.features,
         args.embeddings,
         args.model_name,
         ctx_id=-1,
         det_size=args.det_size,
     )
+
+
+def main() -> int:
+    args = parse_args()
+    scorer = create_scorer(args)
     server = ThreadingHTTPServer((args.host, args.port), create_handler(scorer, args.max_upload_bytes))
     server.serve_forever()
     return 0

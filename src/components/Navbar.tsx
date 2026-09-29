@@ -3,21 +3,61 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Menu, X } from "lucide-react";
 
 export function Navbar() {
+  const pathname = usePathname();
+  const isHome = pathname === "/";
+
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
+    let ticking = false;
+
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      const scrollY = window.scrollY;
+      setIsScrolled(scrollY > 50);
+
+      if (!isHome) {
+        setIsScrolledPastHero(true);
+        return;
+      }
+
+      const trigger = document.getElementById("hero-heading-trigger");
+      if (trigger) {
+        const rect = trigger.getBoundingClientRect();
+        setIsScrolledPastHero(rect.top <= 0);
+      } else {
+        // Fallback if trigger is not yet rendered
+        setIsScrolledPastHero(scrollY > 500);
+      }
     };
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          handleScroll();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
     handleScroll();
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+    const rafId = window.requestAnimationFrame(handleScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [isHome]);
 
   useEffect(() => {
     if (isMenuOpen) {
@@ -35,13 +75,17 @@ export function Navbar() {
     };
   }, [isMenuOpen]);
 
+  const isVisible = !isHome || isScrolledPastHero || isMenuOpen;
+
   return (
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4",
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-out py-4",
           isScrolled ? "bg-background/90 backdrop-blur-md border-b border-white/5" : "bg-transparent",
-          "translate-y-0 opacity-100"
+          isVisible
+            ? "translate-y-0 opacity-100 pointer-events-auto"
+            : "-translate-y-full opacity-0 pointer-events-none"
         )}
       >
         <div className="container mx-auto px-6 md:px-12 flex items-center justify-between">
@@ -75,10 +119,7 @@ export function Navbar() {
               <span>Contato</span>
               <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
             </Link>
-            <Link href="/criminalidadefacial" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
-              <span>Criminalidade Facial</span>
-              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
-            </Link>
+
             <Link href="/meu-portal" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
               <span>Meu Portal</span>
               <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
@@ -143,13 +184,7 @@ export function Navbar() {
         >
           Meu Portal
         </Link>
-        <Link 
-          href="/criminalidadefacial" 
-          onClick={() => setIsMenuOpen(false)}
-          className="w-full text-center py-3 min-h-[50px] flex items-center justify-center hover:text-orange-500 transition-colors"
-        >
-          Criminalidade Facial
-        </Link>
+
         <Link 
           href="/precos" 
           onClick={() => setIsMenuOpen(false)}

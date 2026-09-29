@@ -4,12 +4,13 @@ import { usePathname } from "next/navigation";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { CustomCursor } from "@/components/CustomCursor";
+import { isImmersiveRoute } from "@/lib/public-chrome";
 
 export function PublicChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isPortal = pathname.startsWith("/meu-portal");
 
-  if (isPortal) {
+  if (isPortal || isImmersiveRoute(pathname)) {
     return <>{children}</>;
   }
 

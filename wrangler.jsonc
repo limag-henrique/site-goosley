@@ -16,7 +16,8 @@
 	},
 	"vars": {
 		"APP_URL": "https://goosley-web.henriquelimagusmao.workers.dev",
-		"EMAIL_FROM": "Goosley <goosleytech@gmail.com>"
+		"EMAIL_FROM": "Goosley <goosleytech@gmail.com>",
+		"FACIAL_SIMILARITY_BACKEND_URL": "https://criminalidadefacial-api.henriquelimagusmao.workers.dev"
 	},
 	"assets": {
 		"directory": ".open-next/assets",

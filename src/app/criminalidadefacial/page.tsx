@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
-import { CriminalidadeFacialClient } from "@/components/CriminalidadeFacialClient";
+import { CriminalidadeFacialExperience } from "@/components/CriminalidadeFacialExperience";
+import { getPeopleIndex } from "@/server/criminalidadefacial/people";
 
 export const metadata: Metadata = {
   title: "Criminalidade facial | Goosley Digital",
@@ -8,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function CriminalidadeFacialPage() {
-  return <CriminalidadeFacialClient />;
+  return <CriminalidadeFacialExperience people={getPeopleIndex()} />;
 }
