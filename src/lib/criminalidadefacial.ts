@@ -22,7 +22,6 @@ export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promis
 
 const actionableErrors: Record<number, string> = {
   400: "Escolha uma imagem JPEG, PNG ou WebP válida.",
-  403: "Conclua a verificação de segurança e tente novamente.",
   413: "A imagem excede o limite de 5 MB. Escolha uma versão menor.",
   422: "Não foi possível localizar um rosto utilizável nesta imagem.",
   429: "Muitas tentativas. Aguarde um minuto e tente novamente.",
@@ -33,18 +32,26 @@ export function getFacialApiOrigin(): string {
   return (process.env.NEXT_PUBLIC_FACIAL_SIMILARITY_API_ORIGIN ?? "").replace(/\/$/, "");
 }
 
-export function referenceImageUrl(path: string, apiOrigin = getFacialApiOrigin()): string {
-  return new URL(path, `${apiOrigin}/`).toString();
+/**
+ * Returns the URL for a reference image.
+ * Images are served from /references/ in the public directory (local static files).
+ * The `image_url` from the API typically contains the r2_key like "references/000123.webp".
+ */
+export function referenceImageUrl(path: string): string {
+  // If path already starts with "/references/", return it as-is
+  if (path.startsWith("/references/")) return path;
+  // If path is like "references/000123.webp", prepend slash
+  if (path.startsWith("references/")) return `/${path}`;
+  // Otherwise assume it's just a filename like "000123.webp"
+  return `/references/${path}`;
 }
 
 export async function scorePhoto(
   file: Blob,
-  token: string,
   fetchImpl: FetchLike = fetch,
   apiOrigin = getFacialApiOrigin(),
 ): Promise<PublicScoreResponse> {
   if (!apiOrigin) throw new Error("A análise ainda não foi configurada neste ambiente.");
-  if (!token) throw new Error("Conclua a verificação de segurança antes de analisar a foto.");
   if (!file.type || !["image/jpeg", "image/png", "image/webp"].includes(file.type.toLowerCase())) {
     throw new Error("Escolha uma imagem JPEG, PNG ou WebP válida.");
   }
@@ -53,7 +60,6 @@ export async function scorePhoto(
     method: "POST",
     headers: {
       "Content-Type": file.type,
-      "CF-Turnstile-Response": token,
     },
     body: file,
   }));

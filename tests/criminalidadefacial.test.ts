@@ -9,8 +9,7 @@ test("scorePhoto sends an image body to the configured API and projects score fi
   let request: Request | undefined;
   const result = await scorePhoto(
     photo,
-    "turnstile-token",
-    async (input) => {
+    async (input: RequestInfo | URL) => {
       request = input instanceof Request ? input : new Request(input);
       return Response.json({
         ok: true,
@@ -24,17 +23,16 @@ test("scorePhoto sends an image body to the configured API and projects score fi
 
   assert.equal(result.aggregate_relative_percent, 96.4);
   assert.equal(request?.url, "https://facial.example.test/api/score");
-  assert.equal(request?.headers.get("CF-Turnstile-Response"), "turnstile-token");
   assert.equal(request?.headers.get("Content-Type"), "image/jpeg");
 });
 
 test("scorePhoto converts HTTP 429 and 503 into Portuguese actionable errors", async () => {
   await assert.rejects(
-    () => scorePhoto(photo, "token", async () => new Response("{}", { status: 429 }), "https://facial.example.test"),
+    () => scorePhoto(photo, async () => new Response("{}", { status: 429 }), "https://facial.example.test"),
     /Muitas tentativas/,
   );
   await assert.rejects(
-    () => scorePhoto(photo, "token", async () => new Response("{}", { status: 503 }), "https://facial.example.test"),
+    () => scorePhoto(photo, async () => new Response("{}", { status: 503 }), "https://facial.example.test"),
     /temporariamente indisponível/,
   );
 });

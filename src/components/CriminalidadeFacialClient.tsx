@@ -10,17 +10,6 @@ import {
   type PublicScoreResponse,
 } from "@/lib/criminalidadefacial";
 
-type Turnstile = {
-  render(container: HTMLElement, options: { sitekey: string; action: string; callback(token: string): void; "expired-callback"(): void }): string;
-  reset(widgetId?: string): void;
-};
-
-declare global {
-  interface Window {
-    turnstile?: Turnstile;
-  }
-}
-
 const acceptedTypes = "image/jpeg,image/png,image/webp";
 
 function percent(value: number | undefined | null, digits = 1) {
@@ -29,15 +18,11 @@ function percent(value: number | undefined | null, digits = 1) {
 
 export function CriminalidadeFacialClient() {
   const apiOrigin = getFacialApiOrigin();
-  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
   const videoRef = useRef<HTMLVideoElement>(null);
-  const widgetRef = useRef<HTMLDivElement>(null);
-  const widgetIdRef = useRef<string | undefined>(undefined);
   const streamRef = useRef<MediaStream | undefined>(undefined);
   const [photo, setPhoto] = useState<Blob>();
   const [previewUrl, setPreviewUrl] = useState("");
   const [cameraOpen, setCameraOpen] = useState(false);
-  const [token, setToken] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [score, setScore] = useState<PublicScoreResponse>();
@@ -55,32 +40,6 @@ export function CriminalidadeFacialClient() {
   useEffect(() => () => {
     if (previewUrl) URL.revokeObjectURL(previewUrl);
   }, [previewUrl]);
-
-  useEffect(() => {
-    if (!siteKey || !widgetRef.current) return;
-    const render = () => {
-      if (!widgetRef.current || widgetIdRef.current || !window.turnstile) return;
-      widgetIdRef.current = window.turnstile.render(widgetRef.current, {
-        sitekey: siteKey,
-        action: "turnstile-spin-v1",
-        callback: setToken,
-        "expired-callback": () => setToken(""),
-      });
-    };
-    const existing = document.querySelector<HTMLScriptElement>('script[src^="https://challenges.cloudflare.com/turnstile/"]');
-    if (existing) {
-      existing.addEventListener("load", render);
-      render();
-      return () => existing.removeEventListener("load", render);
-    }
-    const script = document.createElement("script");
-    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
-    script.async = true;
-    script.defer = true;
-    script.addEventListener("load", render);
-    document.head.appendChild(script);
-    return () => script.removeEventListener("load", render);
-  }, [siteKey]);
 
   function usePhoto(next: Blob) {
     if (!acceptedTypes.split(",").includes(next.type.toLowerCase())) {
@@ -136,13 +95,11 @@ export function CriminalidadeFacialClient() {
     setIsLoading(true);
     setError("");
     try {
-      setScore(await scorePhoto(photo, token));
+      setScore(await scorePhoto(photo));
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : "Não foi possível concluir a análise. Tente novamente.");
     } finally {
       setIsLoading(false);
-      setToken("");
-      window.turnstile?.reset(widgetIdRef.current);
     }
   }
 
@@ -191,12 +148,13 @@ export function CriminalidadeFacialClient() {
           <aside className="rounded-3xl border border-white/10 bg-gradient-to-b from-zinc-950 to-zinc-900 p-5 sm:p-7">
             <ShieldCheck className="text-orange-400" size={28} />
             <h2 className="mt-5 text-xl font-bold">analisar com contexto</h2>
-            <p className="mt-3 text-sm leading-6 text-zinc-400">A foto é enviada somente quando você pressiona “Analisar foto”. Não há análise contínua da câmera.</p>
+            <p className="mt-3 text-sm leading-6 text-zinc-400">A foto é enviada somente quando você pressiona "Analisar foto". Não há análise contínua da câmera.</p>
             {!apiOrigin && <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">A origem da API ainda não foi configurada neste ambiente.</p>}
-            {!siteKey && <p className="mt-5 rounded-xl border border-amber-400/30 bg-amber-400/10 p-3 text-sm text-amber-200">A chave pública do Turnstile ainda não foi configurada neste ambiente.</p>}
-            <div ref={widgetRef} data-action="turnstile-spin-v1" className="mt-6 min-h-16" />
+            <p className="mt-5 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-3 text-sm text-emerald-200">
+              A galeria contém 9.482 referências em WebP de alta resolução para máxima assertividade na comparação facial.
+            </p>
             {error && <p role="alert" className="mt-4 rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-200">{error}</p>}
-            <button type="button" disabled={isLoading || !photo || !token || !apiOrigin} onClick={analyze} className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">
+            <button type="button" disabled={isLoading || !photo || !apiOrigin} onClick={analyze} className="mt-5 flex min-h-13 w-full items-center justify-center gap-2 rounded-xl bg-white px-4 font-bold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">
               {isLoading ? <><LoaderCircle className="animate-spin" size={19} /> Analisando…</> : <><ImagePlus size={19} /> Analisar foto</>}
             </button>
           </aside>
