@@ -75,6 +75,10 @@ export function Navbar() {
               <span>Contato</span>
               <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
             </Link>
+            <Link href="/criminalidadefacial" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
+              <span>Criminalidade Facial</span>
+              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
+            </Link>
             <Link href="/meu-portal" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
               <span>Meu Portal</span>
               <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
@@ -139,6 +143,13 @@ export function Navbar() {
           className="w-full text-center py-3 min-h-[50px] flex items-center justify-center hover:text-orange-500 transition-colors"
         >
           Meu Portal
+        </Link>
+        <Link 
+          href="/criminalidadefacial" 
+          onClick={() => setIsMenuOpen(false)}
+          className="w-full text-center py-3 min-h-[50px] flex items-center justify-center hover:text-orange-500 transition-colors"
+        >
+          Criminalidade Facial
         </Link>
         <Link 
           href="/precos" 

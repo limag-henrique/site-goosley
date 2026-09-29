@@ -1,0 +1,67 @@
+export type PublicMatch = {
+  match_id: number;
+  subject_id: string;
+  cosine: number;
+  relative_percent: number;
+  image_url: string;
+};
+
+export type PublicScoreResponse = {
+  ok: boolean;
+  aggregate_relative_percent: number;
+  best_cosine: number;
+  best_relative_percent?: number;
+  distinctiveness_percent?: number;
+  estimated_false_match_rate?: number | null;
+  match_strength?: string;
+  warnings?: string[];
+  top_matches: PublicMatch[];
+};
+
+export type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>;
+
+const actionableErrors: Record<number, string> = {
+  400: "Escolha uma imagem JPEG, PNG ou WebP válida.",
+  403: "Conclua a verificação de segurança e tente novamente.",
+  413: "A imagem excede o limite de 5 MB. Escolha uma versão menor.",
+  422: "Não foi possível localizar um rosto utilizável nesta imagem.",
+  429: "Muitas tentativas. Aguarde um minuto e tente novamente.",
+  503: "A análise está temporariamente indisponível. Tente novamente em instantes.",
+};
+
+export function getFacialApiOrigin(): string {
+  return (process.env.NEXT_PUBLIC_FACIAL_SIMILARITY_API_ORIGIN ?? "").replace(/\/$/, "");
+}
+
+export function referenceImageUrl(path: string, apiOrigin = getFacialApiOrigin()): string {
+  return new URL(path, `${apiOrigin}/`).toString();
+}
+
+export async function scorePhoto(
+  file: Blob,
+  token: string,
+  fetchImpl: FetchLike = fetch,
+  apiOrigin = getFacialApiOrigin(),
+): Promise<PublicScoreResponse> {
+  if (!apiOrigin) throw new Error("A análise ainda não foi configurada neste ambiente.");
+  if (!token) throw new Error("Conclua a verificação de segurança antes de analisar a foto.");
+  if (!file.type || !["image/jpeg", "image/png", "image/webp"].includes(file.type.toLowerCase())) {
+    throw new Error("Escolha uma imagem JPEG, PNG ou WebP válida.");
+  }
+
+  const response = await fetchImpl(new Request(`${apiOrigin}/api/score`, {
+    method: "POST",
+    headers: {
+      "Content-Type": file.type,
+      "CF-Turnstile-Response": token,
+    },
+    body: file,
+  }));
+  if (!response.ok) throw new Error(actionableErrors[response.status] ?? "Não foi possível concluir a análise. Tente novamente.");
+
+  const payload = await response.json() as PublicScoreResponse;
+  if (!payload.ok || !Number.isFinite(payload.aggregate_relative_percent) || !Number.isFinite(payload.best_cosine)) {
+    throw new Error("Não foi possível concluir a análise. Tente novamente.");
+  }
+  return payload;
+}
