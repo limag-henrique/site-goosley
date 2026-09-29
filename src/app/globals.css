@@ -9,19 +9,51 @@
 
 html.immersive-mode,
 html.immersive-mode body {
+  height: 100%;
+  height: -webkit-fill-available;
   min-height: 100dvh;
+  margin: 0;
+  padding: 0;
   overflow: hidden;
   overscroll-behavior: none;
   background: #000;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html.immersive-mode input,
+html.immersive-mode textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+html.immersive-mode img {
+  -webkit-user-drag: none;
+  user-drag: none;
+}
+
+/* Proteção estrita contra impressão e exportação */
+@media print {
+  html.immersive-mode,
+  html.immersive-mode body,
+  html.immersive-mode main,
+  html.immersive-mode div {
+    display: none !important;
+    visibility: hidden !important;
+  }
 }
 
 @media (display-mode: fullscreen), (display-mode: standalone) {
   html,
   body {
+    height: 100%;
+    height: -webkit-fill-available;
     min-height: 100dvh;
     background: #000;
   }
 }
+
 
 @theme inline {
   --color-background: var(--background);

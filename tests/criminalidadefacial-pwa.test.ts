@@ -2,7 +2,12 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import manifest from "../src/app/manifest";
-import { requestImmersiveFullscreen } from "../src/lib/immersive-mode";
+import {
+  exitImmersiveFullscreen,
+  isImmersiveFullscreen,
+  isImmersiveFullscreenSupported,
+  requestImmersiveFullscreen,
+} from "../src/lib/immersive-mode";
 import { isImmersiveRoute } from "../src/lib/public-chrome";
 
 test("manifest abre criminalidade facial como PWA fullscreen", () => {
@@ -33,4 +38,47 @@ test("fullscreen é solicitado silenciosamente e rejeições do navegador são a
     documentElement: { requestFullscreen: async () => { throw new Error("gesture required"); } },
   });
   assert.equal(rejected, false);
+});
+
+test("isImmersiveFullscreen detecta elementos em fullscreen padrão e webkit", () => {
+  assert.equal(isImmersiveFullscreen(null), false);
+  assert.equal(isImmersiveFullscreen({ fullscreenElement: null }), false);
+  assert.equal(isImmersiveFullscreen({ fullscreenElement: {} }), true);
+  assert.equal(isImmersiveFullscreen({ webkitFullscreenElement: {} }), true);
+  assert.equal(isImmersiveFullscreen({ mozFullScreenElement: {} }), true);
+  assert.equal(isImmersiveFullscreen({ msFullscreenElement: {} }), true);
+});
+
+test("isImmersiveFullscreenSupported identifica suporte com prefixos móveis", () => {
+  assert.equal(isImmersiveFullscreenSupported(null), false);
+  assert.equal(isImmersiveFullscreenSupported({}), false);
+  assert.equal(isImmersiveFullscreenSupported({ documentElement: {} }), false);
+  assert.equal(isImmersiveFullscreenSupported({ documentElement: { requestFullscreen: async () => {} } }), true);
+  assert.equal(isImmersiveFullscreenSupported({ documentElement: { webkitRequestFullscreen: () => {} } }), true);
+});
+
+test("requestImmersiveFullscreen suporta prefixo webkit e exitImmersiveFullscreen finaliza", async () => {
+  let webkitCalls = 0;
+  const doc = {
+    fullscreenElement: null,
+    documentElement: {
+      webkitRequestFullscreen: () => {
+        webkitCalls += 1;
+      },
+    },
+  };
+  const success = await requestImmersiveFullscreen(doc);
+  assert.equal(success, true);
+  assert.equal(webkitCalls, 1);
+
+  let exitCalls = 0;
+  const activeDoc = {
+    fullscreenElement: {},
+    exitFullscreen: async () => {
+      exitCalls += 1;
+    },
+  };
+  const exited = await exitImmersiveFullscreen(activeDoc);
+  assert.equal(exited, true);
+  assert.equal(exitCalls, 1);
 });
