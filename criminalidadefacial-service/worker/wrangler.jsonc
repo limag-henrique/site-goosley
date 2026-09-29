@@ -1,0 +1,49 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "criminalidadefacial-api",
+  "main": "src/worker.ts",
+  "compatibility_date": "2026-09-28",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "ALLOWED_ORIGIN": "https://goosley.com.br"
+  },
+  "r2_buckets": [
+    {
+      "binding": "GALLERY_RELEASE",
+      "bucket_name": "criminalidadefacial-release"
+    },
+    {
+      "binding": "REFERENCES",
+      "bucket_name": "criminalidadefacial-references"
+    }
+  ],
+  "containers": [
+    {
+      "name": "face-similarity",
+      "class_name": "FaceSimilarityContainer",
+      "image": "../Dockerfile",
+      "image_build_context": "..",
+      "instance_type": "standard-1",
+      "max_instances": 3,
+      "scheduling_policy": "default"
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "FACE_SIMILARITY_CONTAINER",
+        "class_name": "FaceSimilarityContainer"
+      },
+      {
+        "name": "RATE_LIMITER",
+        "class_name": "RateLimitCounter"
+      }
+    ]
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": ["FaceSimilarityContainer", "RateLimitCounter"]
+    }
+  ]
+}
