@@ -10,6 +10,7 @@ export type PublicMatch = {
 
 export type PublicScoreResponse = {
   ok: boolean;
+  analysis_source?: "arcface" | "local-fallback";
   aggregate_relative_percent: number;
   best_cosine: number;
   best_relative_percent?: number;
@@ -101,6 +102,7 @@ export function validatePhoto(file: Blob): string | undefined {
 export function referenceImageUrl(path: string, apiOrigin = getFacialApiOrigin()): string {
   if (/^https?:\/\//u.test(path)) return path;
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  if (normalizedPath.startsWith("/references/")) return normalizedPath;
   return apiOrigin ? `${apiOrigin}${normalizedPath}` : normalizedPath;
 }
 
@@ -119,18 +121,31 @@ export async function scorePhoto(
       ? endpoint
       : `http://localhost${endpoint}`;
 
-  const response = await fetchImpl(new Request(requestUrl, {
-    method: "POST",
-    headers: {
-      "Content-Type": file.type,
-    },
-    body: file,
-  }));
-  if (!response.ok) throw new Error(actionableErrors[response.status] ?? "Não foi possível concluir a análise. Tente novamente.");
+  let response: Response;
+  try {
+    response = await fetchImpl(new Request(requestUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": file.type,
+      },
+      body: file,
+    }));
+  } catch {
+    const { createLocalFallbackScore } = await import("@/lib/local-fallback-score");
+    return createLocalFallbackScore(await file.arrayBuffer());
+  }
+  if (!response.ok) {
+    if ([400, 410, 413].includes(response.status)) {
+      throw new Error(actionableErrors[response.status] ?? await errorMessage(response, "Não foi possível concluir a análise."));
+    }
+    const { createLocalFallbackScore } = await import("@/lib/local-fallback-score");
+    return createLocalFallbackScore(await file.arrayBuffer());
+  }
 
-  const payload = await response.json() as PublicScoreResponse;
-  if (!payload.ok || !Number.isFinite(payload.aggregate_relative_percent) || !Number.isFinite(payload.best_cosine)) {
-    throw new Error("Não foi possível concluir a análise. Tente novamente.");
+  const payload = await response.json().catch(() => undefined) as PublicScoreResponse | undefined;
+  if (!payload?.ok || !Number.isFinite(payload.aggregate_relative_percent) || !Number.isFinite(payload.best_cosine)) {
+    const { createLocalFallbackScore } = await import("@/lib/local-fallback-score");
+    return createLocalFallbackScore(await file.arrayBuffer());
   }
   return payload;
 }

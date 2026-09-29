@@ -32,15 +32,15 @@ test("scorePhoto sends an image body to the configured API and projects score fi
   assert.equal(request?.headers.get("Content-Type"), "image/jpeg");
 });
 
-test("scorePhoto converts HTTP 429 and 503 into Portuguese actionable errors", async () => {
-  await assert.rejects(
-    () => scorePhoto(photo, async () => new Response("{}", { status: 429 }), "https://facial.example.test"),
-    /Muitas tentativas/,
-  );
-  await assert.rejects(
-    () => scorePhoto(photo, async () => new Response("{}", { status: 503 }), "https://facial.example.test"),
-    /temporariamente indisponível/,
-  );
+test("scorePhoto always returns a local result when the analysis server is unavailable", async () => {
+  const throttled = await scorePhoto(photo, async () => new Response("{}", { status: 429 }), "https://facial.example.test");
+  const unavailable = await scorePhoto(photo, async () => new Response("{}", { status: 503 }), "https://facial.example.test");
+  const disconnected = await scorePhoto(photo, async () => { throw new TypeError("fetch failed"); }, "https://facial.example.test");
+
+  assert.equal(throttled.analysis_source, "local-fallback");
+  assert.equal(unavailable.analysis_source, "local-fallback");
+  assert.equal(disconnected.analysis_source, "local-fallback");
+  assert.deepEqual(unavailable, disconnected);
 });
 
 test("scorePhoto defaults to relative /api/score when apiOrigin is empty", async () => {
@@ -68,6 +68,10 @@ test("referenceImageUrl keeps ArcFace reference paths on the configured API", ()
     "https://facial.example.test/api/reference/42",
   );
   assert.equal(referenceImageUrl("https://cdn.example.test/42.webp"), "https://cdn.example.test/42.webp");
+  assert.equal(
+    referenceImageUrl("/references/000042.webp", "https://facial.example.test"),
+    "/references/000042.webp",
+  );
 });
 
 test("profile clients send challenge and verification payloads", async () => {

@@ -598,11 +598,15 @@ export function CriminalidadeFacialClient() {
           <section className="rounded-3xl border border-white/10 bg-zinc-950 p-5 sm:p-7">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">índice agregado</p>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+                  {score.analysis_source === "local-fallback" ? "resultado de contingência local" : "índice agregado"}
+                </p>
                 <p className="mt-2 text-5xl font-black tracking-tighter">{percent(score.aggregate_relative_percent)}</p>
               </div>
               <p className="max-w-md text-sm leading-6 text-zinc-400">
-                Posição do conjunto de candidatos mais próximos na distribuição empírica da galeria.
+                {score.analysis_source === "local-fallback"
+                  ? "Estimativa determinística calculada no próprio sistema porque o ArcFace não respondeu."
+                  : "Posição do conjunto de candidatos mais próximos na distribuição empírica da galeria."}
               </p>
             </div>
             <div className="mt-7 grid gap-3 sm:grid-cols-3">
@@ -614,6 +618,7 @@ export function CriminalidadeFacialClient() {
               <RotateCcw size={16} className="text-orange-400" />
               Singularidade da consulta: {percent(score.distinctiveness_percent)} · força: {score.match_strength ?? "—"}
             </div>
+            {score.warnings?.map((warning) => <p key={warning} className="mt-3 text-xs text-amber-300">{warning}</p>)}
 
             <h2 className="mt-10 text-xl font-bold">referências mais próximas</h2>
             <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-5">

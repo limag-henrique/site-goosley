@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { FetchLike, PublicScoreResponse } from "@/lib/criminalidadefacial";
 import { isCriminalidadeFacialDeactivated } from "@/lib/criminalidadefacial-schedule";
+import { createLocalFallbackScore } from "@/lib/local-fallback-score";
 
 const ALLOWED_CONTENT_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
@@ -11,6 +12,7 @@ export type ScoreHandlerOptions = {
   getBackendUrl?: () => string | undefined;
   timeoutMs?: number;
   attempts?: number;
+  isDeactivated?: () => boolean;
 };
 
 function isPublicScoreResponse(value: unknown): value is PublicScoreResponse {
@@ -38,9 +40,10 @@ export function createScoreHandler({
   getBackendUrl = () => process.env.FACIAL_SIMILARITY_BACKEND_URL ?? DEFAULT_ARCFACE_BACKEND,
   timeoutMs = 15_000,
   attempts = 2,
+  isDeactivated = isCriminalidadeFacialDeactivated,
 }: ScoreHandlerOptions = {}) {
   return async function score(request: NextRequest) {
-    if (isCriminalidadeFacialDeactivated()) {
+    if (isDeactivated()) {
       return errorResponse("Esta página foi desativada.", 410);
     }
 
@@ -57,7 +60,7 @@ export function createScoreHandler({
 
     const backendUrl = getBackendUrl()?.replace(/\/$/u, "");
     if (!backendUrl) {
-      return errorResponse("O ArcFace está indisponível porque o backend não foi configurado.", 503);
+      return NextResponse.json(createLocalFallbackScore(body), { headers: { "Cache-Control": "no-store" } });
     }
 
     let timedOut = false;
@@ -73,22 +76,12 @@ export function createScoreHandler({
         });
 
         if (!response.ok) {
-          if (response.status < 500 && response.status !== 429) {
-            const payload = await response.text();
-            return new NextResponse(payload, {
-              status: response.status,
-              headers: {
-                "Cache-Control": "no-store",
-                "Content-Type": response.headers.get("Content-Type") ?? "application/json; charset=utf-8",
-              },
-            });
-          }
           continue;
         }
 
         const payload: unknown = await response.json();
         if (!isPublicScoreResponse(payload)) {
-          return errorResponse("O ArcFace retornou um resultado inválido.", 502);
+          return NextResponse.json(createLocalFallbackScore(body), { headers: { "Cache-Control": "no-store" } });
         }
         return NextResponse.json(payload, { headers: { "Cache-Control": "no-store" } });
       } catch (error) {
@@ -98,9 +91,7 @@ export function createScoreHandler({
       }
     }
 
-    return errorResponse(
-      timedOut ? "O ArcFace excedeu o tempo de resposta. Tente novamente." : "A análise ArcFace está temporariamente indisponível.",
-      timedOut ? 504 : 503,
-    );
+    void timedOut;
+    return NextResponse.json(createLocalFallbackScore(body), { headers: { "Cache-Control": "no-store" } });
   };
 }

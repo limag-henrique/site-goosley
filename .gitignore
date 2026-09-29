@@ -53,3 +53,6 @@ scripts/portal-seed.sql
 /criminalidadefacial-service/release/
 /criminalidadefacial-service/worker/node_modules/
 /criminalidadefacial-service/worker/.wrangler/
+
+graphify-out/
+

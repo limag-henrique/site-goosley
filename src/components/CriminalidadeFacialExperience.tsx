@@ -413,10 +413,16 @@ export function CriminalidadeFacialExperience({ people, deactivationAt }: { peop
             <section className="mt-8 overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 p-5 sm:p-8">
               <div className="flex flex-wrap items-end justify-between gap-5">
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-400">resultado do ArcFace</p>
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-400">
+                    {score.analysis_source === "local-fallback" ? "resultado de contingência local" : "resultado do ArcFace"}
+                  </p>
                   <p className="mt-2 text-6xl font-black tracking-tighter">{percent(score.aggregate_relative_percent)}</p>
                 </div>
-                <p className="max-w-md text-sm leading-6 text-zinc-400">Comparação facial por embeddings contra a galeria de referência, sem pontuação aleatória de contingência.</p>
+                <p className="max-w-md text-sm leading-6 text-zinc-400">
+                  {score.analysis_source === "local-fallback"
+                    ? "Estimativa determinística calculada no próprio sistema porque o ArcFace não respondeu."
+                    : "Comparação facial por embeddings contra a galeria de referência."}
+                </p>
               </div>
               <div className="mt-7 grid gap-3 sm:grid-cols-3">
                 <Metric label="melhor cosseno" value={score.best_cosine.toFixed(4)} />
