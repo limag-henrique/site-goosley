@@ -21,9 +21,8 @@ const questions: Record<string, Question> = {
     options: [
       { text: "Vender e atrair clientes na internet.", nextId: "q2a" },
       { text: "Automatizar e organizar processos internos.", nextId: "q2b" },
-      { text: "Ter uma plataforma robusta ou um app próprio.", nextId: "q2c" },
+      { text: "Ter uma plataforma web para o meu negócio.", nextId: "q2c" },
       { text: "Criar uma experiência foda de atendimento com IA.", nextId: "q2d" },
-      { text: "Entender quais processos valem automatizar primeiro.", resultUrl: "/diagnostico-automacao-ia" },
       { text: "Medir resultados, funis e indicadores em dashboards.", resultUrl: "/analytics-dashboards-bi" },
     ],
   },
@@ -43,11 +42,10 @@ const questions: Record<string, Question> = {
     title: "Beleza. E qual o nível da bagunça hoje?",
     options: [
       { text: "São tarefas do dia a dia, como responder mensagens e enviar e-mails.", resultUrl: "/automacoes" },
-      { text: "São processos complexos de vários setores que precisam se falar sozinhos.", resultUrl: "/workflows" },
+      { text: "São processos complexos de vários setores que precisam se falar sozinhos.", resultUrl: "/automacoes" },
       { text: "Preciso de um sistema interno para organizar tudo isso do zero.", resultUrl: "/sistemas-web" },
       { text: "Quero um Agente de IA para ler documentos e ajudar a equipe.", resultUrl: "/agentes-corporativos" },
-      { text: "Quero integrar ferramentas que uso hoje e não se conversam.", resultUrl: "/workflows" },
-      { text: "Ainda preciso mapear gargalos e priorizar o que automatizar.", resultUrl: "/diagnostico-automacao-ia" },
+      { text: "Quero integrar ferramentas que uso hoje e não se conversam.", resultUrl: "/automacoes" },
     ],
   },
   q2c: {
@@ -55,7 +53,6 @@ const questions: Record<string, Question> = {
     title: "Massa. E onde os seus usuários vão acessar mais?",
     options: [
       { text: "Pelo navegador (seja no computador ou celular).", resultUrl: "/sistemas-web" },
-      { text: "Precisa ser um app nativo baixado na loja (Android/iOS).", resultUrl: "/aplicativos" },
       { text: "Quero uma Landing Page foda antes de lançar o sistema.", resultUrl: "/landing-pages" },
       { text: "O acesso vai ser só interno pela minha equipe.", resultUrl: "/sistemas-web" },
       { text: "Preciso de um painel de controle (dashboard) interativo para gerenciar dados.", resultUrl: "/analytics-dashboards-bi" },
@@ -67,7 +64,7 @@ const questions: Record<string, Question> = {
     options: [
       { text: "No WhatsApp, de forma bem humanizada e conversacional.", resultUrl: "/automacoes" },
       { text: "Quero um agente integrado no meu sistema pra ajudar o time e o cliente.", resultUrl: "/agentes-corporativos" },
-      { text: "Num fluxo de processos completo que funciona sozinho (Workflows).", resultUrl: "/workflows" },
+      { text: "Automatizando um fluxo completo de processos.", resultUrl: "/automacoes" },
       { text: "Atendendo no meu e-commerce para recomendar produtos.", resultUrl: "/e-commerce" },
       { text: "Atendendo ligações e agendando serviços de forma inteligente por voz.", resultUrl: "/automacoes" },
     ],

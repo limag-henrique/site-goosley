@@ -91,12 +91,13 @@ export function HoverReveal({ text, imageSrc, href, description, ctaText }: Hove
         }}
       >
         <div className="relative w-full h-full">
-          <Image
+          {isHovered && <Image
             src={imageSrc}
             alt={text}
             fill
+            sizes="300px"
             className="object-cover"
-          />
+          />}
         </div>
       </motion.div>
     </div>

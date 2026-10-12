@@ -23,7 +23,7 @@ export default function Automacoes() {
             (AUTOMAÇÕES)
           </span>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
-            Automações para WhatsApp e Voice Tuning
+            Automação
           </h1>
           <p className="text-2xl text-foreground/80 mb-12 leading-relaxed">
             Diga adeus aos menus robóticos. Criamos agentes conversacionais hiper-realistas para texto e voz, ajustando o tom e a cadência para refletir a identidade da sua empresa. Oferecemos um atendimento automatizado que soa natural e engaja o seu cliente.

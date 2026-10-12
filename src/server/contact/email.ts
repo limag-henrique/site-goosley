@@ -123,12 +123,3 @@ function parseEmailFrom(value: string) {
     email: match[2],
   };
 }
-
-export async function sendPasswordResetEmail(email: string, resetUrl: string) {
-  return sendEmail({
-    to: email,
-    subject: "Recuperacao de acesso Goosley",
-    text: `Use este link para redefinir sua senha: ${resetUrl}. Ele expira em 1 hora e so pode ser usado uma vez.`,
-    html: `<p>Use este link para redefinir sua senha:</p><p><a href="${resetUrl}">Redefinir senha</a></p><p>O link expira em 1 hora e so pode ser usado uma vez.</p>`,
-  });
-}

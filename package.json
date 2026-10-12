@@ -14,8 +14,6 @@
     "pretest": "npm run generate:people",
     "test": "tsx --test tests/*.test.ts",
     "typecheck": "tsc --noEmit",
-    "seed:portal": "tsx scripts/seed-portal.ts",
-    "seed:d1:sql": "tsx scripts/write-portal-seed-sql.ts",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "deploy": "opennextjs-cloudflare build && wrangler deploy --no-autoconfig",
     "upload": "opennextjs-cloudflare build && wrangler deploy --no-autoconfig",

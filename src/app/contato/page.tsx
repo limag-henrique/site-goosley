@@ -61,7 +61,7 @@ export default function Contato() {
       // Fallback: open mailto if server request fails
       const fullPhone = phone ? `${countryCode} ${phone}` : "Não informado";
       const bodyText = `Nome: ${name}\nEmail: ${email}\nTelefone: ${fullPhone}\n\nMensagem:\n${message}`;
-      window.location.href = `mailto:henriquelimagusmao@gmail.com?subject=Contato%20Projeto%20-${encodeURIComponent(name || 'Goosley')}&body=${encodeURIComponent(bodyText)}`;
+      window.location.href = `mailto:henrique@goosley.com.br?subject=Contato%20Projeto%20-${encodeURIComponent(name || 'Goosley')}&body=${encodeURIComponent(bodyText)}`;
     } finally {
       setIsSubmitting(false);
     }
@@ -100,8 +100,8 @@ export default function Contato() {
                 </div>
                 <div>
                   <h4 className="font-bold text-base sm:text-lg">E-mail</h4>
-                  <a href="mailto:henriquelimagusmao@gmail.com" className="text-foreground/70 text-sm sm:text-base hover:text-blue-600 transition-colors break-all">
-                    henriquelimagusmao@gmail.com
+                  <a href="mailto:henrique@goosley.com.br" className="text-foreground/70 text-sm sm:text-base hover:text-blue-600 transition-colors break-all">
+                    henrique@goosley.com.br
                   </a>
                 </div>
               </div>
@@ -146,7 +146,7 @@ export default function Contato() {
                 <CheckCircle2 className="w-16 h-16" />
                 <h4 className="text-2xl font-bold">Solicitação Enviada!</h4>
                 <p className="text-sm font-medium text-foreground/80">
-                  Sua mensagem foi entregue com sucesso para <strong>henriquelimagusmao@gmail.com</strong>. Nossa equipe entrará em contato em breve!
+                  Sua mensagem foi entregue com sucesso para <strong>henrique@goosley.com.br</strong>. Nossa equipe entrará em contato em breve!
                 </p>
                 <button
                   onClick={() => {

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendEmail } from "@/server/portal/email";
+import { sendEmail } from "@/server/contact/email";
 
 export async function POST(req: Request) {
   try {
@@ -36,7 +36,7 @@ ${message}
     `.trim();
 
     await sendEmail({
-      to: "henriquelimagusmao@gmail.com",
+      to: "henrique@goosley.com.br",
       subject: `[Contato Goosley] ${name} - Solicitação de Projeto`,
       text: emailContentText,
       html: emailContentHtml,

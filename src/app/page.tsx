@@ -21,15 +21,11 @@ export default function Home() {
       <InfiniteMarquee speed={30}>
         <div className="flex items-center gap-16 px-8 text-4xl font-bold uppercase tracking-widest text-foreground/20">
           <span>Landing Pages</span>
-          <span>E-commerces</span>
-          <span>Aplicativos</span>
-          <span>Automações</span>
-          <span>Diagnóstico IA</span>
-          <span>Analytics & BI</span>
-          <span>Voice Tuning</span>
+          <span>E-commerce</span>
+          <span>Automação</span>
+          <span>Analytics e BI</span>
           <span>Sistemas Web</span>
-          <span>Agentes IA</span>
-          <span>Workflows</span>
+          <span>Agentes de IA</span>
         </div>
       </InfiniteMarquee>
 
@@ -57,41 +53,29 @@ export default function Home() {
               imageSrc="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=3270&auto=format&fit=crop" 
               href="/e-commerce"
             />
+            
             <HoverReveal 
-              text="APLICATIVOS" 
-              imageSrc="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=3270&auto=format&fit=crop" 
-              href="/aplicativos"
-            />
-            <HoverReveal 
-              text="AUTOMAÇÕES & VOICE TUNING" 
+              text="AUTOMAÇÃO" 
               imageSrc="https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=3270&auto=format&fit=crop" 
               href="/automacoes"
             />
+            
             <HoverReveal 
-              text="DIAGNÓSTICO DE AUTOMAÇÃO E IA" 
-              imageSrc="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=3270&auto=format&fit=crop" 
-              href="/diagnostico-automacao-ia"
-            />
-            <HoverReveal 
-              text="SISTEMAS WEB & BACKEND" 
+              text="SISTEMAS WEB" 
               imageSrc="https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=3270&auto=format&fit=crop" 
               href="/sistemas-web"
             />
             <HoverReveal 
-              text="ANALYTICS, DASHBOARDS & BI" 
+              text="ANALYTICS E BI" 
               imageSrc="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=3270&auto=format&fit=crop" 
               href="/analytics-dashboards-bi"
             />
             <HoverReveal 
-              text="AGENTES IA CORPORATIVOS" 
+              text="AGENTES DE IA" 
               imageSrc="https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=3270&auto=format&fit=crop" 
               href="/agentes-corporativos"
             />
-            <HoverReveal 
-              text="WORKFLOWS AUTÔNOMOS" 
-              imageSrc="https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=3270&auto=format&fit=crop" 
-              href="/workflows"
-            />
+            
           </div>
         </div>
       </section>

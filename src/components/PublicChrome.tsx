@@ -8,9 +8,8 @@ import { isImmersiveRoute } from "@/lib/public-chrome";
 
 export function PublicChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isPortal = pathname.startsWith("/meu-portal");
 
-  if (isPortal || isImmersiveRoute(pathname)) {
+  if (isImmersiveRoute(pathname)) {
     return <>{children}</>;
   }
 

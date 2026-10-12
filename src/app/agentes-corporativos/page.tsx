@@ -23,7 +23,7 @@ export default function AgentesCorporativos() {
             (AGENTES IA)
           </span>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
-            Agentes Corporativos Internos
+            Agentes de IA
           </h1>
           <p className="text-2xl text-foreground/80 mb-12 leading-relaxed">
             Potencialize sua operação com um assistente virtual treinado estritamente com os dados da sua empresa. Nossas IAs analisam seus documentos, manuais e históricos para fornecer respostas precisas e imediatas de apoio às suas equipes de vendas, RH e gestão.

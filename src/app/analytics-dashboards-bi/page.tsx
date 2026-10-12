@@ -23,7 +23,7 @@ export default function AnalyticsDashboardsBI() {
             (ANALYTICS & BI)
           </span>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
-            Analytics, Dashboards e BI
+            Analytics e BI
           </h1>
           <p className="text-2xl text-foreground/80 mb-12 leading-relaxed">
             Implementamos GA4, eventos, pixels, funis, dashboards executivos, relatórios automáticos e painéis operacionais para transformar dados dispersos em decisões claras. Ideal para sistemas web, e-commerces e projetos de extração de dados.

@@ -1,333 +1,162 @@
 "use client";
 
-import { useState, Suspense } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { pricingData, PricingCategory } from "@/data/pricingData";
-import { Check } from "lucide-react";
-import { clsx, type ClassValue } from "clsx";
-import { twMerge } from "tailwind-merge";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronDown, Pencil, RotateCcw } from "lucide-react";
+import { pricingData } from "@/data/pricingData";
+import { cn } from "@/lib/utils";
 
-function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
+const currency = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 });
+const formatRange = (min: number, max: number) => min === max ? currency.format(min) : `${currency.format(min)} – ${currency.format(max)}`;
+const formatTime = (min: number, max: number) => min === max ? `${min} dias úteis` : `${min} a ${max} dias úteis`;
+const solutionLabels: Record<string, string> = {
+  "automacoes": "Automação",
+  "analytics-dashboards-bi": "Analytics e BI",
+  "sistemas-web": "Sistemas web",
+  "agentes-corporativos": "Agentes de IA",
+};
 
-// Inner component to safely use useSearchParams
 function EstimatorInner() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const categoryParam = searchParams.get("categoria");
+  const category = pricingData.find(item => item.id === searchParams.get("categoria")) || pricingData[0];
+  const [showCategories, setShowCategories] = useState(!pricingData.some(item => item.id === searchParams.get("categoria")));
+  const [answers, setAnswers] = useState<Record<string, Record<string, string>>>({});
+  const [steps, setSteps] = useState<Record<string, number>>({});
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const firstRender = useRef(true);
+  const reducedMotion = useReducedMotion();
+  const selections = answers[category.id] || {};
+  const step = Math.min(steps[category.id] || 0, category.variables.length);
+  const reviewing = step === category.variables.length;
+  const variable = category.variables[step];
+  const chosen = category.variables.map(item => ({ variable: item, option: item.options.find(option => option.id === selections[item.id]) }));
+  const completed = chosen.filter(item => item.option).length;
+  const isComplete = completed === category.variables.length;
+  const totals = chosen.reduce((total, { option }) => {
+    if (!option) return total;
+    return {
+      min: total.min + option.setupMin, max: total.max + option.setupMax,
+      monthlyMin: total.monthlyMin + option.recurringMin, monthlyMax: total.monthlyMax + option.recurringMax,
+      timeMin: total.timeMin + (option.timeMin || 0), timeMax: total.timeMax + (option.timeMax || 0),
+    };
+  }, { min: 0, max: 0, monthlyMin: 0, monthlyMax: 0, timeMin: 0, timeMax: 0 });
+  const recurringNotes = chosen.flatMap(({ variable, option }) => option?.recurringText ? [`${variable.name}: ${option.recurringText}`] : []);
+  const setupNotes = chosen.flatMap(({ variable, option }) => option?.setupText && option.setupMin === 0 && option.setupMax === 0 && option.setupText !== "Incluso" ? [`${variable.name}: ${option.setupText}`] : []);
 
-  // Determine initial category
-  const initialCategory = pricingData.find((c) => c.id === categoryParam) || pricingData[0];
-  const [activeCategory, setActiveCategory] = useState<PricingCategory>(initialCategory);
-
-  // State to hold selected options: Record<variableId, optionId>
-  const [selections, setSelections] = useState<Record<string, string>>({});
-
-  const handleSelect = (variableId: string, optionId: string) => {
-    setSelections((prev) => ({ ...prev, [variableId]: optionId }));
-  };
-
-  // Calculate Totals
-  let setupMinTotal = 0;
-  let setupMaxTotal = 0;
-  let recurringMinTotal = 0;
-  let recurringMaxTotal = 0;
-  let timeMinTotal = 0;
-  let timeMaxTotal = 0;
-  const variableCosts: string[] = [];
-  const recurringCosts: string[] = [];
-
-  activeCategory.variables.forEach((variable) => {
-    const selectedOptionId = selections[variable.id];
-    const option = variable.options.find((o) => o.id === selectedOptionId);
-
-    if (option) {
-      setupMinTotal += option.setupMin;
-      setupMaxTotal += option.setupMax;
-      recurringMinTotal += option.recurringMin;
-      recurringMaxTotal += option.recurringMax;
-      timeMinTotal += option.timeMin || 0;
-      timeMaxTotal += option.timeMax || 0;
-
-      if (option.setupText && option.setupMin === 0 && option.setupMax === 0 && option.setupText !== "Incluso") {
-        variableCosts.push(`${variable.name}: ${option.setupText}`);
-      }
-      if (option.recurringText) {
-        recurringCosts.push(`${variable.name}: ${option.recurringText}`);
+  useEffect(() => {
+    if (firstRender.current) { firstRender.current = false; return; }
+    if (!showCategories) {
+      headingRef.current?.focus({ preventScroll: true });
+      if (panelRef.current && panelRef.current.getBoundingClientRect().top < 90) {
+        panelRef.current.scrollIntoView({ block: "start", behavior: reducedMotion ? "instant" : "smooth" });
       }
     }
-  });
+  }, [step, category.id, showCategories, reducedMotion]);
 
-  const formatCurrency = (val: number) => {
-    return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL", maximumFractionDigits: 0 }).format(val);
+  const goToStep = (index: number) => setSteps(previous => ({ ...previous, [category.id]: index }));
+  const selectCategory = (id: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("categoria", id);
+    window.history.replaceState(null, "", `?${params.toString()}`);
+    setShowCategories(false);
+  };
+  const sendProposal = () => {
+    if (!isComplete) return;
+    const lines = [
+      `Olá! Gostaria de solicitar uma proposta para *${category.title}*.`, "", "Minhas escolhas:",
+      ...chosen.map(({ variable, option }) => `- ${variable.name}: ${option?.label}`), "",
+      `*Desenvolvimento:* ${formatRange(totals.min, totals.max)}`,
+      ...setupNotes,
+      ...(totals.monthlyMax > 0 ? [`*Custo recorrente:* ${formatRange(totals.monthlyMin, totals.monthlyMax)} / mês`] : []),
+      ...recurringNotes,
+      ...(totals.timeMax > 0 ? [`*Prazo estimado:* ${formatTime(totals.timeMin, totals.timeMax)}`] : []),
+      "", "Entendo que os valores são uma estimativa inicial, sujeita à definição do escopo.",
+      "Aguardo retorno para detalharmos o projeto!",
+    ];
+    window.open(`https://wa.me/5531994217926?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener,noreferrer");
   };
 
-  const formatRange = (min: number, max: number) => {
-    if (min === max) return formatCurrency(min);
-    return `${formatCurrency(min)} - ${formatCurrency(max)}`;
-  };
+  if (showCategories) return (
+    <section aria-labelledby="solution-heading" className="rounded-3xl border border-white/10 bg-white/[0.025] p-5 sm:p-8">
+      <div className="mb-7 flex items-center justify-between gap-4">
+        <div><p className="mb-2 text-xs font-semibold uppercase tracking-widest text-orange-400">Primeiro, a solução</p><h2 id="solution-heading" className="text-2xl font-semibold tracking-tight sm:text-3xl">O que vamos construir?</h2></div>
+        {completed > 0 && <button type="button" onClick={() => setShowCategories(false)} className="min-h-11 rounded-full border border-white/15 px-4 text-sm text-white/75">Continuar projeto</button>}
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+        {pricingData.map((item) => <button type="button" key={item.id} onClick={() => selectCategory(item.id)} className="group relative min-h-24 min-w-0 rounded-2xl border border-white/10 bg-white/[0.025] p-3 text-left transition-colors hover:border-orange-400/50 hover:bg-orange-500/5 active:bg-orange-500/10 sm:p-5">
+          <div className="min-w-0 pr-4"><span className="block break-words text-sm font-semibold leading-snug sm:text-base">{solutionLabels[item.id] || item.title}</span></div>
+          <ArrowUpRight size={16} className="absolute right-3 top-3 text-white/40 group-hover:text-orange-400 sm:right-5 sm:top-5" />
+        </button>)}
+      </div>
+    </section>
+  );
 
-  const missingSelections = activeCategory.variables.filter(v => !selections[v.id]);
-  const isComplete = missingSelections.length === 0;
-
-  const handleWhatsAppRedirect = () => {
-    const selectedVariableDetails = activeCategory.variables
-      .map(v => {
-        const optionId = selections[v.id];
-        if (!optionId) return null;
-        const option = v.options.find(o => o.id === optionId);
-        return `- ${v.name}: ${option?.label}`;
-      })
-      .filter(Boolean)
-      .join('\n');
-
-    let text = `Olá! Gostaria de solicitar uma proposta para *${activeCategory.title}*.\n\n`;
-    if (selectedVariableDetails) {
-      text += `Minhas escolhas:\n${selectedVariableDetails}\n\n`;
-    }
-    
-    const investmentText = setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta";
-    text += `*Estimativa Inicial (Setup):* ${investmentText}\n`;
-    
-    if (recurringMaxTotal > 0 || recurringCosts.length > 0) {
-      const recText = recurringMaxTotal > 0 ? `${formatRange(recurringMinTotal, recurringMaxTotal)} / mês` : "Variável";
-      text += `*Custo Recorrente Estimado:* ${recText}\n`;
-    }
-
-    if (timeMaxTotal > 0) {
-      const timeText = timeMinTotal === timeMaxTotal ? `${timeMinTotal} dias úteis` : `${timeMinTotal} a ${timeMaxTotal} dias úteis`;
-      text += `*Prazo de Entrega Estimado:* ${timeText}\n`;
-    }
-    
-    text += `\nAguardo retorno para detalharmos o escopo!`;
-
-    const encodedText = encodeURIComponent(text);
-    window.open(`https://wa.me/5531994217926?text=${encodedText}`, "_blank");
-  };
+  const estimate = (
+    <>
+      <div className="mb-5 text-xs font-semibold uppercase tracking-widest text-white/50">{isComplete ? "Sua estimativa" : "Estimativa parcial"}</div>
+      <div className="space-y-5">
+        <div><p className="mb-2 text-sm text-white/55">Desenvolvimento</p><p className="text-2xl font-semibold tracking-tight tabular-nums xl:text-3xl">{completed ? formatRange(totals.min, totals.max) : "A definir"}</p>{setupNotes.map(note => <p key={note} className="mt-2 text-xs leading-relaxed text-white/60">{note}</p>)}</div>
+        {(totals.monthlyMax > 0 || recurringNotes.length > 0) && <div className="border-t border-white/10 pt-4"><p className="mb-1 text-sm text-white/55">Infraestrutura e licenças</p><p className="text-lg font-medium tabular-nums">{totals.monthlyMax > 0 ? `${formatRange(totals.monthlyMin, totals.monthlyMax)} / mês` : "Conforme consumo"}</p>{recurringNotes.map(note => <p key={note} className="mt-2 text-xs leading-relaxed text-white/60">{note}</p>)}</div>}
+        {totals.timeMax > 0 && <div className="border-t border-white/10 pt-4"><p className="mb-1 text-sm text-white/55">Prazo estimado</p><p className="text-lg font-medium text-emerald-400">{formatTime(totals.timeMin, totals.timeMax)}</p></div>}
+      </div>
+      <p className="mt-6 border-t border-white/10 pt-4 text-xs leading-relaxed text-white/50">Estimativa inicial, sujeita à complexidade e à definição do escopo. Custos de terceiros e consumo podem variar.{!isComplete && " O total considera apenas as escolhas feitas até agora."}</p>
+      {isComplete && reviewing && <button type="button" onClick={sendProposal} className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-orange-500 px-5 text-sm font-semibold text-black transition-colors hover:bg-orange-400 active:bg-orange-600">Solicitar proposta <ArrowUpRight size={17} /></button>}
+    </>
+  );
 
   return (
-    <div className="flex flex-col lg:flex-row gap-12 w-full max-w-7xl mx-auto">
-      {/* Main Form Content */}
-      <div className="w-full lg:w-2/3 flex flex-col gap-12">
-        
-        {/* Category Tabs */}
-        <div className="flex flex-col sm:flex-row flex-wrap gap-3 w-full">
-          {pricingData.map((category) => (
-            <button
-              key={category.id}
-              onClick={() => {
-                setActiveCategory(category);
-                setSelections({});
-
-                const params = new URLSearchParams(searchParams.toString());
-                params.set("categoria", category.id);
-                router.replace(`?${params.toString()}`, { scroll: false });
-              }}
-              className={cn(
-                "px-6 py-3.5 rounded-2xl text-xs lg:text-sm font-bold uppercase tracking-widest transition-all duration-300 flex-1 min-w-[200px] text-center shadow-sm",
-                activeCategory.id === category.id
-                  ? "bg-foreground text-background shadow-lg scale-[1.02]"
-                  : "bg-foreground/5 text-foreground/70 hover:bg-foreground/10 hover:text-foreground"
-              )}
-            >
-              {category.title}
-            </button>
-          ))}
-        </div>
-
-        {/* Variables List */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeCategory.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="flex flex-col gap-12"
-          >
-            <div>
-              <h2 className="text-3xl font-bold tracking-tight mb-2">{activeCategory.title}</h2>
-              <p className="text-foreground/60 mb-8">{activeCategory.description}</p>
+    <div ref={panelRef} className="scroll-mt-24">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3"><div><p className="mb-1 text-xs uppercase tracking-widest text-white/40">Seu projeto</p><h2 className="text-lg font-semibold tracking-tight">{category.title}</h2></div><button type="button" onClick={() => setShowCategories(true)} className="flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 text-sm text-white/70 transition-colors hover:border-white/35 hover:text-white"><Pencil size={14} /> Trocar solução</button></div>
+      <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_340px] lg:gap-8">
+        <div className="min-w-0 rounded-3xl border border-white/10 bg-white/[0.025]">
+          <div className="border-b border-white/10 p-5 sm:p-7">
+            <div className="mb-4 text-xs text-white/50">{reviewing ? "Confira suas escolhas" : "Configure os detalhes do seu projeto"}</div>
+            <div className="flex flex-wrap gap-1.5" aria-label="Etapas do projeto">
+              {category.variables.map((item, index) => <button type="button" key={item.id} aria-label={`${item.name}${selections[item.id] ? ", concluída" : ""}`} aria-current={step === index ? "step" : undefined} onClick={() => goToStep(index)} title={item.name} className={cn("flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border text-sm font-medium transition-colors", step === index ? "border-orange-400/60 bg-orange-500/10 text-orange-300" : "border-white/10 text-white/55 hover:bg-white/5")}>
+                {selections[item.id] && <Check size={14} className="shrink-0" aria-hidden="true" />}
+                <span className="min-w-0 text-left text-[11px] leading-tight">{item.name}</span>
+              </button>)}
+              <button type="button" aria-label="Revisar projeto" aria-current={reviewing ? "step" : undefined} disabled={!isComplete} onClick={() => goToStep(category.variables.length)} className={cn("flex min-h-11 flex-1 items-center justify-center gap-2 rounded-xl border px-2 text-xs transition-colors disabled:opacity-30", reviewing ? "border-orange-400/60 bg-orange-500/10 text-orange-300" : "border-white/10 text-white/55 hover:bg-white/5")}>Resumo<ArrowRight size={14} /></button>
             </div>
-
-            <div className="flex flex-col gap-10">
-              {activeCategory.variables.map((variable) => (
-                <div key={variable.id} className="flex flex-col gap-4">
-                  <h3 className="text-xl font-bold">{variable.name}</h3>
-                  <div className="flex flex-col gap-4">
-                    {variable.options.map((option) => {
-                      const isSelected = selections[variable.id] === option.id;
-                      return (
-                        <button
-                          key={option.id}
-                          onClick={() => handleSelect(variable.id, option.id)}
-                          className={cn(
-                            "relative flex flex-col items-start text-left p-6 rounded-2xl border transition-all duration-200 group",
-                            isSelected
-                              ? "border-foreground bg-foreground/5"
-                              : "border-foreground/10 hover:border-foreground/30 bg-transparent"
-                          )}
-                        >
-                          <div className="flex items-center justify-between w-full mb-4">
-                            <span className="font-semibold text-lg">{option.label}</span>
-                            <div className={cn(
-                              "w-6 h-6 rounded-full border flex items-center justify-center transition-colors shrink-0",
-                              isSelected ? "border-foreground bg-foreground text-background" : "border-foreground/30 group-hover:border-foreground/50"
-                            )}>
-                              {isSelected && <Check className="w-4 h-4" />}
-                            </div>
-                          </div>
-                          
-                          <div className="flex flex-col gap-1 mt-auto">
-                            <div className="text-sm">
-                              <span className="text-foreground/60">Setup: </span>
-                              <span className="font-medium">
-                                {option.setupText ? option.setupText : formatRange(option.setupMin, option.setupMax)}
-                              </span>
-                            </div>
-                            {(option.recurringMax > 0 || option.recurringText) && (
-                              <div className="text-sm">
-                                <span className="text-foreground/60">Mensal: </span>
-                                <span className="font-medium">
-                                  {option.recurringText ? option.recurringText : formatRange(option.recurringMin, option.recurringMax)}
-                                </span>
-                              </div>
-                            )}
-                            {(option.timeMax ?? 0) > 0 && (
-                              <div className="text-sm mt-1">
-                                <span className="text-foreground/60">Prazo Adicional: </span>
-                                <span className="font-medium text-emerald-600 dark:text-emerald-400">
-                                  {option.timeMin === option.timeMax ? `+${option.timeMin} dias` : `+${option.timeMin} a ${option.timeMax} dias`}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Summary Container */}
-      <div className="w-full lg:w-1/3 relative">
-        {!isComplete && (
-          <div className="glass-panel p-6 rounded-2xl flex flex-col gap-3 border border-orange-500/20 bg-orange-500/5 mb-24 lg:mb-0">
-            <span className="text-xs font-bold uppercase tracking-widest text-orange-500">
-              Passo a Passo da Estimativa
-            </span>
-            <p className="text-sm text-foreground/80 font-medium">
-              Selecione todas as opções acima ({activeCategory.variables.length - missingSelections.length}/{activeCategory.variables.length} concluídos) para ver a estimativa de preço e prazo.
-            </p>
           </div>
-        )}
-
-        {isComplete && (
-          <>
-            {/* Desktop Sticky Summary Bar */}
-            <div className="hidden lg:flex sticky top-32 glass-panel p-8 rounded-3xl flex-col gap-8 shadow-2xl">
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest text-foreground/50 mb-2 block">
-                  Resumo da Estimativa
-                </span>
-                <h3 className="text-2xl font-black tracking-tight leading-tight mb-6">
-                  Investimento Projetado
-                </h3>
-                
-                <div className="flex flex-col gap-4 border-b border-foreground/10 pb-6 mb-6">
-                  <div className="flex flex-col">
-                    <span className="text-sm text-foreground/60 mb-1">Custo de Desenvolvimento (Setup)</span>
-                    <span className="text-3xl font-black">
-                      {setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta"}
-                    </span>
-                    {variableCosts.length > 0 && (
-                      <div className="mt-2 flex flex-col gap-1">
-                        {variableCosts.map((vc, i) => (
-                          <span key={i} className="text-xs text-foreground/60">• {vc}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {(recurringMaxTotal > 0 || recurringCosts.length > 0) && (
-                    <div className="flex flex-col mt-4">
-                      <span className="text-sm text-foreground/60 mb-1">Custo Recorrente (Infra/Licenças)</span>
-                      <span className="text-2xl font-bold">
-                        {recurringMaxTotal > 0 ? formatRange(recurringMinTotal, recurringMaxTotal) + " / mês" : "Variável"}
-                      </span>
-                      {recurringCosts.length > 0 && (
-                        <div className="mt-2 flex flex-col gap-1">
-                          {recurringCosts.map((rc, i) => (
-                            <span key={i} className="text-xs text-foreground/60">• {rc}</span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {timeMaxTotal > 0 && (
-                    <div className="flex flex-col mt-4 border-t border-foreground/10 pt-4">
-                      <span className="text-sm text-foreground/60 mb-1">Prazo de Entrega Estimado</span>
-                      <span className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">
-                        {timeMinTotal === timeMaxTotal 
-                          ? `${timeMinTotal} dias úteis` 
-                          : `${timeMinTotal} a ${timeMaxTotal} dias úteis`}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                <div className="bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 p-4 rounded-xl text-sm">
-                  <span className="font-bold block mb-1">Atenção:</span>
-                  Estes valores são apenas uma estimativa inicial. Os projetos dependem inteiramente do grau de complexidade.
-                </div>
-              </div>
-              
-              <button 
-                onClick={handleWhatsAppRedirect}
-                className="w-full py-4 rounded-xl font-bold uppercase tracking-widest transition-all bg-foreground text-background hover:scale-[1.02]"
-              >
-                Solicitar Proposta
-              </button>
-            </div>
-
-            {/* Mobile Fixed Floating Bottom Bar */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-background/95 backdrop-blur-xl border-t border-foreground/10 p-4 shadow-2xl flex items-center justify-between gap-4">
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-foreground/50">Investimento Estimado</span>
-                <span className="text-lg font-black text-foreground">
-                  {setupMaxTotal > 0 ? formatRange(setupMinTotal, setupMaxTotal) : "Sob Consulta"}
-                </span>
-                {timeMaxTotal > 0 && (
-                  <span className="text-xs font-semibold text-emerald-500">
-                    Prazo: {timeMinTotal === timeMaxTotal ? `${timeMinTotal} dias` : `${timeMinTotal}-${timeMaxTotal} dias`}
-                  </span>
-                )}
-              </div>
-              <button 
-                onClick={handleWhatsAppRedirect}
-                className="px-5 py-3 rounded-xl font-bold uppercase tracking-wider text-xs bg-emerald-600 text-white shadow-lg active:scale-95 transition-all shrink-0"
-              >
-                WhatsApp Proposta
-              </button>
-            </div>
-          </>
-        )}
+          <motion.div key={`${category.id}-${step}`} initial={reducedMotion ? false : { opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", bounce: 0, duration: 0.25 }} className="p-5 sm:p-7">
+            <details className="mb-5 text-xs text-white/50"><summary className="cursor-pointer">Sobre esta solução</summary><p className="mt-2 leading-relaxed">{category.description}</p></details>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-orange-400">{reviewing ? "Tudo pronto para conversar" : "Uma escolha de cada vez"}</p>
+            <h3 ref={headingRef} tabIndex={-1} className="mb-3 text-2xl font-semibold leading-tight tracking-tight outline-none sm:text-3xl">{reviewing ? "Revise seu projeto." : variable.name}</h3>
+            {reviewing ? <>
+              <p className="mb-6 text-sm leading-relaxed text-white/55">Confira suas escolhas. Você pode editar qualquer etapa antes de solicitar uma proposta.</p>
+              <div className="space-y-2">{chosen.map(({ variable: item, option }, index) => <button type="button" key={item.id} onClick={() => goToStep(index)} className="flex min-h-20 w-full items-center justify-between gap-4 rounded-2xl border border-white/10 p-4 text-left transition-colors hover:bg-white/5"><div><span className="mb-1 block text-xs text-white/45">{item.name}</span><span className="text-sm font-medium">{option?.label || "Não selecionado"}</span></div><Pencil size={15} className="shrink-0 text-white/50" /><span className="sr-only">Editar {item.name}</span></button>)}</div>
+            </> : <>
+              <p className="mb-6 text-sm leading-relaxed text-white/55">Selecione a opção que melhor combina com o que você precisa.</p>
+              <fieldset className="space-y-3"><legend className="sr-only">{variable.name}</legend>{variable.options.map(option => {
+                const selected = selections[variable.id] === option.id;
+                return <label key={option.id} className={cn("relative block cursor-pointer rounded-2xl border p-4 transition-colors sm:p-5", selected ? "border-orange-400/65 bg-orange-500/[0.07]" : "border-white/12 bg-white/[0.015] hover:border-white/30 hover:bg-white/[0.04]")}>
+                  <input type="radio" name={`${category.id}-${variable.id}`} value={option.id} checked={selected} onChange={() => setAnswers(previous => ({ ...previous, [category.id]: { ...previous[category.id], [variable.id]: option.id } }))} className="peer sr-only" />
+                  <div className="pointer-events-none absolute inset-0 rounded-2xl peer-focus-visible:ring-2 peer-focus-visible:ring-orange-400 peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-black" />
+                  <div className="flex items-start justify-between gap-4"><span className="text-base font-medium leading-snug">{option.label}</span><span className={cn("flex size-5 shrink-0 items-center justify-center rounded-full border", selected ? "border-orange-400 bg-orange-400 text-black" : "border-white/30")}>{selected && <Check size={13} aria-hidden="true" />}</span></div>
+                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5 text-xs leading-relaxed text-white/60"><span>Desenvolvimento: <span className="font-medium text-white/85">{option.setupMin === 0 && option.setupMax === 0 ? (option.setupText || "Incluso") : formatRange(option.setupMin, option.setupMax)}</span></span>{(option.timeMax || 0) > 0 && <span>Prazo adicional: <span className="text-emerald-400">{formatTime(option.timeMin || 0, option.timeMax || 0)}</span></span>}</div>
+                  {(option.recurringMax > 0 || option.recurringText) && <p className="mt-2 text-xs leading-relaxed text-white/60">Mensal: {option.recurringMax > 0 ? formatRange(option.recurringMin, option.recurringMax) : "Conforme consumo"}{option.recurringText && <span className="block mt-1 text-white/45">{option.recurringText}</span>}</p>}
+                </label>;
+              })}</fieldset>
+            </>}
+          </motion.div>
+          <div className="flex items-center justify-between gap-3 border-t border-white/10 p-5 sm:px-7">
+            <button type="button" onClick={() => step === 0 ? setShowCategories(true) : goToStep(step - 1)} className="flex min-h-11 items-center gap-2 rounded-full px-3 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white"><ArrowLeft size={16} /> Voltar</button>
+            {reviewing ? <button type="button" onClick={() => goToStep(0)} className="flex min-h-11 items-center gap-2 rounded-full border border-white/15 px-4 text-sm text-white/75"><RotateCcw size={14} /> Revisar escolhas</button> : <button type="button" disabled={!selections[variable.id]} onClick={() => {
+              if (step === category.variables.length - 1 && !isComplete) goToStep(chosen.findIndex(item => !item.option));
+              else goToStep(step + 1);
+            }} className="flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-semibold text-black transition-colors hover:bg-orange-200 active:bg-orange-300 disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-white/30">{step === category.variables.length - 1 ? "Ver resumo" : "Continuar"}<ArrowRight size={16} /></button>}
+          </div>
+        </div>
+        <aside aria-label="Resumo do investimento" className="hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 lg:sticky lg:top-28 lg:block">{estimate}</aside>
+        <details open={reviewing} className="rounded-3xl border border-white/10 bg-white/[0.035] p-5 lg:hidden"><summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-medium"><span>{isComplete ? "Sua estimativa" : "Estimativa parcial"}<span className="mt-1 block text-xs text-white/50">{completed ? formatRange(totals.min, totals.max) : "Faça sua primeira escolha"}</span></span><ChevronDown size={18} className="shrink-0 text-orange-400" /></summary><div className="pt-5">{estimate}</div></details>
       </div>
     </div>
   );
 }
 
 export function CostEstimator() {
-  return (
-    <Suspense fallback={<div className="w-full h-96 animate-pulse bg-foreground/5 rounded-3xl" />}>
-      <EstimatorInner />
-    </Suspense>
-  );
+  return <Suspense fallback={<div className="min-h-80 rounded-3xl border border-white/10 bg-white/[0.025] p-8 text-sm text-white/50">Carregando simulador…</div>}><EstimatorInner /></Suspense>;
 }

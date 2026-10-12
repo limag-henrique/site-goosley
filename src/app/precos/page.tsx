@@ -1,39 +1,17 @@
-"use client";
-
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-
+import type { Metadata } from "next";
 import { CostEstimator } from "@/components/CostEstimator";
+
+export const metadata: Metadata = { title: "Simule seu projeto | Goosley Digital", description: "Monte seu projeto em etapas e veja uma estimativa de investimento, prazo e custos recorrentes." };
 
 export default function Precos() {
   return (
-    <div className="pt-32 pb-32 min-h-screen bg-background">
-      <div className="container mx-auto px-6 md:px-12">
-        <Link href="/" className="inline-flex items-center gap-2 text-foreground/50 hover:text-foreground transition-colors mb-12 uppercase tracking-widest text-sm font-bold">
-          <ArrowLeft className="w-4 h-4" />
-          Voltar
-        </Link>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className="max-w-4xl mb-16"
-        >
-          <span className="inline-block px-4 py-1 border border-foreground rounded-full text-sm font-bold uppercase tracking-widest mb-8">
-            (ESTIMATIVA DE PROJETO)
-          </span>
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
-            Monte seu Projeto
-          </h1>
-          <p className="text-2xl text-foreground/80 leading-relaxed">
-            Selecione as necessidades do seu projeto abaixo para receber uma estimativa instantânea de investimento.
-          </p>
-        </motion.div>
-
-        <CostEstimator />
+    <div className="mx-auto min-h-screen max-w-6xl px-5 pb-20 pt-28 sm:px-8 sm:pt-32">
+      <div className="mb-8 max-w-2xl sm:mb-10">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-orange-400">Simule seu projeto</p>
+        <h1 className="mb-4 text-4xl font-semibold leading-[1.1] tracking-[-0.045em] sm:text-5xl">Uma ideia. Um passo de cada vez.</h1>
+        <p className="max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">Escolha a solução e configure os detalhes em etapas. Veja o investimento, o prazo e os custos recorrentes antes de conversar com a gente.</p>
       </div>
+      <CostEstimator />
     </div>
   );
 }

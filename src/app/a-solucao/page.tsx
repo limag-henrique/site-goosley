@@ -9,13 +9,10 @@ import { useState, useRef, useEffect } from "react";
 const solutions = [
   { name: "Landing Pages", href: "/landing-pages", image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?q=80&w=3272&auto=format&fit=crop" },
   { name: "E-commerce", href: "/e-commerce", image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Aplicativos", href: "/aplicativos", image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Automações & Voice Tuning", href: "/automacoes", image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Diagnóstico de Automação e IA", href: "/diagnostico-automacao-ia", image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Sistemas Web & Backend", href: "/sistemas-web", image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Analytics, Dashboards e BI", href: "/analytics-dashboards-bi", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Agentes IA Corporativos", href: "/agentes-corporativos", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=3270&auto=format&fit=crop" },
-  { name: "Workflows Autônomos", href: "/workflows", image: "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=3270&auto=format&fit=crop" },
+  { name: "Automação", href: "/automacoes", image: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=3270&auto=format&fit=crop" },
+  { name: "Sistemas web", href: "/sistemas-web", image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=3270&auto=format&fit=crop" },
+  { name: "Analytics e BI", href: "/analytics-dashboards-bi", image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=3270&auto=format&fit=crop" },
+  { name: "Agentes de IA", href: "/agentes-corporativos", image: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=3270&auto=format&fit=crop" },
 ];
 
 export default function ASolucao() {

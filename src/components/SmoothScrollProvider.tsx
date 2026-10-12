@@ -2,11 +2,12 @@
 
 import { useEffect, useState, Suspense } from "react";
 import Lenis from "lenis";
-import { usePathname, useSearchParams } from "next/navigation";
+import { MotionConfig } from "framer-motion";
+import { usePathname } from "next/navigation";
 
 function RouteChangeListener({ lenis }: { lenis: Lenis | null }) {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -15,7 +16,7 @@ function RouteChangeListener({ lenis }: { lenis: Lenis | null }) {
         lenis.scrollTo(0, { immediate: true });
       });
     }
-  }, [pathname, searchParams, lenis]);
+  }, [pathname, lenis]);
 
   return null;
 }
@@ -28,6 +29,8 @@ export function SmoothScrollProvider({
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
+    document.body.classList.add("is-loaded");
+    if (window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse)").matches) return;
     const l = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -42,28 +45,30 @@ export function SmoothScrollProvider({
       setLenis(l);
     });
 
+    let animationFrame: number;
     function raf(time: number) {
       l.raf(time);
-      requestAnimationFrame(raf);
+      animationFrame = requestAnimationFrame(raf);
     }
 
-    requestAnimationFrame(raf);
+    animationFrame = requestAnimationFrame(raf);
 
     // Álgebra Booleana: indicamos que o carregamento terminou
     document.body.classList.add("is-loaded");
 
     return () => {
       cancelAnimationFrame(stateFrame);
+      cancelAnimationFrame(animationFrame);
       l.destroy();
     };
   }, []);
 
   return (
-    <>
+    <MotionConfig reducedMotion="user">
       <Suspense fallback={null}>
         <RouteChangeListener lenis={lenis} />
       </Suspense>
       {children}
-    </>
+    </MotionConfig>
   );
 }

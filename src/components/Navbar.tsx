@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -14,6 +14,8 @@ export function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isScrolledPastHero, setIsScrolledPastHero] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let ticking = false;
@@ -65,8 +67,21 @@ export function Navbar() {
     } else {
       document.body.style.overflow = "";
     }
+    if (isMenuOpen) menuRef.current?.querySelector<HTMLButtonElement>("button")?.focus();
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsMenuOpen(false);
+      if (!isMenuOpen) return;
+      if (e.key === "Escape") {
+        setIsMenuOpen(false);
+        menuButtonRef.current?.focus();
+      }
+      if (e.key === "Tab") {
+        const controls = menuRef.current?.querySelectorAll<HTMLElement>("a, button");
+        if (!controls?.length) return;
+        const first = controls[0];
+        const last = controls[controls.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => {
@@ -95,6 +110,7 @@ export function Navbar() {
                 src="/images/logo branco transparente.png" 
                 alt="Logo Goosley" 
                 fill
+                sizes="40px"
                 className="object-contain transition-transform duration-300 group-hover:scale-105" 
               />
             </div>
@@ -105,7 +121,7 @@ export function Navbar() {
 
           {/* Desktop Menu */}
           <nav className={cn(
-            "hidden md:flex items-center gap-7 text-xs lg:text-sm font-bold tracking-widest uppercase transition-colors duration-300 text-white"
+            "hidden lg:flex items-center gap-7 text-xs lg:text-sm font-bold tracking-widest uppercase transition-colors duration-300 text-white"
           )}>
             <Link href="/a-solucao" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
               <span>Nossas Soluções</span>
@@ -119,11 +135,6 @@ export function Navbar() {
               <span>Contato</span>
               <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
             </Link>
-
-            <Link href="/meu-portal" className="hover:text-orange-400 transition-colors min-h-[44px] flex items-center relative group">
-              <span>Meu Portal</span>
-              <span className="absolute bottom-1 left-0 w-0 h-0.5 bg-orange-500 transition-all duration-300 group-hover:w-full" />
-            </Link>
             <Link 
               href="/precos" 
               className="px-5 py-2.5 rounded-full border border-orange-400 bg-orange-500 text-black transition-colors hover:bg-orange-400 min-h-[40px] flex items-center"
@@ -134,11 +145,12 @@ export function Navbar() {
 
           {/* Mobile Menu Toggle */}
           <button 
+            ref={menuButtonRef}
             className={cn(
-              "md:hidden z-[101] min-w-[44px] min-h-[44px] p-2 flex items-center justify-center transition-colors duration-300 text-white active:scale-95"
+              "lg:hidden z-[101] min-w-[44px] min-h-[44px] p-2 flex items-center justify-center transition-colors duration-300 text-white active:scale-95"
             )}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-label="Toggle menu"
+            aria-label="Abrir ou fechar menu"
             aria-expanded={isMenuOpen}
           >
             {isMenuOpen ? <X size={32} /> : <Menu size={32} />}
@@ -148,6 +160,9 @@ export function Navbar() {
 
       {/* Mobile Menu Overlay */}
       <div 
+        ref={menuRef}
+        inert={!isMenuOpen}
+        aria-hidden={!isMenuOpen}
         role="dialog"
         aria-modal="true"
         aria-label="Navegação Principal Mobile"
@@ -156,6 +171,7 @@ export function Navbar() {
           isMenuOpen ? "opacity-100 translate-y-0" : "opacity-0 invisible -translate-y-full pointer-events-none"
         )}
       >
+        <button type="button" aria-label="Fechar menu" onClick={() => { setIsMenuOpen(false); menuButtonRef.current?.focus(); }} className="absolute right-6 top-4 flex min-h-11 min-w-11 items-center justify-center text-white"><X size={32} /></button>
         <Link 
           href="/a-solucao" 
           onClick={() => setIsMenuOpen(false)}
@@ -176,13 +192,6 @@ export function Navbar() {
           className="w-full text-center py-3 min-h-[50px] flex items-center justify-center hover:text-orange-500 transition-colors"
         >
           Contato
-        </Link>
-        <Link 
-          href="/meu-portal" 
-          onClick={() => setIsMenuOpen(false)}
-          className="w-full text-center py-3 min-h-[50px] flex items-center justify-center hover:text-orange-500 transition-colors"
-        >
-          Meu Portal
         </Link>
 
         <Link 

@@ -23,7 +23,7 @@ export default function SistemasWeb() {
             (SISTEMAS WEB)
           </span>
           <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-8 leading-tight">
-            Sistemas Web, Backend e Extração de Dados
+            Sistemas web
           </h1>
           <p className="text-2xl text-foreground/80 mb-12 leading-relaxed">
             Construímos a infraestrutura invisível que escala a sua operação. Desenvolvemos plataformas web completas, automatizamos a coleta de dados estratégicos e estruturamos painéis customizados em tempo recorde, entregando tecnologia robusta sem meses de espera.
