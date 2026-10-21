@@ -8,7 +8,7 @@ interface D1Database { prepare(sql:string):D1Statement }
 
 function databaseStore(db:D1Database):EventStore {return {
   async read(){const rows=await db.prepare('SELECT payload FROM research_portal_events ORDER BY sequence').all<{payload:string}>();return rows.results.map(row=>JSON.parse(row.payload) as PortalEvent);},
-  async lyric(documentId,hash){const rows=await db.prepare("SELECT text FROM research_portal_lyrics WHERE document_id = ? AND lyrics_hash = ? AND rights_status = 'RESEARCH_AUTHORIZED' LIMIT 1").bind(documentId,hash).all<{text:string}>();return rows.results[0]?.text??null;},
+  async lyric(documentId,hash){const rows=await db.prepare("SELECT text FROM research_portal_lyrics WHERE document_id = ? AND lyrics_hash = ? AND rights_status = 'RESEARCH_AUTHORIZED' LIMIT 1").bind(documentId,hash).all<{text:string}>();const value=rows.results[0]?.text;if(value===undefined)return null;const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(value));const actual=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');return actual===hash?value:null;},
   async append(event,expectedCount){const result=await db.prepare('INSERT INTO research_portal_events (id, payload) SELECT ?, ? WHERE (SELECT COUNT(*) FROM research_portal_events) = ?').bind(event.id,JSON.stringify(event),expectedCount).run();if(result.meta.changes!==1)throw new PortalError('Outro parecer foi salvo simultaneamente. Atualize e tente novamente.',409);},
 };}
 

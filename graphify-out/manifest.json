@@ -535,7 +535,7 @@
     "semantic_hash": ""
   },
   "src/server/criminalidadefacial/pessoas.generated.ts": {
-    "mtime": 1792596603.9160316,
+    "mtime": 1792602024.049363,
     "ast_hash": "934aabe54099c9227c6e0433aed513a0",
     "semantic_hash": ""
   },
@@ -48035,8 +48035,8 @@
     "semantic_hash": ""
   },
   "src/app/api/pesquisa-musical/route.ts": {
-    "mtime": 1792595179.8352442,
-    "ast_hash": "a4e2ab85d876199b17bd99703bd0255f",
+    "mtime": 1792599376.5991805,
+    "ast_hash": "e6a7afc64247654cee19a1438d10ca0b",
     "semantic_hash": ""
   },
   "src/app/pesquisa-musical/page.tsx": {
@@ -48045,8 +48045,8 @@
     "semantic_hash": ""
   },
   "src/app/pesquisa-musical/portal.tsx": {
-    "mtime": 1792595737.0662615,
-    "ast_hash": "5e8704624f1ebddc37a0cbb99c1c1741",
+    "mtime": 1792601902.52941,
+    "ast_hash": "966c50c6ba03efe959effb2e03bac10a",
     "semantic_hash": ""
   },
   "src/data/research-portal.json": {
@@ -48055,23 +48055,23 @@
     "semantic_hash": ""
   },
   "src/lib/research-portal.ts": {
-    "mtime": 1792596492.4772606,
-    "ast_hash": "5cb29ce6badeb7fe84636849bd072bce",
+    "mtime": 1792601874.2069874,
+    "ast_hash": "8b22eaebaa4774bcb3d3c6be1427c698",
     "semantic_hash": ""
   },
   "src/server/research-portal.ts": {
-    "mtime": 1792596492.6180563,
-    "ast_hash": "0f072acb21c1c568f769b57e070ef4a9",
+    "mtime": 1792598112.2831068,
+    "ast_hash": "be1af3945d860f7fa1913472fcfb6604",
     "semantic_hash": ""
   },
   "tests/research-portal.test.ts": {
-    "mtime": 1792596503.760047,
-    "ast_hash": "05e8b2230058c6629342e4e5c408c92a",
+    "mtime": 1792601902.52941,
+    "ast_hash": "0334ca8e3e5e50c3d72144a89e8bf88a",
     "semantic_hash": ""
   },
   "docs/research-portal-api.md": {
-    "mtime": 1792596492.931199,
-    "ast_hash": "e36731becdec78b95f67d54a7ce00358",
+    "mtime": 1792599379.3497355,
+    "ast_hash": "5d5ba80083cf18cf6e5f168c4fe13895",
     "semantic_hash": ""
   },
   "docs/research-portal.md": {
@@ -48085,13 +48085,18 @@
     "semantic_hash": ""
   },
   "docs/research-portal-operations.md": {
-    "mtime": 1792596541.0827413,
-    "ast_hash": "bd6ae2171ab43fc6f6c982ba5e4fe928",
+    "mtime": 1792601165.058187,
+    "ast_hash": "e3ba3bc1a1dce8be0042adde1aad09b1",
     "semantic_hash": ""
   },
   "scripts/split-portal-lyrics.py": {
-    "mtime": 1792596497.883243,
-    "ast_hash": "d8a47a7cfd27e831f651306a917add87",
+    "mtime": 1792598112.2353396,
+    "ast_hash": "8cb41b211c6e6cb8167018177646418c",
+    "semantic_hash": ""
+  },
+  "scripts/verify-research-review-export.mjs": {
+    "mtime": 1792599379.3443985,
+    "ast_hash": "ab42dbb2f3a336004f1078def13cff7b",
     "semantic_hash": ""
   }
 }

@@ -16,8 +16,8 @@ def split_dataset(path):
         recording['lyricAvailable'] = bool(content)
         if content:
             assert recording['provenance']['rights_status'] == 'RESEARCH_AUTHORIZED'
-            values = [recording['documentId'], recording['lyricsHash'], content, 'RESEARCH_AUTHORIZED']
-            sql.append('INSERT OR IGNORE INTO research_portal_lyrics(document_id,lyrics_hash,text,rights_status) VALUES (' + ','.join(literal(v) for v in values) + ');')
+            values = [literal(recording['documentId']), literal(recording['lyricsHash']), "CAST(X'" + content.encode('utf-8').hex() + "' AS TEXT)", literal('RESEARCH_AUTHORIZED')]
+            sql.append('INSERT INTO research_portal_lyrics(document_id,lyrics_hash,text,rights_status) VALUES (' + ','.join(values) + ') ON CONFLICT(document_id,lyrics_hash) DO UPDATE SET text=excluded.text, rights_status=excluded.rights_status;')
         recording['lyrics'] = None
     out = path.parents[2] / '.wrangler/research-portal-lyrics.sql'
     out.parent.mkdir(parents=True,exist_ok=True)

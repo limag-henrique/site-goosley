@@ -22,8 +22,17 @@ export class PortalService {
   private async fingerprint(events:PortalEvent[]){const content=JSON.stringify({rubric:this.rubricVersion(),dimensions:this.dataset.dimensions,methodology:this.dataset.methodology,assignments:this.dataset.recordings.map(r=>({id:r.id,documentId:r.documentId,lyricsHash:r.lyricsHash,ai:r.ai,provenance:r.provenance}))});const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(content));const hash=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');if(events.some(e=>e.campaignFingerprint!==hash))throw new PortalError('O corpus, a rubrica ou a referência da IA mudou desde o início da campanha. Preserve a versão congelada.',409);return hash;}
   private state(events:PortalEvent[]){const closed=([1,2] as const).filter(r=>events.some(e=>e.action==='close'&&e.reviewer===r));return {closedReviewers:closed,closed:closed.length===2,assigned:this.dataset.recordings.length,rubricVersion:this.rubricVersion()};}
   async read(params:URLSearchParams):Promise<Record<string,unknown>> {
-    const events=await this.store.read();await this.fingerprint(events);const state=this.state(events);const mode=params.get('mode')||'exploration';
-    if(!['blind','exploration','compare','export'].includes(mode))throw new PortalError('Percurso inválido.');
+    const events=await this.store.read();const campaignFingerprint=await this.fingerprint(events);const state=this.state(events);const mode=params.get('mode')||'exploration';
+    if(!['blind','exploration','compare','export','review-export'].includes(mode))throw new PortalError('Percurso inválido.');
+    if(mode==='review-export'){
+      const reviewer=reviewerOf(params.get('reviewer'));
+      const ownEvents=events.filter(event=>event.reviewer===reviewer);
+      const own=latest(events,reviewer);
+      const payload={exportVersion:'research-review-export-v1',exportedAt:new Date().toISOString(),reviewer,rubricVersion:this.rubricVersion(),campaignFingerprint,assigned:this.dataset.recordings.length,completed:own.size,closed:state.closedReviewers.includes(reviewer),dimensions:this.dataset.dimensions,recordings:this.dataset.recordings.filter(recording=>own.has(recording.id)).map(recording=>({...blindRecording(recording),lyrics:undefined})),events:ownEvents,latestReviews:[...own.values()]};
+      const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(payload)));
+      const sha256=Array.from(new Uint8Array(digest),byte=>byte.toString(16).padStart(2,'0')).join('');
+      return {payload,integrity:{algorithm:'SHA-256',canonicalization:'JSON.stringify(payload), UTF-8',sha256}};
+    }
     if(mode==='compare'||mode==='export'){
       if(!state.closed)throw new PortalError('Comparação e divergências disponíveis somente após os dois percursos independentes encerrarem.',403);
       const reviews=events.filter(e=>e.action==='save');const a=latest(events,1),b=latest(events,2);
@@ -47,8 +56,13 @@ export class PortalService {
     for(const field of ['market','language','genre'] as const){const value=params.get(field);if(value)rows=rows.filter(r=>field==='market'?r.markets.includes(value):r[field]===value);}
     if(params.get('year'))rows=rows.filter(r=>r.years.includes(Number(params.get('year'))));
     const theme=params.get('theme');if(theme){if(!state.closed||mode==='blind')throw new PortalError('Filtros por previsão temática não estão disponíveis durante a avaliação cega.',403);rows=rows.filter(r=>typeof r.ai[theme]==='number'&&Number(r.ai[theme])>=2);}
-    const page=Math.max(1,Math.floor(Number(params.get('page'))||1));const pageSize=Math.min(100,Math.max(1,Math.floor(Number(params.get('pageSize'))||30)));
-    return {...common,total:rows.length,page,pageSize,recordings:rows.slice((page-1)*pageSize,page*pageSize).map(r=>({...blindRecording(r),lyrics:undefined,...(reviewer?{reviewStatus:own.get(r.id)?.status??null}:{})})),filters:{markets:[...new Set(this.dataset.recordings.flatMap(r=>r.markets))].sort(),years:[...new Set(this.dataset.recordings.flatMap(r=>r.years))].sort(),languages:[...new Set(this.dataset.recordings.map(r=>r.language).filter(Boolean))].sort(),genres:[...new Set(this.dataset.recordings.map(r=>r.genre).filter(Boolean))].sort()}};
+    const sort=params.get('sort')||'sample';
+    if(!['sample','market','title'].includes(sort))throw new PortalError('Ordenação inválida.');
+    const displayMarket=(r:Recording)=>params.get('market')||r.market;
+    if(sort!=='sample')rows=[...rows].sort((a,b)=>(sort==='market'?displayMarket(a).localeCompare(displayMarket(b),'pt-BR'):0)||a.title.localeCompare(b.title,'pt-BR')||a.id.localeCompare(b.id));
+    const size=Number(params.get('pageSize'));const pageSize=Number.isFinite(size)&&size>0?Math.min(100,Math.max(1,Math.floor(size))):30;
+    const requested=Number(params.get('page'));const page=Math.min(Math.max(1,Math.ceil(rows.length/pageSize)),Number.isFinite(requested)&&requested>0?Math.floor(requested):1);
+    return {...common,total:rows.length,page,pageSize,recordings:rows.slice((page-1)*pageSize,page*pageSize).map(r=>({...blindRecording(r),displayMarket:displayMarket(r),lyrics:undefined,...(reviewer?{reviewStatus:own.get(r.id)?.status??null}:{})})),filters:{markets:[...new Set(this.dataset.recordings.flatMap(r=>r.markets))].sort(),years:[...new Set(this.dataset.recordings.flatMap(r=>r.years))].sort(),languages:[...new Set(this.dataset.recordings.map(r=>r.language).filter(Boolean))].sort(),genres:[...new Set(this.dataset.recordings.map(r=>r.genre).filter(Boolean))].sort()}};
   }
   async write(input:unknown):Promise<Record<string,unknown>> {
     if(!input||typeof input!=='object'||Array.isArray(input))throw new PortalError('Requisição inválida.');

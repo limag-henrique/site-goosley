@@ -66,3 +66,46 @@ test('blind detail retrieves only the selected authorized document and scored sa
   const missing=new PortalService(local,{read:async()=>[],append:async()=>{throw new Error('Must not append');},lyric:async()=>null});
   await assert.rejects(()=>missing.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Tentativa sem letra'}),/Sem letra autorizada/);
 });
+
+
+test('partial reviewer export preserves original revisions and does not close or reveal other judgments',async()=>{
+  const {portal,events}=setup(true);
+  const justification='Observação com acento, "aspas" e\r\nsegunda linha.';
+  await portal.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification,recordedLanguage:'pt',identityVerdict:'confirmed'});
+  await portal.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'doubt',justification:'Revisão com dúvida'});
+  await portal.write({action:'save',reviewer:2,evaluator:'Bea',recordingId:'song',status:'scored',scores:{sexuality:3},justification:'PARECER DA OUTRA AVALIADORA'});
+  const before=JSON.stringify(events);
+  const result=await portal.read(new URLSearchParams('mode=review-export&reviewer=1')) as {payload:{events:PortalEvent[];latestReviews:PortalEvent[];completed:number;closed:boolean};integrity:{algorithm:string;sha256:string}};
+  assert.equal(JSON.stringify(events),before);
+  assert.equal(result.payload.events.length,2);
+  assert.equal(result.payload.completed,1);
+  assert.equal(result.payload.closed,false);
+  assert.equal(result.payload.events[0].justification,justification);
+  assert.equal(result.payload.events[0].scores?.sexuality,0);
+  assert.equal(result.payload.latestReviews[0].scores?.sexuality,null);
+  assert.equal(result.payload.latestReviews[0].status,'doubt');
+  assert.equal(JSON.stringify(result).includes('PARECER DA OUTRA AVALIADORA'),false);
+  assert.equal('ai' in result.payload,false);
+  assert.equal('divergences' in result.payload,false);
+  const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(result.payload)));
+  const expected=Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');
+  assert.equal(result.integrity.algorithm,'SHA-256');assert.equal(result.integrity.sha256,expected);
+  await assert.rejects(()=>portal.read(new URLSearchParams('mode=export')),/somente/);
+  await assert.rejects(()=>portal.read(new URLSearchParams('mode=review-export')),/Selecione/);
+});
+
+ test('country filtering presents the matching circulation territory and composes with other filters',async()=>{
+ const local=structuredClone(dataset);local.recordings=[{...local.recordings[0],id:'z',title:'Zulu',market:'PA',markets:['PA','BR'],language:'pt',genre:'pop',years:[2021]}, {...local.recordings[0],id:'a',title:'Alfa',market:'BR',markets:['BR'],language:'en',genre:'rock',years:[2020]}];
+ const portal=new PortalService(local,{read:async()=>[],append:async()=>{throw Error('Read only');}});
+ const result=await portal.read(new URLSearchParams('mode=blind&reviewer=1&market=BR&language=pt&genre=pop&year=2021'));
+ const rows=result.recordings as Array<Record<string,unknown>>;assert.equal(result.total,1);assert.equal(rows[0].id,'z');assert.equal(rows[0].displayMarket,'BR');assert.equal(rows[0].market,'PA');assert.equal('ai' in rows[0],false);
+ const sorted=await portal.read(new URLSearchParams('mode=blind&reviewer=1&sort=title&pageSize=1&page=999'));assert.equal(sorted.page,2);assert.deepEqual((sorted.recordings as Array<{id:string}>).map(r=>r.id),['z']);
+ });
+
+test('list sorting is stable across pages, preserves the corpus and never writes reviews',async()=>{
+ const local=structuredClone(dataset);local.recordings=[{...local.recordings[0],id:'c',market:'US',markets:['US'],title:'Beta'}, {...local.recordings[0],id:'b',market:'BR',markets:['BR'],title:'Alfa'}, {...local.recordings[0],id:'a',market:'BR',markets:['BR'],title:'Alfa'}];
+ const before=JSON.stringify(local);const portal=new PortalService(local,{read:async()=>[],append:async()=>{throw Error('Must not write');}});
+ const ids=[];for(let page=1;page<=3;page++){const result=await portal.read(new URLSearchParams('mode=blind&reviewer=2&sort=market&pageSize=1&page='+page));ids.push(...(result.recordings as Array<{id:string}>).map(r=>r.id));}assert.deepEqual(ids,['a','b','c']);assert.equal(JSON.stringify(local),before);
+ for(const query of ['market=XX','language=xx','genre=unknown','year=1900','search=missing']){const result=await portal.read(new URLSearchParams('mode=blind&reviewer=1&'+query));assert.equal(result.total,0);assert.deepEqual(result.recordings,[]);assert.equal(result.page,1);}
+ const result=await portal.read(new URLSearchParams('mode=blind&reviewer=1&search=Alfa&market=BR'));assert.equal(result.total,2);await assert.rejects(()=>portal.read(new URLSearchParams('sort=bad')),/Ordenação/);
+});

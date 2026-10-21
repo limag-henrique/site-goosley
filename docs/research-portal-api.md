@@ -31,3 +31,26 @@ Identificação é autodeclarada e vinculada ao slot no primeiro parecer, não a
 O schema exporta revisões e divergências (última revisão de cada avaliadora); comparação ordinal só usa campos numéricos disponíveis no AI. Métricas de acurácia e adjudicação final não são inferidas automaticamente.
 
 Validação: `npx tsx --test tests/research-portal.test.ts` (ou o runner TS já instalado no site). Testes cobrem contratos públicos de cegamento, embargo cruzado, encerramento, não conversão de ausências em zero, separação de avaliadoras e congelamento documental.
+
+## Download parcial dos pareceres
+
+Em Avaliação cega, selecione o percurso correto e salve as alterações. Use
+**Baixar meus pareceres salvos (JSON)**. Não é necessário encerrar a etapa.
+Repita para cada avaliadora para reunir os dois arquivos na coordenação.
+Cada exportação contém apenas a avaliadora selecionada, todas as suas revisões,
+a versão mais recente de cada parecer, rubrica, documento/hash, justificativa,
+idioma e identidade observados. Não inclui letras nem previsões da IA.
+O download é somente leitura e não encerra, remove ou substitui avaliações.
+Mudanças feitas no formulário ainda não salvas não entram na cópia.
+
+API: `GET /api/pesquisa-musical?mode=review-export&reviewer=1` (ou 2).
+O JSON contém `payload` e checksum SHA-256 sobre `JSON.stringify(payload)`
+em UTF-8. Verifique sem modificar o original:
+`node scripts/verify-research-review-export.mjs caminho/do/arquivo.json`.
+O checksum detecta alterações acidentais; guarde cópias datadas fora do banco.
+A comparação humano–IA e a exportação de divergências permanecem bloqueadas
+até os dois encerramentos.
+
+### Filtros e ordenação da lista
+
+`market` seleciona circulação em qualquer mercado da gravação; não indica nacionalidade. `displayMarket` informa o mercado selecionado, preservando `market` original e `markets` completo. Os filtros de território, ano, idioma, gênero e busca são combinados por interseção. `sort=sample` preserva a amostra; `sort=market` ordena por mercado exibido, título e ID; `sort=title` por título e ID. A ordenação antecede a paginação, cuja página é limitada ao intervalo existente. Nenhuma dessas consultas grava pareceres ou altera o corpus congelado.
