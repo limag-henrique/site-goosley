@@ -11,6 +11,7 @@
 		"command": "npx opennextjs-cloudflare build"
 	},
 	"keep_vars": true,
+  "d1_databases": [{ "binding": "RESEARCH_DB", "database_name": "goosley-prod", "database_id": "2b382a52-57d6-4ea2-b3e1-aea81c4c1c3a" }],
 	"observability": {
 		"enabled": true
 	},

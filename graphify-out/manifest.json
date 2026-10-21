@@ -165,8 +165,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1791836805.19692,
-    "ast_hash": "8406912bc45b5fe7bd3dac0889669960",
+    "mtime": 1792595547.5166287,
+    "ast_hash": "94faaa98ba87c9cb02cc22631c669304",
     "semantic_hash": ""
   },
   "postcss.config.mjs": {
@@ -180,18 +180,18 @@
     "semantic_hash": ""
   },
   "src/app/a-solucao/page.tsx": {
-    "mtime": 1784901344.74999,
-    "ast_hash": "6d77c0495e2ba6a9f1961e92673caef7",
+    "mtime": 1791838392.721022,
+    "ast_hash": "d168cbe2f10330b89d26f16af3a73138",
     "semantic_hash": ""
   },
   "src/app/agentes-corporativos/page.tsx": {
-    "mtime": 1780172351.838591,
-    "ast_hash": "137760d90edd16a20797c4aa564413d7",
+    "mtime": 1791838392.7254245,
+    "ast_hash": "79cbe793b92e4eed10a4939bdbaa2132",
     "semantic_hash": ""
   },
   "src/app/analytics-dashboards-bi/page.tsx": {
-    "mtime": 1784901319.3624692,
-    "ast_hash": "b23d23b9655805f4242dea2d935342b5",
+    "mtime": 1791838392.7274244,
+    "ast_hash": "d4481008eae3b3521b9aa1e6606010da",
     "semantic_hash": ""
   },
   "src/app/api/contato/route.ts": {
@@ -199,14 +199,9 @@
     "ast_hash": "18f158fbe4f5a68c9e077831bd151abf",
     "semantic_hash": ""
   },
-  "src/app/aplicativos/page.tsx": {
-    "mtime": 1780175775.9153717,
-    "ast_hash": "cd2ade3c287390f01afef602194de6ef",
-    "semantic_hash": ""
-  },
   "src/app/automacoes/page.tsx": {
-    "mtime": 1780172331.6952603,
-    "ast_hash": "68f60bfe371eb3464e94ffbce100eb9a",
+    "mtime": 1791838392.723205,
+    "ast_hash": "2210c632c8bde015b65346fa3b003752",
     "semantic_hash": ""
   },
   "src/app/contato/page.tsx": {
@@ -217,11 +212,6 @@
   "src/app/criminalidadefacial/page.tsx": {
     "mtime": 1790699052.6194458,
     "ast_hash": "eb8f210330055587b30c78cc271a8b98",
-    "semantic_hash": ""
-  },
-  "src/app/diagnostico-automacao-ia/page.tsx": {
-    "mtime": 1784901319.3502038,
-    "ast_hash": "eed2f5319169a5eb66ce0dad81d9f632",
     "semantic_hash": ""
   },
   "src/app/e-commerce/page.tsx": {
@@ -240,8 +230,8 @@
     "semantic_hash": ""
   },
   "src/app/layout.tsx": {
-    "mtime": 1784901414.8169172,
-    "ast_hash": "e753e2a3eb47caadd20de5e408adfc02",
+    "mtime": 1791838392.723205,
+    "ast_hash": "596d9e30b6a47346df49e93135b4b030",
     "semantic_hash": ""
   },
   "src/app/metodologia/page.tsx": {
@@ -255,8 +245,8 @@
     "semantic_hash": ""
   },
   "src/app/page.tsx": {
-    "mtime": 1791836025.372261,
-    "ast_hash": "668d86501830bdc66db90ccebbce37ef",
+    "mtime": 1791838392.7194688,
+    "ast_hash": "586ece46633c517f17fe903c51f6398d",
     "semantic_hash": ""
   },
   "src/app/portfolio/cases-de-sucesso/page.tsx": {
@@ -275,23 +265,18 @@
     "semantic_hash": ""
   },
   "src/app/quiz/page.tsx": {
-    "mtime": 1784901358.033865,
-    "ast_hash": "4c2b19abbf4c36632dd33d0f0043cb50",
+    "mtime": 1791838392.722197,
+    "ast_hash": "d1be45e5680ff2e3b5da703175f736e8",
     "semantic_hash": ""
   },
   "src/app/sistemas-web/page.tsx": {
-    "mtime": 1780172341.2398484,
-    "ast_hash": "3291a23a981616592d8a5c34f359c738",
-    "semantic_hash": ""
-  },
-  "src/app/workflows/page.tsx": {
-    "mtime": 1780172361.663163,
-    "ast_hash": "ee97257383b3ae8969a3689e1a8690e1",
+    "mtime": 1791838392.7254245,
+    "ast_hash": "12d92a15c4aa99696d0b1b6401a00bbc",
     "semantic_hash": ""
   },
   "src/components/CostEstimator.tsx": {
-    "mtime": 1791837866.520124,
-    "ast_hash": "3ab0af4b0d5d290c0ab45c9c93bf447f",
+    "mtime": 1791838393.9062223,
+    "ast_hash": "24c87dd02d23b913af5ba8e1bb69c9a5",
     "semantic_hash": ""
   },
   "src/components/CriminalidadeFacialClient.tsx": {
@@ -310,8 +295,8 @@
     "semantic_hash": ""
   },
   "src/components/Footer.tsx": {
-    "mtime": 1791836896.650222,
-    "ast_hash": "482a47ab6e586d176000d5e8a75329de",
+    "mtime": 1791838392.721022,
+    "ast_hash": "ea3bdd2d190cde0a540d7322a99b5419",
     "semantic_hash": ""
   },
   "src/components/Hero.tsx": {
@@ -345,8 +330,8 @@
     "semantic_hash": ""
   },
   "src/data/pricingData.ts": {
-    "mtime": 1791836372.8901503,
-    "ast_hash": "30457cb5056b44e19ae64bfae9ed479f",
+    "mtime": 1791838392.7174525,
+    "ast_hash": "bb722c78c2f03ecaa5de3368f26b39e5",
     "semantic_hash": ""
   },
   "src/lib/criminalidadefacial.ts": {
@@ -375,8 +360,8 @@
     "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1791836805.1954672,
-    "ast_hash": "02a94bb4a8e22741378dfb8f9db43db0",
+    "mtime": 1791838451.6104548,
+    "ast_hash": "80fedf26c515fd2f50f50b7a6327c637",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -530,8 +515,8 @@
     "semantic_hash": ""
   },
   "src/lib/public-chrome.ts": {
-    "mtime": 1790698200.5574863,
-    "ast_hash": "db4fc6e684090471c2dd3ddfd3ff6b47",
+    "mtime": 1792594216.0651371,
+    "ast_hash": "11208881603a6a9226883953516a6091",
     "semantic_hash": ""
   },
   "src/lib/reference-handler.ts": {
@@ -550,7 +535,7 @@
     "semantic_hash": ""
   },
   "src/server/criminalidadefacial/pessoas.generated.ts": {
-    "mtime": 1791837958.1547263,
+    "mtime": 1792596603.9160316,
     "ast_hash": "934aabe54099c9227c6e0433aed513a0",
     "semantic_hash": ""
   },
@@ -48035,8 +48020,78 @@
     "semantic_hash": ""
   },
   "docs/pricing-market.md": {
-    "mtime": 1791836805.2244925,
-    "ast_hash": "4d38e14074c5e7e0775f1441e1300f34",
+    "mtime": 1791838451.6174116,
+    "ast_hash": "805d6b3ccd0c4dcaf8fa85437b2dc8fc",
+    "semantic_hash": ""
+  },
+  "scripts/export-research-portal.py": {
+    "mtime": 1792596500.604935,
+    "ast_hash": "df2098e86b066f181c2e50c058d00a7c",
+    "semantic_hash": ""
+  },
+  "scripts/research-portal-schema.sql": {
+    "mtime": 1792596492.7864928,
+    "ast_hash": "bb0485db3125cc2ed475f6be5aeecfe8",
+    "semantic_hash": ""
+  },
+  "src/app/api/pesquisa-musical/route.ts": {
+    "mtime": 1792595179.8352442,
+    "ast_hash": "a4e2ab85d876199b17bd99703bd0255f",
+    "semantic_hash": ""
+  },
+  "src/app/pesquisa-musical/page.tsx": {
+    "mtime": 1792594194.217828,
+    "ast_hash": "6720539bdff79b753d9e2349863519a3",
+    "semantic_hash": ""
+  },
+  "src/app/pesquisa-musical/portal.tsx": {
+    "mtime": 1792595737.0662615,
+    "ast_hash": "5e8704624f1ebddc37a0cbb99c1c1741",
+    "semantic_hash": ""
+  },
+  "src/data/research-portal.json": {
+    "mtime": 1792596463.3698287,
+    "ast_hash": "44c4178920d8161b277925bc080b9be7",
+    "semantic_hash": ""
+  },
+  "src/lib/research-portal.ts": {
+    "mtime": 1792596492.4772606,
+    "ast_hash": "5cb29ce6badeb7fe84636849bd072bce",
+    "semantic_hash": ""
+  },
+  "src/server/research-portal.ts": {
+    "mtime": 1792596492.6180563,
+    "ast_hash": "0f072acb21c1c568f769b57e070ef4a9",
+    "semantic_hash": ""
+  },
+  "tests/research-portal.test.ts": {
+    "mtime": 1792596503.760047,
+    "ast_hash": "05e8b2230058c6629342e4e5c408c92a",
+    "semantic_hash": ""
+  },
+  "docs/research-portal-api.md": {
+    "mtime": 1792596492.931199,
+    "ast_hash": "e36731becdec78b95f67d54a7ce00358",
+    "semantic_hash": ""
+  },
+  "docs/research-portal.md": {
+    "mtime": 1792594194.0674438,
+    "ast_hash": "7a69f9597a549fb2bd7da8f95bc146dc",
+    "semantic_hash": ""
+  },
+  "cloudflare-env.d.ts": {
+    "mtime": 1792595523.8271163,
+    "ast_hash": "b70c70a6310e8f25330eaaf761a5428c",
+    "semantic_hash": ""
+  },
+  "docs/research-portal-operations.md": {
+    "mtime": 1792596541.0827413,
+    "ast_hash": "bd6ae2171ab43fc6f6c982ba5e4fe928",
+    "semantic_hash": ""
+  },
+  "scripts/split-portal-lyrics.py": {
+    "mtime": 1792596497.883243,
+    "ast_hash": "d8a47a7cfd27e831f651306a917add87",
     "semantic_hash": ""
   }
 }

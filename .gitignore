@@ -54,3 +54,6 @@ next-env.d.ts
 /criminalidadefacial-service/worker/.wrangler/
 
 graphify-out/
+
+# Pareceres locais das pesquisadoras
+.research-portal-local/
