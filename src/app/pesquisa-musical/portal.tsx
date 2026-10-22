@@ -2,53 +2,210 @@
 
 import { useEffect, useState } from 'react';
 import type { Dimension, PortalEvent, ReviewStatus } from '@/lib/research-portal';
+import { AiComparison, SharedReviews, reviewStatuses, type Comparison, type SharedReview } from './review-results';
 import './portal.css';
-import { AiComparison, SharedReviews, type Comparison } from './review-results';
 
-type Mode = 'exploration'|'blind'|'method'|'compare'|'community';
-type Track = {id:string;title:string;artist:string;market:string;displayMarket?:string;markets:string[];years:number[];genre:string|null;language:string|null;documentId:string;lyricsHash:string;lyrics?:string|null;provenance?:Record<string,unknown>;ai?:Record<string,number>;reviewStatus?:string;selectionRank?:number};
-type Reply = {state:{closed:boolean;closedReviewers:number[];assigned:number;rubricVersion:string;pilot?:{ranking:string;selection:string;recordings:{recordingId:string;market:string;rank:number}[]}};comparison?:Comparison;aiRevealed?:boolean;dimensions:Dimension[];methodology:Record<string,unknown>;total?:number;completed?:number;recordings?:Track[];recording?:Track;review?:PortalEvent|null;filters?:{markets:string[];years:number[];languages:string[];genres:string[]};annual?:Record<string,string>[];sources?:Record<string,string>[];context?:Record<string,string>[];divergences?:Record<string,unknown>[];reviews?:PortalEvent[]};
-const states:Record<ReviewStatus,string> = {scored:'Avaliação com escores','missing-lyrics':'Ausência de letra',doubt:'Dúvida de interpretação',abstain:'Abstenção','identity-error':'Erro de identidade'};
-const api='/api/pesquisa-musical';
-const indicators:Record<string,string>={gdp_pc_ppp_constant:'Renda por pessoa ajustada ao poder de compra (PPC, preços constantes)',gender_inequality_index:'Índice de desigualdade de gênero (0–1; maior indica mais desigualdade)',gini:'Índice de Gini (desigualdade da distribuição de renda)',homicide_unodc_female:'Taxa de homicídios de mulheres por 100 mil mulheres',homicide_unodc_female_intimate_partner_family:'Homicídios de mulheres por parceiro íntimo ou familiar (taxa por 100 mil mulheres)',homicide_unodc_total:'Taxa de homicídios por 100 mil habitantes',sigi_2019:'Índice de instituições sociais e gênero, edição de 2019',youth_unemployment:'Desemprego juvenil (% da força de trabalho jovem)'};
-async function request(params:URLSearchParams, signal?:AbortSignal):Promise<Reply>{const response=await fetch(`${api}?${params}`,{cache:'no-store',signal});const value=await response.json();if(!response.ok)throw new Error(value.error||'Não foi possível consultar os dados.');return value;}
-function download(value:unknown,name:string){const url=URL.createObjectURL(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}));const anchor=document.createElement('a');anchor.href=url;anchor.download=name;anchor.click();URL.revokeObjectURL(url);}
-function Method({methodology}:{methodology:Record<string,unknown>}){return <section className="panel"><h2>Como os resultados foram produzidos</h2><p className="muted">Snapshot: {String(methodology.freeze??'não informado')}. {String(methodology.sampleStatus??'')}</p><p>A unidade é uma gravação em um mercado de circulação. O mercado indica onde a música entrou nas paradas, não a nacionalidade do artista. Temas podem coexistir e seus percentuais não somam 100%.</p><p>Escala: 0 = ausente; 1 = incidental; 2 = substancial; 3 = central. Presença substancial corresponde a escore ≥ 2. Menção, representação e endosso são conceitos distintos.</p><p className="notice">{String(methodology.parameterNote??'Parâmetros não registrados permanecem ausentes.')}</p>{[['Prompt e estrutura da entrada',methodology.promptTemplate],['Esquema de resposta',methodology.responseSchema],['Protocolo de avaliação independente',methodology.protocol]].map(([label,value])=><details key={String(label)}><summary>{String(label)}</summary><pre>{typeof value==='string'?value:JSON.stringify(value,null,2)}</pre></details>)}<p className="muted">Prompt: {String(methodology.promptVersion??'não registrado')} · Taxonomia de IA: {String(methodology.rubricVersion??'não registrada')}. A rubrica humana é versionada separadamente no parecer.</p></section>;}
+type Track = { id:string; title:string; artist:string; displayMarket?:string; market:string; lyrics?:string|null; reviewStatus?:string };
+type Reply = {
+  state:{ closedReviewers:number[]; assigned:number };
+  dimensions:Dimension[]; completed?:number; recordings?:Track[]; recording?:Track;
+  review?:PortalEvent|null; reflection?:PortalEvent|null; comparison?:Comparison; reviews?:SharedReview[];
+};
+type Mode = 'blind'|'community';
+type Action = 'save'|'close'|'reveal'|'reflect'|'export';
+const api = '/api/pesquisa-musical';
+const marketNames:Record<string,string> = { DO:'República Dominicana', PA:'Panamá', CL:'Chile', BR:'Brasil', ID:'Indonésia', JP:'Japão', TW:'Taiwan' };
 
-export default function ResearchPortal(){
- const [mode,setMode]=useState<Mode>('exploration');const [reviewer,setReviewer]=useState<1|2>(1);const [evaluator,setEvaluator]=useState('');const [accessKey,setAccessKey]=useState('');
- const [data,setData]=useState<Reply|null>(null);const [detail,setDetail]=useState<Reply|null>(null);const [selected,setSelected]=useState('');const [error,setError]=useState('');const [message,setMessage]=useState('');const [loading,setLoading]=useState(true);const [saving,setSaving]=useState(false);const [revision,setRevision]=useState(0);
- const [filters,setFilters]=useState({search:'',market:'',year:'',language:'',genre:'',theme:'',sort:'sample'});const [page,setPage]=useState(1);const [theme,setTheme]=useState('explicitness');
- const [status,setStatus]=useState<ReviewStatus>('scored');const [scores,setScores]=useState<Record<string,string>>({});const [justification,setJustification]=useState('');const [recordedLanguage,setRecordedLanguage]=useState('');const [identityVerdict,setIdentityVerdict]=useState('');const [dirty,setDirty]=useState(false);const [confirmClose,setConfirmClose]=useState(false);
- function leave(){if(saving)return false;return !dirty||window.confirm('Há alterações não salvas. Deseja sair desta gravação?');}
- function changeMode(next:Mode){if(!leave())return;setDirty(false);setMode(next);setData(null);setSelected('');setDetail(null);setError('');setMessage('');setPage(1);setConfirmClose(false);}
- useEffect(()=>{try{setEvaluator(localStorage.getItem('research-evaluator')??'');const stored=localStorage.getItem('research-reviewer');if(stored==='1'||stored==='2')setReviewer(Number(stored) as 1|2);}catch{}},[]);
- useEffect(()=>{try{const name=`research-access-key-${reviewer}`;let key=localStorage.getItem(name);if(!key){key=crypto.randomUUID()+crypto.randomUUID();localStorage.setItem(name,key);}setAccessKey(key);}catch{setAccessKey('');}},[reviewer]);
- function updateAccessKey(value:string){setAccessKey(value);try{localStorage.setItem(`research-access-key-${reviewer}`,value);}catch{}}
- useEffect(()=>{if(mode!=='community')return;const timer=setInterval(()=>{if(document.visibilityState==='visible')setRevision(v=>v+1);},15000);return()=>clearInterval(timer);},[mode]);
- async function revealAi(){if(!selected||dirty||saving)return;setSaving(true);setError('');try{const response=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'reveal',reviewer,evaluator,accessKey,recordingId:selected})});const value=await response.json();if(!response.ok)throw new Error(value.error||'Não foi possível consultar a IA.');setDetail(current=>current?{...current,comparison:value,aiRevealed:true}:current);}catch(error){setError(error instanceof Error?error.message:'Falha ao consultar a IA.');}finally{setSaving(false);}}
- useEffect(()=>{function unload(event:BeforeUnloadEvent){if(dirty)event.preventDefault();}window.addEventListener('beforeunload',unload);return()=>window.removeEventListener('beforeunload',unload);},[dirty]);
- useEffect(()=>{const controller=new AbortController();setLoading(true);setError('');const params=new URLSearchParams({mode:mode==='method'?'exploration':mode,reviewer:String(reviewer),page:String(page),pageSize:'20',...filters,theme:mode==='exploration'?filters.theme:''});request(params,controller.signal).then(setData).catch(e=>{if(e.name!=='AbortError')setError(e.message);}).finally(()=>{if(!controller.signal.aborted)setLoading(false);});return()=>controller.abort();},[mode,reviewer,filters,page,revision]);
- useEffect(()=>{if(!selected){setDetail(null);return;}const controller=new AbortController();setDetail(null);setError('');request(new URLSearchParams({mode:mode==='blind'?'blind':'exploration',reviewer:String(reviewer),id:selected}),controller.signal).then(value=>{setDetail(value);const review=value.review;setStatus(review?.status??'scored');setScores(Object.fromEntries(Object.entries(review?.scores??{}).map(([key,value])=>[key,value===null?'':String(value)])));setJustification(review?.justification??'');setRecordedLanguage(review?.recordedLanguage??'');setIdentityVerdict(review?.identityVerdict??'');setDirty(false);}).catch(e=>{if(e.name!=='AbortError')setError(e.message);});return()=>controller.abort();},[selected,reviewer,mode,revision]);
- async function save(close=false){setSaving(true);setError('');setMessage('');try{const response=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(close?{action:'close',reviewer,evaluator,accessKey}:{action:'save',reviewer,evaluator,accessKey,recordingId:selected,status,scores:status==='scored'?Object.fromEntries(Object.entries(scores).map(([k,v])=>[k,v===''?null:Number(v)])):{},justification,recordedLanguage,identityVerdict:identityVerdict||null})});const result=await response.json();if(!response.ok)throw new Error(result.error||'Não foi possível salvar.');setDirty(false);setConfirmClose(false);setMessage(close?'Etapa independente encerrada. Seus pareceres estão congelados.':'Parecer salvo no servidor e disponível em Pareceres salvos. Você pode atualizar o navegador sem perder este registro.');setRevision(v=>v+1);}catch(e){setError(e instanceof Error?e.message:'Falha ao salvar.');}finally{setSaving(false);}}
- function filter(key:keyof typeof filters,value:string){if(!leave())return;setDirty(false);setFilters(v=>({...v,[key]:value}));setPage(1);setSelected('');setDetail(null);}
- async function exportReviews(){setError('');setMessage('');try{const response=await fetch(`${api}?mode=review-export&reviewer=${reviewer}`,{cache:'no-store'});if(!response.ok){const value=await response.json();throw new Error(value.error||'Não foi possível baixar os pareceres.');}const blob=await response.blob();const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;anchor.download=`pareceres-avaliadora-${reviewer}-${new Date().toISOString().replace(/[:.]/g,'-')}.json`;anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);setMessage('Cópia dos pareceres salvos preparada para download. A etapa continua no estado anterior.');}catch(error){setError(error instanceof Error?error.message:'Falha ao baixar os pareceres.');}}
- const track=detail?.recording;const closed=data?.state.closedReviewers.includes(reviewer)??false;const dimensions=data?.dimensions??[];
- const annual=(data?.annual??[]).filter(row=>(!filters.market||row.market_code===filters.market)&&(!filters.year||row.year===filters.year));
- return <main className="research"><header><div><p className="eyebrow">Goosley · Núcleo de pesquisa</p><h1>O que as músicas dizem.</h1><p className="muted">Leitura dos resultados e avaliação independente de letras.</p></div><span className="badge">Portal das pesquisadoras</span></header>
- <nav aria-label="Percursos da pesquisa">{([['exploration','Exploração'],['blind','Avaliação'],['method','Método'],['compare','Comparação'],['community','Pareceres salvos']] as const).map(([id,label])=><button key={id} disabled={saving} aria-current={mode===id?'page':undefined} onClick={()=>changeMode(id)}>{label}</button>)}</nav>
- {data?.state.pilot&&<section className="notice"><strong>Piloto: 12 músicas por pesquisadora</strong><p>7 músicas dos três primeiros mercados do ranking do artigo, 2 do Brasil e 3 dos três últimos. Ranking de explicitude sexual, da maior para a menor presença; as posições não representam qualidade dos países. A seleção é fixa e exploratória, sem representatividade estatística.</p><details><summary>Critério e posições dos mercados</summary><p>{data.state.pilot.ranking}</p><p>{data.state.pilot.selection}</p><p>República Dominicana (1º), Panamá (2º), Chile (3º), Brasil (22º), Indonésia (66º), Japão (67º), Taiwan (68º).</p></details></section>}{error&&<div className="notice error" role="alert">{error} <button disabled={dirty||saving} onClick={()=>setRevision(v=>v+1)}>Tentar novamente</button></div>}{message&&<p className="notice" role="status">{message}</p>}{loading&&<p role="status">Carregando o arquivo de pesquisa…</p>}
- {mode==='blind'&&<section className="panel"><div className="row"><div><h2>Avaliação independente</h2><p className="muted">Comece pelo seu parecer. Depois de salvar, você pode escolher consultar a classificação da IA. Pareceres de todas as avaliadoras ficam disponíveis em Pareceres salvos.</p></div><span className="badge">{data?.completed??0} / {data?.state.assigned??'…'} pareceres</span></div><div className="filters"><label>Identificação da avaliadora<input value={evaluator} disabled={saving} maxLength={160} onChange={e=>{setEvaluator(e.target.value);try{localStorage.setItem('research-evaluator',e.target.value);}catch{}}} placeholder="Seu nome completo" autoComplete="name"/></label><label>Percurso<select value={reviewer} onChange={e=>{if(leave()){setReviewer(Number(e.target.value) as 1|2);try{localStorage.setItem('research-reviewer',e.target.value);}catch{}setPage(1);setSelected('');setDetail(null);setDirty(false);}}}><option value={1}>Avaliadora 1</option><option value={2}>Avaliadora 2</option></select></label></div><p className="muted">Use sempre o mesmo nome e percurso. O nome é declarado e a edição exige a chave privada do percurso. Ao salvar, seu nome, justificativa e escores ficam visíveis aos visitantes desta página. {closed?'Seu percurso está encerrado.':'Salvar permite revisar; encerrar congela toda a sua etapa.'}</p><details><summary>Chave privada para editar meus pareceres</summary><p>Uma chave foi criada neste navegador. Guarde uma cópia privada para continuar em outro dispositivo. Não compartilhe a chave com visitantes. Perder a chave não apaga os pareceres salvos; a recuperação de acesso depende da coordenação.</p><label>Chave privada do percurso<input type="password" autoComplete="off" value={accessKey} disabled={saving} onChange={e=>updateAccessKey(e.target.value)} minLength={32}/></label><button type="button" disabled={saving||accessKey.length<32} onClick={()=>download({reviewer,accessKey},`chave-privada-avaliadora-${reviewer}.json`)}>Baixar minha chave privada</button></details><div className="actions"><button type="button" disabled={saving||dirty} onClick={exportReviews}>Baixar meus pareceres salvos (JSON)</button><small>{dirty?'Salve as alterações antes de baixar.':'Pode baixar parcialmente, sem encerrar. Inclui todas as revisões desta avaliadora, sem previsões da IA.'}</small></div><details><summary>Encerrar minha etapa independente</summary><p>Disponível após registrar um parecer para cada gravação. Após encerrar, os pareceres ficam bloqueados.</p><label><span><input type="checkbox" checked={confirmClose} onChange={e=>setConfirmClose(e.target.checked)}/> Confirmo que concluí minha avaliação independente.</span></label><button disabled={!confirmClose||saving||closed||dirty||data?.completed!==data?.state.assigned} onClick={()=>save(true)}>Encerrar e congelar pareceres</button></details></section>}
- {(mode==='exploration'||mode==='blind')&&<section aria-label="Filtros" className="filters"><label>Buscar gravação<input value={filters.search} onChange={e=>filter('search',e.target.value)} placeholder="Título ou artista"/></label>{([['market','Território','markets'],['year','Ano','years'],['language','Idioma','languages'],['genre','Gênero disponível','genres']] as const).map(([key,label,list])=><label key={key}>{label}<select value={filters[key]} onChange={e=>filter(key,e.target.value)}><option value="">Todos</option>{data?.filters?.[list].map(value=><option key={value} value={value}>{value}</option>)}</select></label>)}<label>Ordenar por<select value={filters.sort} onChange={e=>filter('sort',e.target.value)}><option value="sample">Ordem da amostra</option><option value="market">País / território</option><option value="title">Título</option></select></label>{mode==='exploration'&&data?.state.closed&&<label>Tema presente na gravação<select value={filters.theme} onChange={e=>filter('theme',e.target.value)}><option value="">Todos</option>{dimensions.map(d=><option key={d.code} value={d.code}>{d.label}</option>)}</select></label>}</section>}
- {mode==='exploration'&&data&&<><div className="stats"><div className="panel"><div className="metric">{data.state.assigned.toLocaleString('pt-BR')}</div><small>Gravações na amostra provisória de avaliação</small></div><div className="panel"><div className="metric">26</div><small>Dimensões temáticas, avaliadas separadamente</small></div><div className="panel"><div className="metric">{data.state.closed?'Concluída':'Em avaliação'}</div><small>Etapa independente das duas pesquisadoras</small></div></div>{!data.state.closed&&<p className="notice">A classificação individual da IA pode ser consultada, por opção da pesquisadora, após salvar o próprio parecer. A comparação global continua disponível após os dois encerramentos. Os agregados históricos descrevem o corpus do artigo, não os itens filtrados da avaliação.</p>}<section className="panel"><div className="row"><h2>Resultados por tema e período</h2><label>Dimensão<select value={theme} onChange={e=>setTheme(e.target.value)}>{dimensions.map(d=><option key={d.code} value={d.code}>{d.label}</option>)}</select></label></div><p className="muted">{dimensions.find(d=>d.code===theme)?.definition} Percentual = gravações com escore ≥ 2 ÷ gravações classificadas × 100. Apenas células com pelo menos 300 classificadas. 2022 termina em 13 de março.</p><div className="table-wrap"><table><thead><tr><th>Mercado</th><th>Ano</th><th>Presença substancial</th><th>Classificadas</th><th>Repertório candidato</th></tr></thead><tbody>{annual.slice(0,80).map(row=><tr key={`${row.market_code}-${row.year}`}><td>{row.market_code}</td><td>{row.year}</td><td>{Number(row[theme+'_pct']).toFixed(1)}% <small>({row[theme+'_positive']})</small><div className="bar"><span style={{width:`${Number(row[theme+'_pct'])}%`}}/></div></td><td>{row.classified_tracks}</td><td>{row.chart_tracks}</td></tr>)}</tbody></table></div>{!annual.length&&<p>Nenhum agregado elegível neste recorte.</p>}{annual.length>80&&<p className="muted">Exibindo 80 células. Selecione mercado ou ano para restringir o recorte.</p>}</section><section className="panel"><h2>Fontes e cobertura do artigo</h2><p className="muted">Contagens por fonte não devem ser somadas: uma gravação pode aparecer em várias fontes.</p><div className="table-wrap"><table><thead><tr><th>Fonte</th><th>Família de parada</th><th>Gravações</th><th>Classificadas</th><th>Cobertura</th></tr></thead><tbody>{data.sources?.map((row,i)=><tr key={i}><td>{row.provider}</td><td>{row.chart_family}</td><td>{row.chart_tracks}</td><td>{row.classified_tracks}</td><td>{(100*Number(row.classified_tracks)/Number(row.chart_tracks)).toFixed(1)}%</td></tr>)}</tbody></table></div></section></>}
- {(mode==='exploration'||mode==='blind')&&<><div className="split"><section className="panel"><h2>Gravações</h2><p className="muted">{data?.total??0} neste recorte da amostra</p><p className="muted">O território indica circulação nas paradas, não nacionalidade. Com um território selecionado, os cartões mostram esse mercado; a ficha lista todos.</p>{data?.recordings?.map(item=><button className="track" disabled={loading} key={item.id} aria-pressed={selected===item.id} onClick={()=>{if(leave()){setDirty(false);setSelected(item.id);setMessage('');}}}><strong>{item.title}</strong><small>{item.artist}</small><small>{item.displayMarket??item.market}{item.selectionRank?` · posição ${item.selectionRank} no artigo`:''} · {item.language??'Idioma não informado'}{item.reviewStatus?' · Parecer registrado':''}</small></button>)}{data?.total===0&&<p>Nenhuma gravação encontrada. Ajuste os filtros.</p>}<div className="row"><button disabled={loading||page===1} onClick={()=>{if(leave()){setDirty(false);setPage(v=>v-1);setSelected('');setDetail(null);}}}>Anterior</button><small>Página {page}</small><button disabled={loading||page*20>=(data?.total??0)} onClick={()=>{if(leave()){setDirty(false);setPage(v=>v+1);setSelected('');setDetail(null);}}}>Próxima</button></div></section><section className="panel">{!track?<><h2>{selected?'Carregando gravação…':'Selecione uma gravação'}</h2><p className="muted">Consulte a identidade documental e a letra. No percurso de avaliação, registre seu próprio parecer antes de consultar a IA.</p></>:<><h2>{track.title}</h2><p className="muted">{track.artist} · {track.markets.join(', ')} · {track.genre??'Gênero não informado'}</p><details><summary>Identidade da letra e rastreabilidade</summary><dl><dt>Gravação</dt><dd>{track.id}</dd><dt>Documento</dt><dd>{track.documentId}</dd><dt>SHA-256 da letra</dt><dd>{track.lyricsHash}</dd><dt>Idioma registrado</dt><dd>{track.language??'Não informado'}</dd><dt>Anos disponíveis</dt><dd>{track.years.join(', ')||'Não informado'}</dd></dl>{mode==='exploration'&&<pre>{JSON.stringify(track.provenance,null,2)}</pre>}</details>{track.lyrics?<div className="lyrics" tabIndex={0} aria-label="Letra autorizada">{track.lyrics}</div>:<p className="notice">Letra autorizada indisponível nesta versão. Registre ausência ou abstenção; não atribua zero.</p>}
- {mode==='exploration'&&track.ai&&<><h3>Classificação da IA</h3><div className="table-wrap"><table><thead><tr><th>Tema</th><th>Intensidade</th></tr></thead><tbody>{dimensions.map(d=><tr key={d.code}><td>{d.label}<br/><small>{d.definition}</small></td><td>{track.ai?.[d.code]??'Não informado'}</td></tr>)}</tbody></table></div></>}
- {mode==='blind'&&detail?.review&&<section className="notice"><p>Gostaria de ver a classificação feita por IA e compará-la com seu parecer salvo?</p><button type="button" disabled={saving||dirty||!evaluator.trim()} onClick={revealAi}>{saving?'Consultando…':'Ver classificação feita por IA'}</button>{dirty&&<p>Salve suas alterações antes de comparar.</p>}<small>A consulta fica registrada. Revisões posteriores serão identificadas como realizadas após consultar a IA.</small></section>}
- {mode==='blind'&&detail?.comparison&&!dirty&&<AiComparison comparison={detail.comparison} dimensions={dimensions}/>}
- {mode==='blind'&&<form onSubmit={e=>{e.preventDefault();save();}}><h3 style={{marginTop:24}}>Seu parecer</h3><p className="muted">Rubrica {data?.state.rubricVersion}. 0 ausente · 1 incidental · 2 substancial · 3 central. Não confunda a voz narrativa com endosso.</p><label>Situação<select value={status} disabled={closed||saving} onChange={e=>{setStatus(e.target.value as ReviewStatus);setDirty(true);}}>{Object.entries(states).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label><div className="rubric"><label>Idioma confirmado<input value={recordedLanguage} disabled={closed||saving} onChange={e=>{setRecordedLanguage(e.target.value);setDirty(true);}} placeholder="Idioma(s), ou não identificado"/></label><label>Identidade da gravação<select value={identityVerdict} disabled={closed||saving} onChange={e=>{setIdentityVerdict(e.target.value);setDirty(true);}}><option value="">Não confirmada</option><option value="confirmed">Letra corresponde à gravação</option><option value="uncertain">Há dúvida</option><option value="mismatch">Letra não corresponde</option></select></label></div>{status==='scored'&&<div className="rubric">{dimensions.map(d=><label key={d.code}>{d.label}<small>{d.definition}</small><select required value={scores[d.code]??''} disabled={closed||saving} onChange={e=>{setScores(v=>({...v,[d.code]:e.target.value}));setDirty(true);}}><option value="">Selecionar intensidade</option>{['Ausente','Incidental','Substancial','Central'].map((label,i)=><option key={i} value={i}>{i} · {label}</option>)}</select></label>)}</div>}<label>Justificativa<textarea required maxLength={6000} disabled={closed||saving} value={justification} onChange={e=>{setJustification(e.target.value);setDirty(true);}} placeholder="Registre evidências, dúvidas e o motivo do parecer."/></label><div className="actions"><button className="primary" disabled={saving||closed||accessKey.length<32||!evaluator.trim()||!justification.trim()} type="submit">{saving?'Salvando…':closed?'Etapa encerrada':'Salvar parecer'}</button><small>{dirty?'Alterações ainda não salvas':detail?.review?'Parecer registrado; você pode revisar até encerrar.':'Nenhum parecer salvo para esta gravação.'}</small></div></form>}</>}</section></div></>}
- {mode==='exploration'&&data?.context&&<section className="panel"><h2>Indicadores e associações contextuais</h2><p className="muted">Associações de Spearman entre a participação temática e indicadores por mercado e ano. São comparações exploratórias entre agregados; não descrevem indivíduos nem demonstram causalidade. O tema acompanha a seleção nos resultados acima. ρ varia de −1 a +1; sinal positivo indica variação no mesmo sentido. Cobertura indica a fração do repertório candidato com classificação.</p><div className="table-wrap"><table><thead><tr><th>Indicador</th><th>Ano</th><th>Mercados</th><th>Correlação (ρ)</th><th>Cobertura mediana</th></tr></thead><tbody>{data.context.filter(r=>r.metric===theme&&(!filters.year||r.year===filters.year)).slice(0,80).map((r,i)=><tr key={i}><td>{indicators[r.context]??r.context}</td><td>{r.year}</td><td>{r.n}</td><td>{r.rho?Number(r.rho).toFixed(3):'Não estimada'}</td><td>{r.median_coverage?(100*Number(r.median_coverage)).toFixed(1)+'%':'Não informada'}</td></tr>)}</tbody></table></div></section>}
- {mode==='community'&&data&&<SharedReviews reviews={data.reviews??[]} recordings={data.recordings??[]} dimensions={dimensions}/>}
- {mode==='method'&&data&&<Method methodology={data.methodology}/>}
- {mode==='compare'&&!loading&&<section className="panel"><h2>Comparação humano–IA</h2>{!data?.state.closed?<p>Disponível após o encerramento das duas avaliações independentes.</p>:<><p className="muted">Divergências entre os dois pareceres e a IA. Esta comparação não substitui a adjudicação independente nem constitui padrão-ouro.</p><button onClick={async()=>{try{const value=await request(new URLSearchParams({mode:'export'}));download(value,'pareceres-e-divergencias.json');}catch(e){setError(e instanceof Error?e.message:'Falha ao exportar.');}}}>Exportar pareceres e divergências</button><div className="table-wrap"><table><thead><tr><th>Gravação</th><th>Dimensão</th><th>Avaliadora 1</th><th>Avaliadora 2</th><th>IA</th></tr></thead><tbody>{data.divergences?.slice(0,200).map((row,i)=><tr key={i}>{['recordingId','dimension','human1','human2','ai'].map(key=><td key={key}>{String(row[key]??'Sem escore')}</td>)}</tr>)}</tbody></table></div><p className="muted">Até 200 divergências exibidas. A exportação contém todas as revisões e divergências.</p></>}</section>}
- <footer>Pesquisa musical · Leitura por link direto. Edição protegida por chave privada do percurso. O endereço não é divulgado na navegação pública. Letras para leitura no contexto da pesquisa.</footer></main>;
+async function request(params:URLSearchParams, signal?:AbortSignal):Promise<Reply> {
+  const response = await fetch(`${api}?${params}`, { cache:'no-store', signal });
+  const value = await response.json();
+  if (!response.ok) throw new Error(value.error || 'Não foi possível carregar os pareceres.');
+  return value;
+}
+function download(value:unknown, filename:string) {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(value,null,2)], {type:'application/json'}));
+  const anchor = document.createElement('a'); anchor.href=url; anchor.download=filename; anchor.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+export default function ResearchPortal() {
+  const [mode,setMode] = useState<Mode>('blind');
+  const [reviewer,setReviewer] = useState<1|2>(1);
+  const [evaluator,setEvaluator] = useState('');
+  const [credential,setCredential] = useState({reviewer:1,key:''});
+  const accessKey = credential.reviewer===reviewer ? credential.key : '';
+  const [data,setData] = useState<Reply|null>(null);
+  const [detail,setDetail] = useState<Reply|null>(null);
+  const [selected,setSelected] = useState('');
+  const [error,setError] = useState('');
+  const [message,setMessage] = useState('');
+  const [loading,setLoading] = useState(true);
+  const [busy,setBusy] = useState<Action|null>(null);
+  const [revision,setRevision] = useState(0);
+  const [status,setStatus] = useState<ReviewStatus>('scored');
+  const [scores,setScores] = useState<Record<string,string>>({});
+  const [justification,setJustification] = useState('');
+  const [recordedLanguage,setRecordedLanguage] = useState('');
+  const [identityVerdict,setIdentityVerdict] = useState('');
+  const [reviewDirty,setReviewDirty] = useState(false);
+  const [reflection,setReflection] = useState('');
+  const [reflectionDirty,setReflectionDirty] = useState(false);
+  const [confirmClose,setConfirmClose] = useState(false);
+  const dirty = reviewDirty || reflectionDirty;
+  const closed = data?.state.closedReviewers.includes(reviewer) ?? false;
+  const dimensions = data?.dimensions ?? [];
+  const track = detail?.recording;
+  const review = detail?.review;
+
+  function leave() { return !busy && (!dirty || window.confirm('Há alterações não salvas. Deseja sair desta música?')); }
+  function clearSelection() {
+    setSelected(''); setDetail(null); setReviewDirty(false); setReflectionDirty(false);
+    setError(''); setMessage(''); setConfirmClose(false);
+  }
+  function changeMode(next:Mode) { if(next===mode)return; if(leave()) { clearSelection(); setData(null); setMode(next); } }
+  function identify(value:string) { setEvaluator(value); try { localStorage.setItem('research-evaluator',value); } catch {} }
+  function updateKey(value:string) { setCredential({reviewer,key:value}); try { localStorage.setItem(`research-access-key-${reviewer}`,value); } catch {} }
+
+  useEffect(()=>{
+    try {
+      setEvaluator(localStorage.getItem('research-evaluator') ?? '');
+      const stored=localStorage.getItem('research-reviewer');
+      if(stored==='1'||stored==='2') setReviewer(Number(stored) as 1|2);
+    } catch {}
+  },[]);
+  useEffect(()=>{
+    let key='';
+    try { key=localStorage.getItem(`research-access-key-${reviewer}`) ?? ''; } catch {}
+    if(!key) {
+      key=crypto.randomUUID()+crypto.randomUUID();
+      try { localStorage.setItem(`research-access-key-${reviewer}`,key); } catch {
+        setError('Este navegador não guardou sua chave de edição. Baixe uma cópia em Acesso e cópia dos pareceres.');
+      }
+    }
+    setCredential({reviewer,key});
+  },[reviewer]);
+  useEffect(()=>{
+    const controller=new AbortController(); setLoading(true); setError('');
+    request(new URLSearchParams({mode,reviewer:String(reviewer),pageSize:'100'}),controller.signal)
+      .then(setData).catch(e=>{if(e.name!=='AbortError')setError(e.message);})
+      .finally(()=>{if(!controller.signal.aborted)setLoading(false);});
+    return ()=>controller.abort();
+  },[mode,reviewer,revision]);
+  useEffect(()=>{
+    if(!selected)return;
+    const controller=new AbortController(); setDetail(null); setError('');
+    request(new URLSearchParams({mode:'blind',reviewer:String(reviewer),id:selected}),controller.signal)
+      .then(value=>{
+        setDetail(value); const saved=value.review;
+        setStatus(saved?.status??'scored');
+        setScores(Object.fromEntries(Object.entries(saved?.scores??{}).map(([key,value])=>[key,value===null?'':String(value)])));
+        setJustification(saved?.justification??''); setRecordedLanguage(saved?.recordedLanguage??'');
+        setIdentityVerdict(saved?.identityVerdict??''); setReflection(value.reflection?.reflection??'');
+        setReviewDirty(false); setReflectionDirty(false);
+      }).catch(e=>{if(e.name!=='AbortError')setError(e.message);});
+    return ()=>controller.abort();
+  },[selected,reviewer,revision]);
+  useEffect(()=>{
+    function unload(event:BeforeUnloadEvent) { if(dirty)event.preventDefault(); }
+    window.addEventListener('beforeunload',unload); return ()=>window.removeEventListener('beforeunload',unload);
+  },[dirty]);
+  useEffect(()=>{
+    if(mode!=='community')return;
+    const timer=setInterval(()=>{if(document.visibilityState==='visible')setRevision(v=>v+1);},15000);
+    return ()=>clearInterval(timer);
+  },[mode]);
+
+  async function act(action:Exclude<Action,'export'>) {
+    if(busy)return;
+    if((action==='reveal'&&dirty)||(action==='reflect'&&reviewDirty)||(action==='save'&&reflectionDirty))return;
+    setBusy(action); setError(''); setMessage('');
+    try {
+      const body:Record<string,unknown>={action,reviewer,evaluator,accessKey,recordingId:selected};
+      if(action==='save') Object.assign(body,{status,scores:status==='scored'?Object.fromEntries(Object.entries(scores).map(([key,value])=>[key,value===''?null:Number(value)])):{},justification,recordedLanguage,identityVerdict:identityVerdict||null});
+      if(action==='reflect') Object.assign(body,{reviewId:review?.id,reflection});
+      const response=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      const result=await response.json();
+      if(!response.ok)throw new Error(result.error||'Não foi possível salvar. Seu texto continua no formulário.');
+      if(action==='reveal')setDetail(current=>current?{...current,comparison:result}:current);
+      if(action==='reflect') {
+        setDetail(current=>current?{...current,reflection:result.reflection}:current);
+        setReflectionDirty(false); setMessage('Ponderação salva e disponível em Pareceres salvos.');
+      }
+      if(action==='save'||action==='close') {
+        setReviewDirty(false); setConfirmClose(false); setRevision(v=>v+1);
+        setMessage(action==='save'?'Parecer salvo. Se desejar, consulte agora a análise da IA.':'Etapa de avaliação encerrada. Você ainda pode registrar ponderações sobre a IA.');
+      }
+    } catch(e) { setError(e instanceof Error?e.message:'Falha ao salvar. Seu texto continua no formulário.'); }
+    finally { setBusy(null); }
+  }
+  async function exportReviews() {
+    if(busy||dirty)return; setBusy('export'); setError('');
+    try {
+      const response=await fetch(`${api}?mode=review-export&reviewer=${reviewer}`,{cache:'no-store'});
+      const result=await response.json(); if(!response.ok)throw new Error(result.error||'Não foi possível baixar os pareceres.');
+      download(result,`pareceres-avaliadora-${reviewer}.json`);
+    } catch(e) { setError(e instanceof Error?e.message:'Falha ao baixar os pareceres.'); }
+    finally {setBusy(null);}
+  }
+
+  return <main className="research">
+    <header><div><p className="eyebrow">Goosley · Pesquisa musical</p><h1>Avalie as músicas.</h1><p className="muted">Registre seu fundamento, consulte a IA e pondere sobre as diferenças.</p></div></header>
+    <nav aria-label="Avaliação musical">{([['blind','Avaliar músicas'],['community','Pareceres salvos']] as const).map(([id,label])=><button key={id} disabled={!!busy} aria-current={mode===id?'page':undefined} onClick={()=>changeMode(id)}>{label}</button>)}</nav>
+    {error&&<div className="notice error" role="alert">{error} <button disabled={dirty||!!busy} onClick={()=>setRevision(v=>v+1)}>Tentar novamente</button></div>}
+    {message&&<p className="notice" role="status">{message}</p>}
+    {loading&&<p role="status">Carregando músicas e pareceres…</p>}
+
+    {mode==='blind'&&<>
+      <section className="panel" aria-label="Sua identificação">
+        <div className="row"><h2>Sua avaliação</h2><span className="badge">{data?.completed??0} de {data?.state.assigned??'…'} músicas avaliadas</span></div>
+        <div className="identity-fields">
+          <label>Seu nome<input value={evaluator} disabled={!!busy} maxLength={160} onChange={e=>identify(e.target.value)} placeholder="Nome completo" autoComplete="name"/></label>
+          <label>Avaliadora<select value={reviewer} disabled={!!busy} onChange={e=>{if(leave()){clearSelection();setData(null);setReviewer(Number(e.target.value) as 1|2);try{localStorage.setItem('research-reviewer',e.target.value);}catch{}}}}><option value={1}>Avaliadora 1</option><option value={2}>Avaliadora 2</option></select></label>
+        </div>
+        <p className="muted">Use sempre o mesmo nome e número. Seu parecer e sua ponderação ficam visíveis em Pareceres salvos.</p>
+        <details><summary>Acesso e cópia dos pareceres</summary>
+          <p>A chave privada de edição fica neste navegador. Baixe uma cópia para continuar em outro dispositivo e guarde-a só com você. Perder a chave não apaga os pareceres salvos.</p>
+          <label>Chave privada da avaliadora<input type="password" value={accessKey} disabled={!!busy} autoComplete="off" onChange={e=>updateKey(e.target.value)}/></label>
+          <div className="actions"><button disabled={!!busy||accessKey.length<32} onClick={()=>download({reviewer,accessKey},`chave-privada-avaliadora-${reviewer}.json`)}>Baixar chave privada</button><button disabled={!!busy||dirty} onClick={exportReviews}>Baixar pareceres e ponderações</button></div>
+          <details><summary>Encerrar minha etapa de avaliação</summary><p>Encerre após avaliar todas as músicas. Os escores e fundamentos ficam bloqueados; ponderações sobre a IA continuam disponíveis.</p><label className="confirmation"><input type="checkbox" checked={confirmClose} disabled={!!busy} onChange={e=>setConfirmClose(e.target.checked)}/> Concluí minha avaliação de todas as músicas.</label><button disabled={!confirmClose||!!busy||closed||dirty||!evaluator.trim()||accessKey.length<32||data?.completed!==data?.state.assigned} onClick={()=>act('close')}>Encerrar avaliação</button></details>
+        </details>
+      </section>
+      <div className="split">
+        <section className="panel"><h2>Músicas para avaliar</h2>
+          {data?.recordings?.map(item=><button className="track" key={item.id} disabled={loading||!!busy} aria-pressed={selected===item.id} onClick={()=>{if(selected===item.id)return;if(leave()){clearSelection();setSelected(item.id);}}}><strong>{item.title}</strong><small>{item.artist}</small><small>{marketNames[item.displayMarket??item.market]??item.market}{item.reviewStatus?' · Parecer salvo':''}</small></button>)}
+          {!loading&&!error&&!data?.recordings?.length&&<p>Nenhuma música disponível para avaliação.</p>}
+        </section>
+        <section className="panel" aria-label="Música e avaliação">
+          {!track?<><h2>{selected?'Carregando música…':'Escolha uma música'}</h2><p className="muted">Leia a letra e registre seu parecer. Depois de salvar, você pode consultar a IA e comentar as diferenças.</p></>:<>
+            <h2>{track.title}</h2><p className="muted">{track.artist}</p>
+            {track.lyrics?<details open><summary>Letra da música</summary><div className="lyrics" tabIndex={0} aria-label="Letra da música">{track.lyrics}</div></details>:<p className="notice">A letra autorizada está indisponível. Registre ausência de letra ou abstenção; não atribua zero para representar essa ausência.</p>}
+            {review&&<section className="saved-basis"><h3>Seu fundamento salvo</h3><p className="review-text">{review.justification}</p><small>{closed?'Avaliação encerrada. Os escores e este fundamento estão preservados.':'Seu fundamento original fica preservado ao registrar a ponderação sobre a IA.'}</small></section>}
+            <details key={review?.id??selected} open={!review} className="review-editor"><summary>{review?'Ver escores e revisar seu parecer':'Seu parecer'}</summary>
+              <form onSubmit={e=>{e.preventDefault();act('save');}}>
+                <p className="muted">Escala: 0 ausente · 1 incidental · 2 substancial · 3 central. Considere o contexto da letra e diferencie representação de endosso.</p>
+                <label>Situação<select value={status} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setStatus(e.target.value as ReviewStatus);setReviewDirty(true);}}>{Object.entries(reviewStatuses).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+                {status==='scored'&&<div className="rubric">{dimensions.map(d=><label key={d.code}>{d.label}<small>{d.definition}</small><select required value={scores[d.code]??''} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setScores(v=>({...v,[d.code]:e.target.value}));setReviewDirty(true);}}><option value="">Selecionar intensidade</option>{['Ausente','Incidental','Substancial','Central'].map((label,i)=><option key={i} value={i}>{i} · {label}</option>)}</select></label>)}</div>}
+                <label>Seu fundamento<textarea required maxLength={6000} disabled={closed||!!busy||reflectionDirty} value={justification} onChange={e=>{setJustification(e.target.value);setReviewDirty(true);}} placeholder="Explique sua interpretação e as evidências da letra que sustentam os escores."/></label>
+                <details><summary>Idioma e identificação da letra (opcional)</summary><div className="identity-fields"><label>Idioma observado<input value={recordedLanguage} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setRecordedLanguage(e.target.value);setReviewDirty(true);}}/></label><label>Correspondência da letra<select value={identityVerdict} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setIdentityVerdict(e.target.value);setReviewDirty(true);}}><option value="">Não confirmada</option><option value="confirmed">Corresponde à música</option><option value="uncertain">Há dúvida</option><option value="mismatch">Não corresponde à música</option></select></label></div></details>
+                <div className="actions"><button className="primary" disabled={!!busy||closed||reflectionDirty||accessKey.length<32||!evaluator.trim()||!justification.trim()} type="submit">{busy==='save'?'Salvando…':closed?'Avaliação encerrada':'Salvar meu parecer'}</button><small>{reviewDirty?'Há alterações não salvas.':review?'Parecer salvo no servidor.':'Salve antes de consultar a IA.'}</small></div>
+              </form>
+            </details>
+            {review&&!detail?.comparison&&<section className="ai-invitation"><h3>Análise da IA</h3><p>Gostaria de ver a classificação feita por IA e compará-la com seu parecer?</p><button disabled={!!busy||dirty||!evaluator.trim()||accessKey.length<32} onClick={()=>act('reveal')}>{busy==='reveal'?'Consultando…':'Ver análise da IA'}</button>{reviewDirty&&<p>Salve as alterações do seu parecer antes de comparar.</p>}</section>}
+            {reviewDirty&&detail?.comparison&&<p className="notice">Salve as alterações do seu parecer para atualizar a comparação com a IA.</p>}
+            {detail?.comparison&&!reviewDirty&&<>
+              <AiComparison comparison={detail.comparison} dimensions={dimensions}/>
+              <form className="reflection-form" onSubmit={e=>{e.preventDefault();act('reflect');}}>
+                <h3>Sua ponderação sobre as diferenças</h3>
+                <label>Como seu fundamento se compara à análise da IA?<textarea required maxLength={6000} value={reflection} disabled={!!busy} onChange={e=>{setReflection(e.target.value);setReflectionDirty(true);}} placeholder="Explique onde concorda ou discorda, o contexto que sustenta sua leitura e o que pode explicar as diferenças de escores."/></label>
+                <p className="muted">A ponderação é salva separadamente do seu parecer e também fica visível em Pareceres salvos.</p>
+                <div className="actions"><button className="primary" disabled={!!busy||!reflection.trim()||!evaluator.trim()||accessKey.length<32} type="submit">{busy==='reflect'?'Salvando…':'Salvar ponderação'}</button><small>{reflectionDirty?'Ponderação ainda não salva.':detail.reflection?'Ponderação salva no servidor.':'Você pode ponderar mesmo quando os escores coincidem.'}</small></div>
+              </form>
+            </>}
+          </>}
+        </section>
+      </div>
+    </>}
+    {mode==='community'&&data&&<SharedReviews reviews={data.reviews??[]} recordings={data.recordings??[]} dimensions={dimensions}/>}
+    <footer>Pesquisa musical · O país de cada música indica circulação nas paradas, não a nacionalidade do artista. Pareceres e ponderações salvos ficam no servidor; a edição exige sua chave privada.</footer>
+  </main>;
 }

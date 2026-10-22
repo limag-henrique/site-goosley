@@ -28,3 +28,30 @@ A leitura segue pública e não exige conta. O portal gera uma chave aleatória 
 Registros legados sem chave permanecem legíveis e exportáveis, mas novas escritas nesse percurso falham explicitamente até a coordenação vincular uma credencial por procedimento administrativo. Não reclamar propriedade de dados antigos com base apenas no nome público. Verificar essa situação antes da publicação. Esta decisão substitui a edição apenas por nome do fluxo anterior.
 
 Novos eventos do piloto registram também o fingerprint do manifesto da seleção, separado do fingerprint histórico do corpus. Mudanças na seleção após o primeiro registro bloqueiam a campanha; a adoção inicial do piloto preserva eventos legados e não modifica seu hash original.
+
+
+## Fluxo simplificado das avaliadoras — 22/10/2026
+
+Decisão do responsável: retirar os blocos Resultados por tema e período e Fontes e cobertura do artigo e manter somente o necessário para avaliar músicas e ler a classificação da IA.
+
+Aceite do fluxo atual:
+- Entrada direta em Avaliar músicas, com apenas duas abas: Avaliar músicas e Pareceres salvos.
+- Removidos da interface os agregados, fontes/cobertura, associações contextuais, método geral, comparação global e filtros de exploração. Os dados históricos do artigo não são apagados nem alterados no backend.
+- Mantidas as mesmas 12 músicas e a rubrica existente. Identificação, progresso e acesso ficam concentrados; chave, download e encerramento ficam em um painel recolhido.
+- Por música: letra, fundamento/escores da avaliadora, consulta opcional à IA após salvar, comparação por dimensão e prompt histórico disponível.
+- Após consultar a IA, campo próprio para ponderar sobre concordâncias, divergências, contexto e fundamento pessoal.
+- A ponderação é um evento append-only separado, vinculado ao ID do parecer comparado. Não altera escores nem justificativa inicial, pode ser salva após o encerramento e exige a mesma chave privada.
+- O detalhe recupera a ponderação após recarregar e a lista pública mostra a ponderação vinculada ao parecer atual. Revisões anteriores continuam no histórico exportado.
+- A classificação histórica contém escores e não inclui uma justificativa textual preservada da IA; a interface informa essa limitação sem gerar uma explicação nova.
+
+Verificação: serviço do portal (salvar/consultar IA/ponderar/compartilhar/exportar), reabertura do adaptador real de disco e fluxo no navegador, incluindo refresh, erros e largura de celular. Nenhuma mudança de corpus, branch, commits ou publicação é necessária para este escopo.
+
+
+### Evidências da simplificação
+
+- 17 testes do portal passaram, incluindo ponderação separada, encerramento, rejeição de comparação desatualizada, leitura pública/exportação e recuperação com o adaptador real de disco.
+- Typecheck passou. Suíte geral: 46 testes passaram e seis falhas preexistentes em rotas faciais desativadas (HTTP 410), fora deste escopo.
+- Navegador local com dados técnicos isolados: entrada direta em avaliação, duas abas, consulta opcional à IA, ponderação salva, refresh com recuperação do texto e fundamento preservado, ponderação visível na lista compartilhada.
+- A revisão encontrou e corrigiu cliques repetidos na aba e música ativas. Uma segunda inspeção confirmou os retornos antecipados e não encontrou pendências. Nova interação no navegador ficou indisponível porque o controle local foi desativado nas configurações do Work; não houve tentativa de contornar essa configuração.
+- HTTP local retornou 200 com os títulos Avaliar músicas e Pareceres salvos, sem Resultados por tema e período, Fontes e cobertura do artigo ou Indicadores e associações contextuais.
+- Graphify atualizado. Nenhum commit, troca de branch, modificação do corpus original ou escrita no banco de produção.

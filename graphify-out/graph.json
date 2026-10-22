@@ -2188,8 +2188,8 @@
       "source_location": "",
       "_origin": "ast",
       "id": "criminalidadefacial_service_face_profile_ml_experiment_specs_py_any",
-      "community": 2,
-      "community_name": "experiment_runner.py",
+      "community": 4,
+      "community_name": "ArtifactBundle",
       "norm_label": "any"
     },
     {
@@ -5362,7 +5362,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "package",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "package.json"
     },
@@ -5373,7 +5373,7 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "package_name",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "name"
     },
@@ -5384,7 +5384,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "package_version",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "version"
     },
@@ -5395,7 +5395,7 @@
       "source_location": "L4",
       "_origin": "ast",
       "id": "package_private",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "private"
     },
@@ -5406,7 +5406,7 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "package_scripts",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "scripts"
     },
@@ -5417,7 +5417,7 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "package_scripts_build",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "build"
     },
@@ -5428,7 +5428,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "package_scripts_build_next",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "build:next"
     },
@@ -5439,7 +5439,7 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "package_scripts_dev",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "dev"
     },
@@ -5450,7 +5450,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "package_scripts_start",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "start"
     },
@@ -5461,7 +5461,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "package_scripts_lint",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "lint"
     },
@@ -5472,7 +5472,7 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "package_scripts_generate_people",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "generate:people"
     },
@@ -5483,7 +5483,7 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "package_scripts_prebuild",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "prebuild"
     },
@@ -5494,7 +5494,7 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "package_scripts_prebuild_next",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "prebuild:next"
     },
@@ -5505,7 +5505,7 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "package_scripts_pretest",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "pretest"
     },
@@ -5516,7 +5516,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "package_scripts_test",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "test"
     },
@@ -5527,7 +5527,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "package_scripts_typecheck",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "typecheck"
     },
@@ -5538,7 +5538,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "package_scripts_preview",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "preview"
     },
@@ -5549,7 +5549,7 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "package_scripts_deploy",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "deploy"
     },
@@ -5560,7 +5560,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "package_scripts_upload",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "upload"
     },
@@ -5571,7 +5571,7 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "package_scripts_cf_typegen",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "cf-typegen"
     },
@@ -5582,7 +5582,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "package_scripts_facial_worker_test",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "facial:worker:test"
     },
@@ -5593,7 +5593,7 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "package_scripts_facial_worker_typecheck",
-      "community": 5,
+      "community": 10,
       "community_name": "scripts",
       "norm_label": "facial:worker:typecheck"
     },
@@ -5605,7 +5605,7 @@
       "_origin": "ast",
       "id": "package_dependencies",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "dependencies"
     },
     {
@@ -5616,7 +5616,7 @@
       "_origin": "ast",
       "id": "package_dependencies_opennextjs_cloudflare",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "@opennextjs/cloudflare"
     },
     {
@@ -5627,7 +5627,7 @@
       "_origin": "ast",
       "id": "opennextjs_cloudflare",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "@opennextjs/cloudflare"
     },
     {
@@ -5638,7 +5638,7 @@
       "_origin": "ast",
       "id": "package_dependencies_clsx",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "clsx"
     },
     {
@@ -5649,7 +5649,7 @@
       "_origin": "ast",
       "id": "clsx",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "clsx"
     },
     {
@@ -5660,7 +5660,7 @@
       "_origin": "ast",
       "id": "package_dependencies_compression",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "compression"
     },
     {
@@ -5671,7 +5671,7 @@
       "_origin": "ast",
       "id": "compression",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "compression"
     },
     {
@@ -5682,7 +5682,7 @@
       "_origin": "ast",
       "id": "package_dependencies_framer_motion",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "framer-motion"
     },
     {
@@ -5693,7 +5693,7 @@
       "_origin": "ast",
       "id": "framer_motion",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "framer-motion"
     },
     {
@@ -5726,7 +5726,7 @@
       "_origin": "ast",
       "id": "package_dependencies_lucide_react",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "lucide-react"
     },
     {
@@ -5737,7 +5737,7 @@
       "_origin": "ast",
       "id": "lucide_react",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "lucide-react"
     },
     {
@@ -5748,7 +5748,7 @@
       "_origin": "ast",
       "id": "package_dependencies_next",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "next"
     },
     {
@@ -5759,7 +5759,7 @@
       "_origin": "ast",
       "id": "next",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "next"
     },
     {
@@ -5770,7 +5770,7 @@
       "_origin": "ast",
       "id": "package_dependencies_nodemailer",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "nodemailer"
     },
     {
@@ -5781,7 +5781,7 @@
       "_origin": "ast",
       "id": "nodemailer",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "nodemailer"
     },
     {
@@ -5792,7 +5792,7 @@
       "_origin": "ast",
       "id": "package_dependencies_react",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "react"
     },
     {
@@ -5803,7 +5803,7 @@
       "_origin": "ast",
       "id": "react",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "react"
     },
     {
@@ -5814,7 +5814,7 @@
       "_origin": "ast",
       "id": "package_dependencies_react_dom",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "react-dom"
     },
     {
@@ -5825,7 +5825,7 @@
       "_origin": "ast",
       "id": "react_dom",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "react-dom"
     },
     {
@@ -5836,7 +5836,7 @@
       "_origin": "ast",
       "id": "package_dependencies_tailwind_merge",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "tailwind-merge"
     },
     {
@@ -5847,7 +5847,7 @@
       "_origin": "ast",
       "id": "tailwind_merge",
       "community": 5,
-      "community_name": "scripts",
+      "community_name": "dependencies",
       "norm_label": "tailwind-merge"
     },
     {
@@ -5858,7 +5858,7 @@
       "_origin": "ast",
       "id": "package_devdependencies",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "devdependencies"
     },
     {
@@ -5869,7 +5869,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_emnapi_core",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@emnapi/core"
     },
     {
@@ -5880,7 +5880,7 @@
       "_origin": "ast",
       "id": "emnapi_core",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@emnapi/core"
     },
     {
@@ -5891,7 +5891,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_emnapi_runtime",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@emnapi/runtime"
     },
     {
@@ -5902,7 +5902,7 @@
       "_origin": "ast",
       "id": "emnapi_runtime",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@emnapi/runtime"
     },
     {
@@ -5913,7 +5913,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_tailwindcss_postcss",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@tailwindcss/postcss"
     },
     {
@@ -5924,7 +5924,7 @@
       "_origin": "ast",
       "id": "tailwindcss_postcss",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@tailwindcss/postcss"
     },
     {
@@ -5935,7 +5935,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_types_node",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/node"
     },
     {
@@ -5946,7 +5946,7 @@
       "_origin": "ast",
       "id": "package_json_types_node",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/node"
     },
     {
@@ -5957,7 +5957,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_types_nodemailer",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/nodemailer"
     },
     {
@@ -5968,7 +5968,7 @@
       "_origin": "ast",
       "id": "types_nodemailer",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/nodemailer"
     },
     {
@@ -5979,7 +5979,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_types_react",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/react"
     },
     {
@@ -5990,7 +5990,7 @@
       "_origin": "ast",
       "id": "types_react",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/react"
     },
     {
@@ -6001,7 +6001,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_types_react_dom",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/react-dom"
     },
     {
@@ -6012,7 +6012,7 @@
       "_origin": "ast",
       "id": "types_react_dom",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "@types/react-dom"
     },
     {
@@ -6023,7 +6023,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_eslint",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "eslint"
     },
     {
@@ -6034,7 +6034,7 @@
       "_origin": "ast",
       "id": "eslint",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "eslint"
     },
     {
@@ -6045,7 +6045,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_eslint_config_next",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "eslint-config-next"
     },
     {
@@ -6056,7 +6056,7 @@
       "_origin": "ast",
       "id": "eslint_config_next",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "eslint-config-next"
     },
     {
@@ -6067,7 +6067,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_tailwindcss",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "tailwindcss"
     },
     {
@@ -6078,7 +6078,7 @@
       "_origin": "ast",
       "id": "tailwindcss",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "tailwindcss"
     },
     {
@@ -6089,7 +6089,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_tsx",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "tsx"
     },
     {
@@ -6100,7 +6100,7 @@
       "_origin": "ast",
       "id": "package_json_tsx",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "tsx"
     },
     {
@@ -6111,7 +6111,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_typescript",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "typescript"
     },
     {
@@ -6122,7 +6122,7 @@
       "_origin": "ast",
       "id": "package_json_typescript",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "typescript"
     },
     {
@@ -6133,7 +6133,7 @@
       "_origin": "ast",
       "id": "package_devdependencies_wrangler",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "wrangler"
     },
     {
@@ -6144,7 +6144,7 @@
       "_origin": "ast",
       "id": "package_json_wrangler",
       "community": 10,
-      "community_name": "devDependencies",
+      "community_name": "scripts",
       "norm_label": "wrangler"
     },
     {
@@ -7176,23 +7176,10 @@
       "norm_label": "portal.tsx"
     },
     {
-      "label": "Mode",
-      "file_type": "code",
-      "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L8",
-      "_callable": true,
-      "_callable_class": true,
-      "_origin": "ast",
-      "id": "src_app_pesquisa_musical_portal_mode",
-      "community": 11,
-      "community_name": "lib/research-portal.ts",
-      "norm_label": "mode"
-    },
-    {
       "label": "Track",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L9",
+      "source_location": "L8",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
@@ -7205,7 +7192,7 @@
       "label": "Reply",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L10",
+      "source_location": "L9",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
@@ -7215,32 +7202,47 @@
       "norm_label": "reply"
     },
     {
-      "label": "states",
+      "label": "Mode",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L11",
+      "source_location": "L14",
+      "_callable": true,
+      "_callable_class": true,
       "_origin": "ast",
-      "id": "src_app_pesquisa_musical_portal_states",
+      "id": "src_app_pesquisa_musical_portal_mode",
       "community": 11,
       "community_name": "lib/research-portal.ts",
-      "norm_label": "states"
+      "norm_label": "mode"
     },
     {
-      "label": "indicators",
+      "label": "Action",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L13",
+      "source_location": "L15",
+      "_callable": true,
+      "_callable_class": true,
       "_origin": "ast",
-      "id": "src_app_pesquisa_musical_portal_indicators",
+      "id": "src_app_pesquisa_musical_portal_action",
       "community": 11,
       "community_name": "lib/research-portal.ts",
-      "norm_label": "indicators"
+      "norm_label": "action"
+    },
+    {
+      "label": "marketNames",
+      "file_type": "code",
+      "source_file": "src/app/pesquisa-musical/portal.tsx",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_app_pesquisa_musical_portal_marketnames",
+      "community": 11,
+      "community_name": "lib/research-portal.ts",
+      "norm_label": "marketnames"
     },
     {
       "label": "request()",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L14",
+      "source_location": "L19",
       "_callable": true,
       "_origin": "ast",
       "id": "src_app_pesquisa_musical_portal_request",
@@ -7252,7 +7254,7 @@
       "label": "download()",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L15",
+      "source_location": "L25",
       "_callable": true,
       "_origin": "ast",
       "id": "src_app_pesquisa_musical_portal_download",
@@ -7261,22 +7263,10 @@
       "norm_label": "download()"
     },
     {
-      "label": "Method()",
-      "file_type": "code",
-      "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L16",
-      "_callable": true,
-      "_origin": "ast",
-      "id": "src_app_pesquisa_musical_portal_method",
-      "community": 11,
-      "community_name": "lib/research-portal.ts",
-      "norm_label": "method()"
-    },
-    {
       "label": "ResearchPortal()",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L18",
+      "source_location": "L31",
       "_callable": true,
       "_origin": "ast",
       "id": "src_app_pesquisa_musical_portal_researchportal",
@@ -7296,10 +7286,21 @@
       "norm_label": "review-results.tsx"
     },
     {
-      "label": "Comparison",
+      "label": "reviewStatuses",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/review-results.tsx",
       "source_location": "L3",
+      "_origin": "ast",
+      "id": "src_app_pesquisa_musical_review_results_reviewstatuses",
+      "community": 11,
+      "community_name": "lib/research-portal.ts",
+      "norm_label": "reviewstatuses"
+    },
+    {
+      "label": "Comparison",
+      "file_type": "code",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L6",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
@@ -7309,10 +7310,46 @@
       "norm_label": "comparison"
     },
     {
+      "label": "SharedReview",
+      "file_type": "code",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L11",
+      "_callable": true,
+      "_callable_class": true,
+      "_origin": "ast",
+      "id": "src_app_pesquisa_musical_review_results_sharedreview",
+      "community": 11,
+      "community_name": "lib/research-portal.ts",
+      "norm_label": "sharedreview"
+    },
+    {
+      "label": "intensity",
+      "file_type": "code",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "src_app_pesquisa_musical_review_results_intensity",
+      "community": 11,
+      "community_name": "lib/research-portal.ts",
+      "norm_label": "intensity"
+    },
+    {
+      "label": "scoreLabel()",
+      "file_type": "code",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L13",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_pesquisa_musical_review_results_scorelabel",
+      "community": 11,
+      "community_name": "lib/research-portal.ts",
+      "norm_label": "scorelabel()"
+    },
+    {
       "label": "AiComparison()",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/review-results.tsx",
-      "source_location": "L4",
+      "source_location": "L15",
       "_callable": true,
       "_origin": "ast",
       "id": "src_app_pesquisa_musical_review_results_aicomparison",
@@ -7324,7 +7361,7 @@
       "label": "SharedReviews()",
       "file_type": "code",
       "source_file": "src/app/pesquisa-musical/review-results.tsx",
-      "source_location": "L7",
+      "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
       "id": "src_app_pesquisa_musical_review_results_sharedreviews",
@@ -7772,8 +7809,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_components_criminalidadefacialexperience_criminalidadefacialdeactivated",
-      "community": 15,
-      "community_name": "CriminalidadeFacialExperience.tsx",
+      "community": 27,
+      "community_name": "criminalidadefacial-profile.ts",
       "norm_label": "criminalidadefacialdeactivated()"
     },
     {
@@ -8412,8 +8449,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_lib_criminalidadefacial_profile_personprofileresult",
-      "community": 15,
-      "community_name": "CriminalidadeFacialExperience.tsx",
+      "community": 27,
+      "community_name": "criminalidadefacial-profile.ts",
       "norm_label": "personprofileresult"
     },
     {
@@ -9224,10 +9261,22 @@
       "norm_label": "latest()"
     },
     {
-      "label": "PilotSelection",
+      "label": "reflectionFor()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
       "source_location": "L17",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_lib_research_portal_reflectionfor",
+      "community": 11,
+      "community_name": "lib/research-portal.ts",
+      "norm_label": "reflectionfor()"
+    },
+    {
+      "label": "PilotSelection",
+      "file_type": "code",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L19",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
@@ -9240,7 +9289,7 @@
       "label": "PortalService",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L20",
+      "source_location": "L22",
       "_callable": true,
       "_callable_class": true,
       "_origin": "ast",
@@ -9253,7 +9302,7 @@
       "label": ".constructor()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L22",
+      "source_location": "L24",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_constructor",
@@ -9265,7 +9314,7 @@
       "label": ".assigned()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L25",
+      "source_location": "L27",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_assigned",
@@ -9277,7 +9326,7 @@
       "label": ".completed()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L26",
+      "source_location": "L28",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_completed",
@@ -9289,7 +9338,7 @@
       "label": ".comparison()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L27",
+      "source_location": "L29",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_comparison",
@@ -9301,7 +9350,7 @@
       "label": ".lyric()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L28",
+      "source_location": "L30",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_lyric",
@@ -9313,7 +9362,7 @@
       "label": ".rubricVersion()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L29",
+      "source_location": "L31",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_rubricversion",
@@ -9325,7 +9374,7 @@
       "label": ".digest()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L30",
+      "source_location": "L32",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_digest",
@@ -9337,7 +9386,7 @@
       "label": ".assignmentFingerprint()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L31",
+      "source_location": "L33",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_assignmentfingerprint",
@@ -9349,7 +9398,7 @@
       "label": ".fingerprint()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_fingerprint",
@@ -9361,7 +9410,7 @@
       "label": ".state()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L33",
+      "source_location": "L35",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_state",
@@ -9373,7 +9422,7 @@
       "label": ".read()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L34",
+      "source_location": "L36",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_read",
@@ -9385,7 +9434,7 @@
       "label": ".write()",
       "file_type": "code",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L82",
+      "source_location": "L84",
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_research_portal_portalservice_write",
@@ -10651,6 +10700,17 @@
       "norm_label": "chave privada de edicao e congelamento do piloto"
     },
     {
+      "label": "Fluxo simplificado das avaliadoras \u2014 22/10/2026",
+      "file_type": "document",
+      "source_file": "docs/research-pilot.md",
+      "source_location": "L33",
+      "_origin": "ast",
+      "id": "docs_research_pilot_fluxo_simplificado_das_avaliadoras_22_10_2026",
+      "community": 13,
+      "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
+      "norm_label": "fluxo simplificado das avaliadoras \u2014 22/10/2026"
+    },
+    {
       "label": "research-portal-api.md",
       "file_type": "document",
       "source_file": "docs/research-portal-api.md",
@@ -10715,6 +10775,17 @@
       "community": 13,
       "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
       "norm_label": "contrato atual do piloto"
+    },
+    {
+      "label": "Pondera\u00e7\u00e3o sobre a IA",
+      "file_type": "document",
+      "source_file": "docs/research-portal-api.md",
+      "source_location": "L72",
+      "_origin": "ast",
+      "id": "docs_research_portal_api_pondera\u00e7\u00e3o_sobre_a_ia",
+      "community": 13,
+      "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
+      "norm_label": "ponderacao sobre a ia"
     },
     {
       "label": "research-portal-operations.md",
@@ -10792,6 +10863,17 @@
       "community": 13,
       "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
       "norm_label": "chave privada de edicao e congelamento do piloto"
+    },
+    {
+      "label": "Verifica\u00e7\u00e3o do piloto \u2014 22/10/2026",
+      "file_type": "document",
+      "source_file": "docs/research-portal-operations.md",
+      "source_location": "L97",
+      "_origin": "ast",
+      "id": "docs_research_portal_operations_verifica\u00e7\u00e3o_do_piloto_22_10_2026",
+      "community": 13,
+      "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
+      "norm_label": "verificacao do piloto \u2014 22/10/2026"
     },
     {
       "label": "research-portal.md",
@@ -24165,6 +24247,17 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
+      "target": "src_app_pesquisa_musical_portal_action",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/portal.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_portal",
       "target": "src_app_pesquisa_musical_portal_download",
       "confidence_score": 1.0
     },
@@ -24172,44 +24265,11 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L13",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
-      "target": "src_app_pesquisa_musical_portal_indicators",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L16",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_pesquisa_musical_portal",
-      "target": "src_app_pesquisa_musical_portal_method",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L8",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_pesquisa_musical_portal",
-      "target": "src_app_pesquisa_musical_portal_mode",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L10",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_pesquisa_musical_portal",
-      "target": "src_app_pesquisa_musical_portal_reply",
+      "target": "src_app_pesquisa_musical_portal_marketnames",
       "confidence_score": 1.0
     },
     {
@@ -24220,6 +24280,28 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
+      "target": "src_app_pesquisa_musical_portal_mode",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/portal.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_portal",
+      "target": "src_app_pesquisa_musical_portal_reply",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/portal.tsx",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_portal",
       "target": "src_app_pesquisa_musical_portal_request",
       "confidence_score": 1.0
     },
@@ -24227,7 +24309,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L18",
+      "source_location": "L31",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
@@ -24238,18 +24320,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_app_pesquisa_musical_portal",
-      "target": "src_app_pesquisa_musical_portal_states",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L9",
+      "source_location": "L8",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
@@ -24261,7 +24332,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L6",
+      "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
@@ -24273,7 +24344,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L6",
+      "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
@@ -24285,7 +24356,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L6",
+      "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
@@ -24297,7 +24368,31 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L6",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_portal",
+      "target": "src_app_pesquisa_musical_review_results_reviewstatuses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/portal.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_portal",
+      "target": "src_app_pesquisa_musical_review_results_sharedreview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/portal.tsx",
+      "source_location": "L5",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal",
@@ -24357,7 +24452,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L31",
+      "source_location": "L89",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal_researchportal",
@@ -24369,7 +24464,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/portal.tsx",
-      "source_location": "L41",
+      "source_location": "L169",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_portal_researchportal",
@@ -24380,7 +24475,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/review-results.tsx",
-      "source_location": "L4",
+      "source_location": "L15",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_review_results",
@@ -24391,7 +24486,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/review-results.tsx",
-      "source_location": "L3",
+      "source_location": "L6",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_review_results",
@@ -24402,7 +24497,51 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/pesquisa-musical/review-results.tsx",
-      "source_location": "L7",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results",
+      "target": "src_app_pesquisa_musical_review_results_intensity",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results",
+      "target": "src_app_pesquisa_musical_review_results_reviewstatuses",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L13",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results",
+      "target": "src_app_pesquisa_musical_review_results_scorelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L11",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results",
+      "target": "src_app_pesquisa_musical_review_results_sharedreview",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_review_results",
@@ -24443,6 +24582,42 @@
       "_origin": "ast",
       "source": "src_app_pesquisa_musical_review_results",
       "target": "src_lib_research_portal_portalevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results",
+      "target": "src_lib_research_portal_reviewstatus",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results_aicomparison",
+      "target": "src_app_pesquisa_musical_review_results_scorelabel",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/pesquisa-musical/review-results.tsx",
+      "source_location": "L41",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_pesquisa_musical_review_results_sharedreviews",
+      "target": "src_app_pesquisa_musical_review_results_scorelabel",
       "confidence_score": 1.0
     },
     {
@@ -27372,7 +27547,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L17",
+      "source_location": "L19",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal",
@@ -27416,7 +27591,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L20",
+      "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal",
@@ -27443,6 +27618,17 @@
       "_origin": "ast",
       "source": "src_lib_research_portal",
       "target": "src_lib_research_portal_recording",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal",
+      "target": "src_lib_research_portal_reflectionfor",
       "confidence_score": 1.0
     },
     {
@@ -27659,7 +27845,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -27671,7 +27857,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L85",
+      "source_location": "L87",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -27683,7 +27869,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L104",
+      "source_location": "L106",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -27695,7 +27881,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L28",
+      "source_location": "L30",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_lyric",
@@ -27741,7 +27927,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L43",
+      "source_location": "L45",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -27753,7 +27939,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L84",
+      "source_location": "L86",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -27765,7 +27951,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L84",
+      "source_location": "L86",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -27777,7 +27963,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L40",
+      "source_location": "L42",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -27789,7 +27975,7 @@
       "context": "argument",
       "confidence": "INFERRED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L44",
+      "source_location": "L46",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -27801,7 +27987,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L122",
+      "source_location": "L116",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -27813,7 +27999,19 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L26",
+      "source_location": "L17",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_reflectionfor",
+      "target": "src_lib_research_portal_publicevent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_completed",
@@ -27825,7 +28023,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L39",
+      "source_location": "L41",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -27837,7 +28035,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L101",
+      "source_location": "L103",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -27845,25 +28043,15 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "method",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L25",
+      "source_location": "L41",
       "weight": 1.0,
       "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_assigned",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L31",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_assignmentfingerprint",
+      "source": "src_lib_research_portal_portalservice_read",
+      "target": "src_lib_research_portal_reflectionfor",
       "confidence_score": 1.0
     },
     {
@@ -27874,84 +28062,7 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_comparison",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L26",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_completed",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L22",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_constructor",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L30",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_digest",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L32",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_fingerprint",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L28",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_lyric",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L34",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_read",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "method",
-      "confidence": "EXTRACTED",
-      "source_file": "src/lib/research-portal.ts",
-      "source_location": "L29",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "src_lib_research_portal_portalservice",
-      "target": "src_lib_research_portal_portalservice_rubricversion",
+      "target": "src_lib_research_portal_portalservice_assigned",
       "confidence_score": 1.0
     },
     {
@@ -27962,6 +28073,105 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_assignmentfingerprint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L29",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_comparison",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L28",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_completed",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_constructor",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_digest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_fingerprint",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L30",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_lyric",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L36",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_read",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
+      "target": "src_lib_research_portal_portalservice_rubricversion",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/research-portal.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_lib_research_portal_portalservice",
       "target": "src_lib_research_portal_portalservice_state",
       "confidence_score": 1.0
     },
@@ -27969,7 +28179,7 @@
       "relation": "method",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L82",
+      "source_location": "L84",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice",
@@ -28005,7 +28215,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L26",
+      "source_location": "L28",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_completed",
@@ -28017,7 +28227,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L46",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28029,7 +28239,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L33",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_state",
@@ -28041,7 +28251,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L108",
+      "source_location": "L119",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28053,7 +28263,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L46",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28065,7 +28275,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L108",
+      "source_location": "L119",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28077,7 +28287,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L68",
+      "source_location": "L70",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28089,7 +28299,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L105",
+      "source_location": "L107",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28101,7 +28311,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L67",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28113,7 +28323,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L118",
+      "source_location": "L129",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28125,7 +28335,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_fingerprint",
@@ -28137,7 +28347,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L46",
+      "source_location": "L48",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28149,7 +28359,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L33",
+      "source_location": "L35",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_state",
@@ -28161,7 +28371,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L99",
+      "source_location": "L101",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28173,7 +28383,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L31",
+      "source_location": "L33",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_assignmentfingerprint",
@@ -28185,7 +28395,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L32",
+      "source_location": "L34",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_fingerprint",
@@ -28197,7 +28407,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L47",
+      "source_location": "L49",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28209,7 +28419,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L92",
+      "source_location": "L94",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28221,7 +28431,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28233,7 +28443,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L85",
+      "source_location": "L87",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28245,7 +28455,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28257,7 +28467,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L85",
+      "source_location": "L87",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -28269,7 +28479,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L35",
+      "source_location": "L37",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_read",
@@ -28281,7 +28491,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/research-portal.ts",
-      "source_location": "L85",
+      "source_location": "L87",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_lib_research_portal_portalservice_write",
@@ -29560,6 +29770,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/research-pilot.md",
+      "source_location": "L33",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_research_pilot_piloto_de_avalia\u00e7\u00e3o_musical_12_grava\u00e7\u00f5es",
+      "target": "docs_research_pilot_fluxo_simplificado_das_avaliadoras_22_10_2026",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/research-pilot.md",
       "source_location": "L20",
       "weight": 1.0,
       "_origin": "ast",
@@ -29637,6 +29858,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/research-portal-api.md",
+      "source_location": "L72",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_research_portal_api_api_de_leitura_e_avalia\u00e7\u00e3o",
+      "target": "docs_research_portal_api_pondera\u00e7\u00e3o_sobre_a_ia",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/research-portal-api.md",
       "source_location": "L56",
       "weight": 1.0,
       "_origin": "ast",
@@ -29686,6 +29918,17 @@
       "_origin": "ast",
       "source": "docs_research_portal_operations_opera\u00e7\u00e3o_do_portal",
       "target": "docs_research_portal_operations_piloto_e_prote\u00e7\u00e3o_dos_registros",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/research-portal-operations.md",
+      "source_location": "L97",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_research_portal_operations_opera\u00e7\u00e3o_do_portal",
+      "target": "docs_research_portal_operations_verifica\u00e7\u00e3o_do_piloto_22_10_2026",
       "confidence_score": 1.0
     },
     {
@@ -29954,5 +30197,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "de4bde93412e426efb2ff46e64a6fd5e9bafb55a"
+  "built_at_commit": "e0d26bd0709caeb4f6ce8fd485e7364b3deb4c8d"
 }

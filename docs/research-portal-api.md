@@ -67,3 +67,12 @@ até os dois encerramentos.
 - O detalhe cego mantém IA ausente antes da consulta. Depois de uma consulta registrada, retorna também `comparison` e `aiRevealed`, inclusive após atualizar o navegador.
 - O fingerprint da seleção é separado do corpus e impede alterações do manifesto após o primeiro evento piloto. Exportação parcial preserva eventos antigos e revisões sem divulgar hashes privados.
 - Desenvolvimento sem `ENABLE_OPENNEXT_DEV_PROXY=1` usa diretamente disco local. `RESEARCH_LOCAL_STORE_DIR` permite um diretório isolado de teste. Produção ignora essa variável e exige D1.
+
+
+## Ponderação sobre a IA
+
+`POST {action:'reflect',reviewer,evaluator,accessKey,recordingId,reviewId,reflection}` registra uma ponderação não vazia de até 6.000 caracteres. Exige parecer salvo e consulta à IA registrada. `reviewId` deve corresponder ao último parecer da avaliadora para evitar salvar um comentário sobre uma comparação desatualizada. A ação é permitida após o encerramento, sem reabrir nem alterar escores ou fundamento.
+
+Eventos `reflect` preservam o ID do parecer, documento/hash, fingerprint da campanha/seleção e exposição à IA. O detalhe `mode=blind` retorna `reflection`; a consulta pública `mode=community` associa `reflectionEvent` ao último parecer, quando existente. Exportações individuais incluem todo o histórico e `latestReflections` do parecer atual. Alterar o parecer produz nova versão: ponderações de versões anteriores permanecem nos eventos exportados, sem ser atribuídas à nova versão por engano.
+
+O cliente das avaliadoras usa somente `blind` e `community`. Agregados e contratos históricos continuam disponíveis no serviço, mas não integram a interface simplificada.

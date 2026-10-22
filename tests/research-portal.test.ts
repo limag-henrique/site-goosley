@@ -173,9 +173,13 @@ test('a saved judgment survives reopening the real file store and stale writes c
   await assert.rejects(()=>reopened.append({...((detail.review) as PortalEvent),id:crypto.randomUUID()},0),/simultaneamente/);
   assert.equal((await reopened.read()).length,1);
   await restored.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'doubt',justification:'Segunda revisão'});
+  const current=await restored.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
+  await restored.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song'});
+  await restored.write({action:'reflect',reviewer:1,evaluator:'Ana',recordingId:'song',reviewId:(current.review as PortalEvent).id,reflection:'A IA atribuiu intensidade central; meu fundamento considera a ambiguidade.'});
   const shared=await new PortalService(corpus,await localStore(folder)).read(new URLSearchParams('mode=community'));
   assert.equal((shared.reviews as PortalEvent[])[0].justification,'Segunda revisão');
-  assert.equal((await reopened.read()).length,2);
+  assert.equal((shared.reviews as (PortalEvent&{reflectionEvent:PortalEvent})[])[0].reflectionEvent.reflection,'A IA atribuiu intensidade central; meu fundamento considera a ambiguidade.');
+  assert.equal((await reopened.read()).length,4);
  }finally{await rm(folder,{recursive:true,force:true});}
 });
 
@@ -189,7 +193,7 @@ test('public names cannot authorize edits or reveals when private keys are requi
  const shared=await secure.read(new URLSearchParams('mode=community'));
  assert.equal(JSON.stringify(shared).includes(accessKey),false);
  assert.equal(JSON.stringify(shared).includes(events[0].ownerKeyHash!),false);
- for(const action of ['save','reveal','close'])await assert.rejects(()=>secure.write({...body,action,accessKey:'another-private-random-key-with-more-than-32-characters'}),/Chave privada incorreta/);
+ for(const action of ['save','reveal','reflect','close'])await assert.rejects(()=>secure.write({...body,action,accessKey:'another-private-random-key-with-more-than-32-characters'}),/Chave privada incorreta/);
  assert.equal(events.length,1);
  await secure.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song',accessKey});
  assert.equal(events.length,2);
@@ -205,4 +209,31 @@ test('a changed pilot cannot reuse prior pilot records or silently reopen comple
  await first.write({action:'close',reviewer:1,evaluator:'Ana'});
  const changed=new PortalService(portal.dataset,portal.store,{...pilot,version:'pilot-v2'});
  await assert.rejects(()=>changed.read(new URLSearchParams('mode=community')),/seleção piloto mudou/);
+});
+
+
+test('a ponderation after reading AI is saved separately and survives reopening and closure',async()=>{
+ const {portal,events}=setup(true);
+ const secure=new PortalService(portal.dataset,portal.store,undefined,true);
+ const accessKey='a-private-random-key-with-at-least-32-characters';
+ const identity={reviewer:1,evaluator:'Ana',accessKey,recordingId:'song'};
+ const saved=await secure.write({...identity,action:'save',status:'scored',scores:{sexuality:0},justification:'Meu fundamento independente'});
+ const review=saved.review as PortalEvent;
+ await assert.rejects(()=>secure.write({...identity,action:'reflect',reviewId:review.id,reflection:'Ainda não consultei a IA'}),/Consulte/);
+ await secure.write({...identity,action:'reveal'});
+ await secure.write({...identity,action:'close'});
+ await assert.rejects(()=>secure.write({...identity,action:'reflect',reviewId:review.id,reflection:'  '}),/Ponderação/);
+ await assert.rejects(()=>secure.write({...identity,action:'reflect',reviewId:'outdated',reflection:'Parecer desatualizado'}),/parecer mudou/);
+ await secure.write({...identity,action:'reflect',reviewId:review.id,reflection:'Discordo do escore 3 da IA: a referência é incidental no contexto narrativo.'});
+ const reopened=new PortalService(portal.dataset,portal.store,undefined,true);
+ const detail=await reopened.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
+ assert.equal((detail.reflection as PortalEvent).reflection,'Discordo do escore 3 da IA: a referência é incidental no contexto narrativo.');
+ assert.equal((detail.review as PortalEvent).id,review.id);
+ assert.equal((detail.review as PortalEvent).scores?.sexuality,0);
+ assert.equal((detail.review as PortalEvent).justification,'Meu fundamento independente');
+ const shared=await reopened.read(new URLSearchParams('mode=community'));
+ assert.equal((shared.reviews as (PortalEvent&{reflectionEvent:PortalEvent})[])[0].reflectionEvent.reflection,(detail.reflection as PortalEvent).reflection);
+ const exported=await reopened.read(new URLSearchParams('mode=review-export&reviewer=1'));
+ assert.equal(JSON.stringify(exported).includes('Discordo do escore 3'),true);
+ assert.equal(events.filter(e=>e.action==='save').length,1);
 });
