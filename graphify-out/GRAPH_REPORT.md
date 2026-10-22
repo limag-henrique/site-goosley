@@ -1,16 +1,16 @@
-# Graph Report - site-goosley  (2026-10-21)
+# Graph Report - site-goosley  (2026-10-22)
 
 ## Corpus Check
-- 125 files · ~765,032 words
+- 130 files · ~767,907 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 931 nodes · 1582 edges · 63 communities (46 shown, 17 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 44 edges (avg confidence: 0.5)
+- 956 nodes · 1636 edges · 62 communities (45 shown, 17 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `33008414`
+- Built from commit: `de4bde93`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,15 +20,15 @@
 - experiment_runner.py
 - GallerySimilarityScorer
 - ArtifactBundle
-- dependencies
+- scripts
 - 1. Company Overview
 - target_rules.py
 - compilerOptions
 - index.ts
-- scripts
+- devDependencies
 - lib/research-portal.ts
 - Faixas comerciais do simulador
-- Operação do portal
+- Piloto de avaliação musical — 12 gravações
 - worker/package.json
 - CriminalidadeFacialExperience.tsx
 - CostEstimator.tsx
@@ -39,10 +39,8 @@
 - bootstrap_ci.py
 - decompose_variance
 - email.ts
-- Portal de pesquisa musical
 - criminalidadefacial-profile.ts
 - not-found.tsx
-- API de leitura e avaliação
 - server.mjs
 - app/page.tsx
 - cosine_similarity_groups
@@ -76,9 +74,9 @@
 5. `ArcFaceEmbedder` - 16 edges
 6. `FaceProfileModel` - 16 edges
 7. `compilerOptions` - 16 edges
-8. `FitSpec` - 14 edges
-9. `write_json()` - 14 edges
-10. `ScoreCalibrator` - 13 edges
+8. `PortalService` - 15 edges
+9. `FitSpec` - 14 edges
+10. `write_json()` - 14 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `ImageScorer` --uses--> `GallerySimilarityScorer`  [INFERRED]
@@ -95,7 +93,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (63 total, 17 thin omitted)
+## Communities (62 total, 17 thin omitted)
 
 ### Community 0 - "cloudflare-env.d.ts"
 Cohesion: 0.36
@@ -117,9 +115,9 @@ Nodes (21): AppHandler, _clamp(), compose_white_background(), encode_preview_jpe
 Cohesion: 0.11
 Nodes (21): ArtifactBundle, BundleValidation, CompletionResult, Any, DataFrame, Path, Atomic, integrity-checked artifact bundles for experiment outputs., Append an explicit, hashed failure classification to ``failures.csv``. (+13 more)
 
-### Community 5 - "dependencies"
-Cohesion: 0.10
-Nodes (21): clsx, compression, framer-motion, lucide-react, next, nodemailer, @opennextjs/cloudflare, dependencies (+13 more)
+### Community 5 - "scripts"
+Cohesion: 0.05
+Nodes (42): clsx, compression, framer-motion, lucide-react, next, nodemailer, @opennextjs/cloudflare, dependencies (+34 more)
 
 ### Community 6 - "1. Company Overview"
 Cohesion: 0.20
@@ -137,29 +135,29 @@ Nodes (29): criminalidadefacial-service/worker/**, dom, dom.iterable, esnext, **
 Cohesion: 0.11
 Nodes (25): FaceSimilarityContainer, consumeRateLimit(), corsHeaders(), DEFAULT_ALLOWED_ORIGINS, Fetchable, forwardScore(), GalleryRelease, handleReference() (+17 more)
 
-### Community 10 - "scripts"
-Cohesion: 0.04
-Nodes (48): @emnapi/core, @emnapi/runtime, eslint, eslint-config-next, devDependencies, @emnapi/core, @emnapi/runtime, eslint (+40 more)
+### Community 10 - "devDependencies"
+Cohesion: 0.07
+Nodes (27): @emnapi/core, @emnapi/runtime, eslint, eslint-config-next, devDependencies, @emnapi/core, @emnapi/runtime, eslint (+19 more)
 
 ### Community 11 - "lib/research-portal.ts"
 Cohesion: 0.06
-Nodes (35): dynamic, failure(), GET(), headers, POST(), metadata, download(), indicators (+27 more)
+Nodes (40): dynamic, failure(), GET(), headers, POST(), metadata, download(), indicators (+32 more)
 
 ### Community 12 - "Faixas comerciais do simulador"
 Cohesion: 0.40
 Nodes (4): Decisões, Faixas comerciais do simulador, Referências públicas consultadas, Verificação
 
-### Community 13 - "Operação do portal"
-Cohesion: 0.50
-Nodes (3): Download parcial dos pareceres, Operação do portal, Verificações realizadas
+### Community 13 - "Piloto de avaliação musical — 12 gravações"
+Cohesion: 0.08
+Nodes (20): Chave privada de edição e congelamento do piloto, Critérios de aceite, Limites, Piloto de avaliação musical — 12 gravações, Problema e decisão confirmada, Verificação, API de leitura e avaliação, Contrato atual do piloto (+12 more)
 
 ### Community 14 - "worker/package.json"
 Cohesion: 0.10
 Nodes (20): @cloudflare/containers, @cloudflare/workers-types, dependencies, @cloudflare/containers, devDependencies, @cloudflare/workers-types, tsx, @types/node (+12 more)
 
 ### Community 15 - "CriminalidadeFacialExperience.tsx"
-Cohesion: 0.06
-Nodes (45): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialDeactivated() (+37 more)
+Cohesion: 0.05
+Nodes (46): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialDeactivated() (+38 more)
 
 ### Community 16 - "CostEstimator.tsx"
 Cohesion: 0.07
@@ -193,21 +191,13 @@ Nodes (9): decompose_variance(), _design(), DataFrame, ndarray, Fixed-effect var
 Cohesion: 0.36
 Nodes (7): POST(), EmailInput, getCloudflareEmailBinding(), getEnvVar(), parseEmailFrom(), sendEmail(), SendEmailBinding
 
-### Community 26 - "Portal de pesquisa musical"
-Cohesion: 0.50
-Nodes (3): Fronteiras e aceite, Percurso e linguagem visual, Portal de pesquisa musical
-
 ### Community 27 - "criminalidadefacial-profile.ts"
-Cohesion: 0.07
-Nodes (41): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+33 more)
+Cohesion: 0.08
+Nodes (40): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+32 more)
 
 ### Community 28 - "not-found.tsx"
 Cohesion: 0.32
 Nodes (3): metadata, ErrorState(), ErrorStateProps
-
-### Community 29 - "API de leitura e avaliação"
-Cohesion: 0.50
-Nodes (3): API de leitura e avaliação, Download parcial dos pareceres, Persistência e implantação
 
 ### Community 30 - "server.mjs"
 Cohesion: 0.33
@@ -238,7 +228,7 @@ Cohesion: 0.33
 Nodes (6): parseLine(), records, root, slugify(), sourcePath, targetPath
 
 ## Knowledge Gaps
-- **223 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+218 more)
+- **232 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+227 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -246,13 +236,13 @@ Nodes (6): parseLine(), records, root, slugify(), sourcePath, targetPath
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `GallerySimilarityScorer` connect `GallerySimilarityScorer` to `cli.py`, `container_api.py`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `dependencies` to `CostEstimator.tsx`, `scripts`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Why does `dependencies` connect `scripts` to `CostEstimator.tsx`?**
+  _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `GallerySimilarityScorer` (e.g. with `ImageScorer` and `ScoreCalibrator`) actually correct?**
   _`GallerySimilarityScorer` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Cloudflare`, `NodeJS`, `face-profile-ml` to the rest of the system?**
-  _223 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _232 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `cli.py` be split into smaller, more focused modules?**
   _Cohesion score 0.057729138166894664 - nodes in this community are weakly interconnected._
 - **Should `experiment_runner.py` be split into smaller, more focused modules?**

@@ -1,0 +1,93 @@
+{
+  "version": "pilot-12-v1",
+  "ranking": "Explicitude sexual: presença substancial, maior para menor; artigo, atlas internacional, 2017–13/03/2022",
+  "source": "research/article/international-atlas.csv",
+  "sourceSha256": "40708c16721ad0a84a4169f660fe0cfebcc059bef78165f74b0fe0985dad536b",
+  "selection": "7 dos três primeiros mercados, 2 do Brasil, 3 dos três últimos; ordem SHA-256(pilot-v1:mercado:id), sem usar escores individuais de IA; itens do estrato original do mercado (market)",
+  "recordings": [
+    {
+      "recordingId": "4eVkn18rN4GguUWOsR6Use",
+      "market": "DO",
+      "rank": 1,
+      "title": "Answer : Love Myself",
+      "artist": "BTS"
+    },
+    {
+      "recordingId": "3ru7MVVWr45jAKmjoB7OBx",
+      "market": "DO",
+      "rank": 1,
+      "title": "Danzau",
+      "artist": "Ozuna"
+    },
+    {
+      "recordingId": "4nxTe3aVTD3tpxjfxdITkv",
+      "market": "DO",
+      "rank": 1,
+      "title": "Culpable",
+      "artist": "Ala Jaza"
+    },
+    {
+      "recordingId": "2aMVyJSuDFFL1sTjJnvk7X",
+      "market": "PA",
+      "rank": 2,
+      "title": "Nena Maldición (feat. Lenny Tavárez)",
+      "artist": "Paulo Londra"
+    },
+    {
+      "recordingId": "62aP9fBQKYKxi7PDXwcUAS",
+      "market": "PA",
+      "rank": 2,
+      "title": "ily (i love you baby) (feat. Emilee)",
+      "artist": "Surf Mesa"
+    },
+    {
+      "recordingId": "5Lbsc65org0b85kNsPkluY",
+      "market": "CL",
+      "rank": 3,
+      "title": "Only Angel",
+      "artist": "Harry Styles"
+    },
+    {
+      "recordingId": "152U4ecGSiYeKm2gnFc4wA",
+      "market": "CL",
+      "rank": 3,
+      "title": "Serenata cruel",
+      "artist": "Villa Cariño"
+    },
+    {
+      "recordingId": "0M1A9wInEHilyWkh4I8tWo",
+      "market": "BR",
+      "rank": 22,
+      "title": "Lost In The Wild",
+      "artist": "WALK THE MOON"
+    },
+    {
+      "recordingId": "5UGKVzE5Vhd9EVC38xIIYX",
+      "market": "BR",
+      "rank": 22,
+      "title": "Pandemia",
+      "artist": "Mc Kevin"
+    },
+    {
+      "recordingId": "0PgYPBGqF6Wm5KFHQ81nq5",
+      "market": "ID",
+      "rank": 66,
+      "title": "comethru (with Bea Miller)",
+      "artist": "Jeremy Zucker"
+    },
+    {
+      "recordingId": "2dmGj5Nf01FcR6N4HPzAbL",
+      "market": "JP",
+      "rank": 67,
+      "title": "Saudade Nível Hard",
+      "artist": "Yasmin Santos"
+    },
+    {
+      "recordingId": "6IgOD7rsZrsBIwOdVLfMHS",
+      "market": "TW",
+      "rank": 68,
+      "title": "衝動",
+      "artist": "Power Station"
+    }
+  ]
+}

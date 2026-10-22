@@ -109,3 +109,100 @@ test('list sorting is stable across pages, preserves the corpus and never writes
  for(const query of ['market=XX','language=xx','genre=unknown','year=1900','search=missing']){const result=await portal.read(new URLSearchParams('mode=blind&reviewer=1&'+query));assert.equal(result.total,0);assert.deepEqual(result.recordings,[]);assert.equal(result.page,1);}
  const result=await portal.read(new URLSearchParams('mode=blind&reviewer=1&search=Alfa&market=BR'));assert.equal(result.total,2);await assert.rejects(()=>portal.read(new URLSearchParams('sort=bad')),/Ordenação/);
 });
+
+
+test('saved judgments are shared before closure and optional AI reveal survives a new service',async()=>{
+ const {portal,events}=setup(true);
+ await assert.rejects(()=>portal.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song'}),/Salve/);
+ await portal.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Parecer compartilhado'});
+ const publicView=await portal.read(new URLSearchParams('mode=community&id=song'));
+ assert.equal((publicView.reviews as PortalEvent[])[0].justification,'Parecer compartilhado');
+ assert.equal('ai' in publicView,false);
+ const revealed=await portal.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song'});
+ assert.deepEqual(revealed.ai,{sexuality:3});
+ assert.deepEqual(revealed.metrics,[{dimension:'sexuality',human:0,ai:3,delta:-3}]);
+ const restored=new PortalService(portal.dataset,portal.store);
+ const detail=await restored.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
+ assert.equal((detail.review as PortalEvent).justification,'Parecer compartilhado');
+ assert.equal(detail.aiRevealed,true);
+ assert.equal(events.filter(e=>e.action==='reveal').length,1);
+ await restored.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song'});
+ assert.equal(events.filter(e=>e.action==='reveal').length,1);
+});
+
+
+test('pilot assignment preserves historical events and counts only the selected songs',async()=>{
+ const {portal,events}=setup(true);
+ await portal.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Registro original'});
+ const original=structuredClone(events);
+ const pilot={version:'test-pilot',ranking:'Artigo',selection:'Seleção fixa',recordings:[{recordingId:'song',market:'BR',rank:22}]};
+ const service=new PortalService(portal.dataset,portal.store,pilot);
+ const list=await service.read(new URLSearchParams('mode=blind&reviewer=1'));
+ assert.equal((list.state as {assigned:number}).assigned,1);
+ assert.equal(list.completed,1);assert.deepEqual(events,original);
+ const absent=await service.read(new URLSearchParams('market=JP'));
+ assert.equal(absent.total,0);
+ await service.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song'});
+ await service.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:1},justification:'Revisão informada'});
+ assert.equal(events.at(-1)?.aiExposed,true);
+ await service.write({action:'close',reviewer:1,evaluator:'Ana'});
+ assert.equal(events[0].scores?.sexuality,0);
+});
+
+test('the published pilot has 12 unique authorized recordings with the agreed ranking allocation',async()=>{
+ const {readFile}=await import('node:fs/promises');
+ const pilot=JSON.parse(await readFile(new URL('../src/data/research-pilot.json',import.meta.url),'utf8'));
+ const corpus=JSON.parse(await readFile(new URL('../src/data/research-portal.json',import.meta.url),'utf8'));
+ assert.equal(new Set(pilot.recordings.map((r:{recordingId:string})=>r.recordingId)).size,12);
+ const counts:Record<string,number>={};
+ for(const item of pilot.recordings){counts[item.market]=(counts[item.market]??0)+1;const track=corpus.recordings.find((r:{id:string})=>r.id===item.recordingId);assert.ok(track?.lyricAvailable);assert.equal(track.market,item.market);}
+ assert.deepEqual(counts,{DO:3,PA:2,CL:2,BR:2,ID:1,JP:1,TW:1});
+});
+
+
+test('a saved judgment survives reopening the real file store and stale writes cannot erase it',async()=>{
+ const {mkdtemp,rm}=await import('node:fs/promises');const {tmpdir}=await import('node:os');const {join}=await import('node:path');
+ const {localStore}=await import('../src/server/research-local-store');
+ const folder=await mkdtemp(join(tmpdir(),'research-persistence-'));
+ try{
+  const first=await localStore(folder);const corpus=structuredClone(dataset);corpus.recordings[0].lyrics='Authorized text';
+  await new PortalService(corpus,first).write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Persistência após reinício'});
+  const reopened=await localStore(folder);const restored=new PortalService(corpus,reopened);
+  const detail=await restored.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
+  assert.equal((detail.review as PortalEvent).justification,'Persistência após reinício');
+  await assert.rejects(()=>reopened.append({...((detail.review) as PortalEvent),id:crypto.randomUUID()},0),/simultaneamente/);
+  assert.equal((await reopened.read()).length,1);
+  await restored.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'doubt',justification:'Segunda revisão'});
+  const shared=await new PortalService(corpus,await localStore(folder)).read(new URLSearchParams('mode=community'));
+  assert.equal((shared.reviews as PortalEvent[])[0].justification,'Segunda revisão');
+  assert.equal((await reopened.read()).length,2);
+ }finally{await rm(folder,{recursive:true,force:true});}
+});
+
+
+test('public names cannot authorize edits or reveals when private keys are required',async()=>{
+ const {portal,events}=setup(true);const secure=new PortalService(portal.dataset,portal.store,undefined,true);
+ const accessKey='a-private-random-key-with-at-least-32-characters';
+ const body={action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Parecer protegido'};
+ await assert.rejects(()=>secure.write(body),/chave privada/);
+ await secure.write({...body,accessKey});
+ const shared=await secure.read(new URLSearchParams('mode=community'));
+ assert.equal(JSON.stringify(shared).includes(accessKey),false);
+ assert.equal(JSON.stringify(shared).includes(events[0].ownerKeyHash!),false);
+ for(const action of ['save','reveal','close'])await assert.rejects(()=>secure.write({...body,action,accessKey:'another-private-random-key-with-more-than-32-characters'}),/Chave privada incorreta/);
+ assert.equal(events.length,1);
+ await secure.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song',accessKey});
+ assert.equal(events.length,2);
+ const reopened=new PortalService(portal.dataset,portal.store,undefined,true);
+ await reopened.write({...body,accessKey,justification:'Revisão autorizada'});
+ assert.equal(events.length,3);
+});
+
+test('a changed pilot cannot reuse prior pilot records or silently reopen completed assignments',async()=>{
+ const {portal}=setup(true);const pilot={version:'pilot-v1',ranking:'Artigo',selection:'Fixa',recordings:[{recordingId:'song',market:'BR',rank:22}]};
+ const first=new PortalService(portal.dataset,portal.store,pilot);
+ await first.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Original'});
+ await first.write({action:'close',reviewer:1,evaluator:'Ana'});
+ const changed=new PortalService(portal.dataset,portal.store,{...pilot,version:'pilot-v2'});
+ await assert.rejects(()=>changed.read(new URLSearchParams('mode=community')),/seleção piloto mudou/);
+});

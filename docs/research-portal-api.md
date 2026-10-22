@@ -1,3 +1,5 @@
+> Atualização: o piloto de 12 gravações e a consulta opcional à IA são definidos em [research-pilot.md](research-pilot.md). O embargo global descrito abaixo é histórico e não se aplica à consulta opcional após salvar. Pareceres salvos são compartilhados antes do encerramento.
+
 # API de leitura e avaliação
 
 Endpoint `/api/pesquisa-musical`, sem cache. `GET` padrão: `mode=exploration`.
@@ -54,3 +56,14 @@ até os dois encerramentos.
 ### Filtros e ordenação da lista
 
 `market` seleciona circulação em qualquer mercado da gravação; não indica nacionalidade. `displayMarket` informa o mercado selecionado, preservando `market` original e `markets` completo. Os filtros de território, ano, idioma, gênero e busca são combinados por interseção. `sort=sample` preserva a amostra; `sort=market` ordena por mercado exibido, título e ID; `sort=title` por título e ID. A ordenação antecede a paginação, cuja página é limitada ao intervalo existente. Nenhuma dessas consultas grava pareceres ou altera o corpus congelado.
+
+
+## Contrato atual do piloto
+
+- O servidor usa o manifesto `research-pilot.json`; atribuição, fechamento e lista usam 12 músicas, sem reescrever o corpus original. O ranking foi conferido em `D:/PromiscuidadeMusical/research/article/international-atlas.csv`, repositório de origem do artigo; seu SHA-256 está no manifesto.
+- `GET ?mode=community[&id=...]` retorna `state`, `dimensions`, `reviews` e identidade das gravações com parecer. Mostra o último parecer de cada avaliadora por música. Não exige chave nem encerramento, não revela hashes de chave nem previsões da IA. Revisões anteriores continuam nos eventos/exportações.
+- `POST {action:'save'|'close'|'reveal',reviewer,evaluator,accessKey,...}` exige uma chave privada de pelo menos 32 caracteres. O navegador cria uma chave aleatória por percurso e oferece download privado. A primeira escrita vincula somente seu hash; dados legados sem chave exigem migração administrativa antes de novas escritas.
+- `reveal` também exige `recordingId` e parecer anterior; retorna `ai`, `metrics` (dimension/human/ai/delta), `prompt` (template/version/note), `provenance` e `aiRevealed`. Registra a primeira consulta; revisões subsequentes têm `aiExposed=true`. Diferença é humano menos IA, ou null se um dos escores faltar.
+- O detalhe cego mantém IA ausente antes da consulta. Depois de uma consulta registrada, retorna também `comparison` e `aiRevealed`, inclusive após atualizar o navegador.
+- O fingerprint da seleção é separado do corpus e impede alterações do manifesto após o primeiro evento piloto. Exportação parcial preserva eventos antigos e revisões sem divulgar hashes privados.
+- Desenvolvimento sem `ENABLE_OPENNEXT_DEV_PROXY=1` usa diretamente disco local. `RESEARCH_LOCAL_STORE_DIR` permite um diretório isolado de teste. Produção ignora essa variável e exige D1.

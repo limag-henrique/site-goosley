@@ -57,3 +57,6 @@ graphify-out/
 
 # Pareceres locais das pesquisadoras
 .research-portal-local/
+
+# Backups privados de pareceres e letras
+.research-portal-backups/

@@ -1,3 +1,5 @@
+> Atualização: o piloto de 12 gravações e a consulta opcional à IA são definidos em [research-pilot.md](research-pilot.md). O embargo global descrito abaixo é histórico e não se aplica à consulta opcional após salvar. Pareceres salvos são compartilhados antes do encerramento.
+
 # Portal de pesquisa musical
 
 Escopo confirmado: rota `/pesquisa-musical`, fora da navegação comercial e do sitemap,

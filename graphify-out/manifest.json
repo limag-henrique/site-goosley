@@ -535,7 +535,7 @@
     "semantic_hash": ""
   },
   "src/server/criminalidadefacial/pessoas.generated.ts": {
-    "mtime": 1792602024.049363,
+    "mtime": 1792670957.0261824,
     "ast_hash": "934aabe54099c9227c6e0433aed513a0",
     "semantic_hash": ""
   },
@@ -48045,8 +48045,8 @@
     "semantic_hash": ""
   },
   "src/app/pesquisa-musical/portal.tsx": {
-    "mtime": 1792601902.52941,
-    "ast_hash": "966c50c6ba03efe959effb2e03bac10a",
+    "mtime": 1792670587.9357626,
+    "ast_hash": "6dbb255aa23ba1d213e1eda5393d81f2",
     "semantic_hash": ""
   },
   "src/data/research-portal.json": {
@@ -48055,28 +48055,28 @@
     "semantic_hash": ""
   },
   "src/lib/research-portal.ts": {
-    "mtime": 1792601874.2069874,
-    "ast_hash": "8b22eaebaa4774bcb3d3c6be1427c698",
+    "mtime": 1792670754.4474053,
+    "ast_hash": "a370a307663b3dc3a3efffb5afab3b93",
     "semantic_hash": ""
   },
   "src/server/research-portal.ts": {
-    "mtime": 1792598112.2831068,
-    "ast_hash": "be1af3945d860f7fa1913472fcfb6604",
+    "mtime": 1792670754.4484112,
+    "ast_hash": "89b53a1e6600df283fd73131c55b9bd5",
     "semantic_hash": ""
   },
   "tests/research-portal.test.ts": {
-    "mtime": 1792601902.52941,
-    "ast_hash": "0334ca8e3e5e50c3d72144a89e8bf88a",
+    "mtime": 1792670636.3386962,
+    "ast_hash": "702cf0c7265f86c3523143678287fb43",
     "semantic_hash": ""
   },
   "docs/research-portal-api.md": {
-    "mtime": 1792599379.3497355,
-    "ast_hash": "5d5ba80083cf18cf6e5f168c4fe13895",
+    "mtime": 1792670923.2599938,
+    "ast_hash": "44d311f7b1091ba7125068065be54187",
     "semantic_hash": ""
   },
   "docs/research-portal.md": {
-    "mtime": 1792594194.0674438,
-    "ast_hash": "7a69f9597a549fb2bd7da8f95bc146dc",
+    "mtime": 1792670341.8499496,
+    "ast_hash": "dedec73e1f5f64c3427a39c991a89f54",
     "semantic_hash": ""
   },
   "cloudflare-env.d.ts": {
@@ -48085,8 +48085,8 @@
     "semantic_hash": ""
   },
   "docs/research-portal-operations.md": {
-    "mtime": 1792601165.058187,
-    "ast_hash": "e3ba3bc1a1dce8be0042adde1aad09b1",
+    "mtime": 1792670636.3412259,
+    "ast_hash": "64c0b475ecce96e2631bc4f048769457",
     "semantic_hash": ""
   },
   "scripts/split-portal-lyrics.py": {
@@ -48097,6 +48097,31 @@
   "scripts/verify-research-review-export.mjs": {
     "mtime": 1792599379.3443985,
     "ast_hash": "ab42dbb2f3a336004f1078def13cff7b",
+    "semantic_hash": ""
+  },
+  "scripts/backup-research-portal.ps1": {
+    "mtime": 1792670398.3350346,
+    "ast_hash": "177080764ee3f7567dcbaf1909492aad",
+    "semantic_hash": ""
+  },
+  "src/app/pesquisa-musical/review-results.tsx": {
+    "mtime": 1792670217.423704,
+    "ast_hash": "68faec95157aa093a683086020350d8a",
+    "semantic_hash": ""
+  },
+  "src/data/research-pilot.json": {
+    "mtime": 1792670077.9539752,
+    "ast_hash": "1d37090960736784cccbe3803d0e1293",
+    "semantic_hash": ""
+  },
+  "src/server/research-local-store.ts": {
+    "mtime": 1792670280.711094,
+    "ast_hash": "0d5ded7de368a0259a40e668fff6973b",
+    "semantic_hash": ""
+  },
+  "docs/research-pilot.md": {
+    "mtime": 1792670636.3402116,
+    "ast_hash": "1f1a12b259311c7e36648ecf82bcb440",
     "semantic_hash": ""
   }
 }
