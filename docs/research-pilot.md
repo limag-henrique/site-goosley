@@ -55,3 +55,17 @@ Verificação: serviço do portal (salvar/consultar IA/ponderar/compartilhar/exp
 - A revisão encontrou e corrigiu cliques repetidos na aba e música ativas. Uma segunda inspeção confirmou os retornos antecipados e não encontrou pendências. Nova interação no navegador ficou indisponível porque o controle local foi desativado nas configurações do Work; não houve tentativa de contornar essa configuração.
 - HTTP local retornou 200 com os títulos Avaliar músicas e Pareceres salvos, sem Resultados por tema e período, Fontes e cobertura do artigo ou Indicadores e associações contextuais.
 - Graphify atualizado. Nenhum commit, troca de branch, modificação do corpus original ou escrita no banco de produção.
+
+
+## Consulta opcional antes de preencher — decisão posterior de 22/10/2026
+
+A pedido do responsável, a avaliadora pode consultar a classificação da IA antes de preencher qualquer campo do parecer, inclusive sem preencher o nome. Esta decisão substitui a exigência de salvar primeiro nas seções históricas acima.
+
+O botão Ver análise da IA antes de avaliar aparece acima do formulário de cada música. A consulta permanece opcional e não apaga o rascunho; a classificação continua visível enquanto a avaliadora preenche seus escores e fundamento. A tabela identifica escores humanos como salvos e mostra ausência até o primeiro salvamento, sem inventar concordância ou diferença.
+
+Uma consulta prévia registra um evento técnico `preview` identificado pelo hash da chave aleatória do navegador, sem nome e sem reservar uma vaga de avaliadora. Ao salvar, somente a consulta correspondente à chave privada daquele parecer marca `aiExposed=true`. Consultas de outros visitantes não alteram a autoria nem a classificação de exposição da avaliadora. As credenciais não são divulgadas. O parecer salvo e sua ponderação continuam protegidos pela chave privada.
+
+A ponderação separada continua disponível após salvar o fundamento e os escores, já que se vincula à versão do parecer comparado. A justificativa do parecer também pode comentar diretamente os acertos e erros da IA. O corpus, a amostra e as respostas históricas do modelo não são alterados.
+
+
+Verificação da consulta prévia: 19 testes do portal passaram; TypeScript passou. A suíte geral teve 48 aprovações e as mesmas seis falhas preexistentes nas APIs faciais desativadas. Uma integração HTTP local, com diretório de eventos técnico isolado, consultou os 26 escores sem nome ou avaliação, salvou o parecer com exposição registrada, criou a ponderação e recuperou os dados no detalhe e na leitura pública. A revisão não encontrou pendências. O botão foi conferido no código acima do formulário e sem bloqueio por nome, escores, justificativa ou rascunho. A interação visual desta alteração não foi repetida porque o controle de navegador local está desativado nas configurações do Work. Graphify atualizado; nenhum commit, troca de branch, publicação ou escrita na coleta real.

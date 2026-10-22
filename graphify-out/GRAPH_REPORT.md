@@ -1,16 +1,16 @@
 # Graph Report - site-goosley  (2026-10-22)
 
 ## Corpus Check
-- 130 files · ~768,669 words
+- 130 files · ~769,456 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 963 nodes · 1650 edges · 62 communities (45 shown, 17 thin omitted)
+- 967 nodes · 1656 edges · 63 communities (46 shown, 17 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `e0d26bd0`
+- Built from commit: `af910dc6`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -20,12 +20,12 @@
 - experiment_runner.py
 - GallerySimilarityScorer
 - ArtifactBundle
-- dependencies
+- scripts
 - 1. Company Overview
 - target_rules.py
 - compilerOptions
 - index.ts
-- scripts
+- devDependencies
 - lib/research-portal.ts
 - Faixas comerciais do simulador
 - Piloto de avaliação musical — 12 gravações
@@ -39,6 +39,7 @@
 - bootstrap_ci.py
 - decompose_variance
 - email.ts
+- anti-screenshot.ts
 - criminalidadefacial-profile.ts
 - not-found.tsx
 - server.mjs
@@ -93,7 +94,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (62 total, 17 thin omitted)
+## Communities (63 total, 17 thin omitted)
 
 ### Community 0 - "cloudflare-env.d.ts"
 Cohesion: 0.36
@@ -105,19 +106,19 @@ Nodes (63): ArgumentParser, ndarray, Path, ScoreCalibrator, add_feature_args(), 
 
 ### Community 2 - "experiment_runner.py"
 Cohesion: 0.06
-Nodes (52): BackendFactory, AgglomerativeBackend, build_backend(), ClusteringBackend, FittedClustering, GMMBackend, KMeansBackend, MiniBatchKMeansBackend (+44 more)
+Nodes (53): BackendFactory, AgglomerativeBackend, build_backend(), ClusteringBackend, FittedClustering, GMMBackend, KMeansBackend, MiniBatchKMeansBackend (+45 more)
 
 ### Community 3 - "GallerySimilarityScorer"
 Cohesion: 0.07
 Nodes (21): AppHandler, _clamp(), compose_white_background(), encode_preview_jpeg(), GallerySimilarityScorer, _grabcut_person_mask(), keep_component_near_face(), main() (+13 more)
 
 ### Community 4 - "ArtifactBundle"
-Cohesion: 0.10
-Nodes (22): ArtifactBundle, BundleValidation, CompletionResult, Any, DataFrame, Path, Atomic, integrity-checked artifact bundles for experiment outputs., Append an explicit, hashed failure classification to ``failures.csv``. (+14 more)
+Cohesion: 0.11
+Nodes (21): ArtifactBundle, BundleValidation, CompletionResult, Any, DataFrame, Path, Atomic, integrity-checked artifact bundles for experiment outputs., Append an explicit, hashed failure classification to ``failures.csv``. (+13 more)
 
-### Community 5 - "dependencies"
-Cohesion: 0.10
-Nodes (21): clsx, compression, framer-motion, lucide-react, next, nodemailer, @opennextjs/cloudflare, dependencies (+13 more)
+### Community 5 - "scripts"
+Cohesion: 0.05
+Nodes (42): clsx, compression, framer-motion, lucide-react, next, nodemailer, @opennextjs/cloudflare, dependencies (+34 more)
 
 ### Community 6 - "1. Company Overview"
 Cohesion: 0.20
@@ -135,13 +136,13 @@ Nodes (29): criminalidadefacial-service/worker/**, dom, dom.iterable, esnext, **
 Cohesion: 0.11
 Nodes (25): FaceSimilarityContainer, consumeRateLimit(), corsHeaders(), DEFAULT_ALLOWED_ORIGINS, Fetchable, forwardScore(), GalleryRelease, handleReference() (+17 more)
 
-### Community 10 - "scripts"
-Cohesion: 0.04
-Nodes (48): @emnapi/core, @emnapi/runtime, eslint, eslint-config-next, devDependencies, @emnapi/core, @emnapi/runtime, eslint (+40 more)
+### Community 10 - "devDependencies"
+Cohesion: 0.07
+Nodes (27): @emnapi/core, @emnapi/runtime, eslint, eslint-config-next, devDependencies, @emnapi/core, @emnapi/runtime, eslint (+19 more)
 
 ### Community 11 - "lib/research-portal.ts"
 Cohesion: 0.05
-Nodes (45): dynamic, failure(), GET(), headers, POST(), metadata, Action, download() (+37 more)
+Nodes (46): dynamic, failure(), GET(), headers, POST(), metadata, Action, download() (+38 more)
 
 ### Community 12 - "Faixas comerciais do simulador"
 Cohesion: 0.40
@@ -149,7 +150,7 @@ Nodes (4): Decisões, Faixas comerciais do simulador, Referências públicas con
 
 ### Community 13 - "Piloto de avaliação musical — 12 gravações"
 Cohesion: 0.07
-Nodes (23): Chave privada de edição e congelamento do piloto, Critérios de aceite, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações, Problema e decisão confirmada, Verificação, API de leitura e avaliação (+15 more)
+Nodes (26): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações, Problema e decisão confirmada (+18 more)
 
 ### Community 14 - "worker/package.json"
 Cohesion: 0.10
@@ -157,7 +158,7 @@ Nodes (20): @cloudflare/containers, @cloudflare/workers-types, dependencies, @cl
 
 ### Community 15 - "CriminalidadeFacialExperience.tsx"
 Cohesion: 0.06
-Nodes (44): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialExperience() (+36 more)
+Nodes (40): POST, runtime, AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialDeactivated(), CriminalidadeFacialExperience() (+32 more)
 
 ### Community 16 - "CostEstimator.tsx"
 Cohesion: 0.07
@@ -191,9 +192,13 @@ Nodes (9): decompose_variance(), _design(), DataFrame, ndarray, Fixed-effect var
 Cohesion: 0.36
 Nodes (7): POST(), EmailInput, getCloudflareEmailBinding(), getEnvVar(), parseEmailFrom(), sendEmail(), SendEmailBinding
 
+### Community 26 - "anti-screenshot.ts"
+Cohesion: 0.39
+Nodes (6): AntiScreenshotShield(), ANTI_SCREENSHOT_MESSAGE, ANTI_SCREENSHOT_WATERMARK_TEXT, attemptWipeClipboard(), isScreenshotKey(), KeyboardEventLike
+
 ### Community 27 - "criminalidadefacial-profile.ts"
-Cohesion: 0.07
-Nodes (42): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+34 more)
+Cohesion: 0.08
+Nodes (40): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+32 more)
 
 ### Community 28 - "not-found.tsx"
 Cohesion: 0.32
@@ -228,7 +233,7 @@ Cohesion: 0.33
 Nodes (6): parseLine(), records, root, slugify(), sourcePath, targetPath
 
 ## Knowledge Gaps
-- **236 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+231 more)
+- **238 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+233 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **17 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -237,15 +242,15 @@ _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `GallerySimilarityScorer` connect `GallerySimilarityScorer` to `cli.py`, `container_api.py`?**
   _High betweenness centrality (0.029) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `dependencies` to `CostEstimator.tsx`, `scripts`?**
+- **Why does `dependencies` connect `scripts` to `CostEstimator.tsx`?**
   _High betweenness centrality (0.028) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `GallerySimilarityScorer` (e.g. with `ImageScorer` and `ScoreCalibrator`) actually correct?**
   _`GallerySimilarityScorer` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Cloudflare`, `NodeJS`, `face-profile-ml` to the rest of the system?**
-  _236 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _238 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `cli.py` be split into smaller, more focused modules?**
   _Cohesion score 0.057729138166894664 - nodes in this community are weakly interconnected._
 - **Should `experiment_runner.py` be split into smaller, more focused modules?**
-  _Cohesion score 0.062111801242236024 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.060764587525150904 - nodes in this community are weakly interconnected._
 - **Should `GallerySimilarityScorer` be split into smaller, more focused modules?**
   _Cohesion score 0.0701484895033282 - nodes in this community are weakly interconnected._

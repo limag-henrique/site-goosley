@@ -76,3 +76,12 @@ até os dois encerramentos.
 Eventos `reflect` preservam o ID do parecer, documento/hash, fingerprint da campanha/seleção e exposição à IA. O detalhe `mode=blind` retorna `reflection`; a consulta pública `mode=community` associa `reflectionEvent` ao último parecer, quando existente. Exportações individuais incluem todo o histórico e `latestReflections` do parecer atual. Alterar o parecer produz nova versão: ponderações de versões anteriores permanecem nos eventos exportados, sem ser atribuídas à nova versão por engano.
 
 O cliente das avaliadoras usa somente `blind` e `community`. Agregados e contratos históricos continuam disponíveis no serviço, mas não integram a interface simplificada.
+
+
+## Consulta prévia opcional
+
+`POST {action:'preview',reviewer,accessKey,recordingId}` consulta a IA antes de preencher a avaliação. Nome, justificativa, situação e escores não são exigidos. A chave aleatória é gerada automaticamente pelo cliente e identifica apenas a consulta; o evento não reserva o percurso nem autoriza edições em nome de uma avaliadora.
+
+A resposta traz `ai`, `metrics`, `prompt` e `provenance`; sem parecer salvo, `human` e `delta` são null. A classificação não desaparece quando o formulário fica sujo. Depois de salvar, a comparação usa os escores salvos e a ponderação segue vinculada ao `reviewId` atual.
+
+Eventos técnicos `preview` guardam somente `viewerKeyHash`, nunca a chave; são idempotentes por navegador, percurso e música. O vínculo de autoria e de chave continua ocorrendo na primeira escrita identificada. `aiExposed` considera uma consulta prévia apenas quando seu hash corresponde à chave do parecer. Exportações individuais incluem somente consultas da chave vinculada e removem todos os hashes privados. O fluxo antigo `reveal` permanece compatível, mas o cliente atual usa `preview` para permitir leitura antes de preencher.

@@ -12,7 +12,7 @@ type Reply = {
   review?:PortalEvent|null; reflection?:PortalEvent|null; comparison?:Comparison; reviews?:SharedReview[];
 };
 type Mode = 'blind'|'community';
-type Action = 'save'|'close'|'reveal'|'reflect'|'export';
+type Action = 'save'|'close'|'reveal'|'preview'|'reflect'|'export';
 const api = '/api/pesquisa-musical';
 const marketNames:Record<string,string> = { DO:'República Dominicana', PA:'Panamá', CL:'Chile', BR:'Brasil', ID:'Indonésia', JP:'Japão', TW:'Taiwan' };
 
@@ -126,14 +126,14 @@ export default function ResearchPortal() {
       const response=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const result=await response.json();
       if(!response.ok)throw new Error(result.error||'Não foi possível salvar. Seu texto continua no formulário.');
-      if(action==='reveal')setDetail(current=>current?{...current,comparison:result}:current);
+      if(action==='reveal'||action==='preview')setDetail(current=>current?{...current,comparison:result}:current);
       if(action==='reflect') {
         setDetail(current=>current?{...current,reflection:result.reflection}:current);
         setReflectionDirty(false); setMessage('Ponderação salva e disponível em Pareceres salvos.');
       }
       if(action==='save'||action==='close') {
         setReviewDirty(false); setConfirmClose(false); setRevision(v=>v+1);
-        setMessage(action==='save'?'Parecer salvo. Se desejar, consulte agora a análise da IA.':'Etapa de avaliação encerrada. Você ainda pode registrar ponderações sobre a IA.');
+        setMessage(action==='save'?'Parecer salvo. Consulte a IA, se desejar, e registre sua ponderação.':'Etapa de avaliação encerrada. Você ainda pode registrar ponderações sobre a IA.');
       }
     } catch(e) { setError(e instanceof Error?e.message:'Falha ao salvar. Seu texto continua no formulário.'); }
     finally { setBusy(null); }
@@ -149,7 +149,7 @@ export default function ResearchPortal() {
   }
 
   return <main className="research">
-    <header><div><p className="eyebrow">Goosley · Pesquisa musical</p><h1>Avalie as músicas.</h1><p className="muted">Registre seu fundamento, consulte a IA e pondere sobre as diferenças.</p></div></header>
+    <header><div><p className="eyebrow">Goosley · Pesquisa musical</p><h1>Avalie as músicas.</h1><p className="muted">Se desejar, consulte a IA antes de avaliar e explique onde concorda ou discorda.</p></div></header>
     <nav aria-label="Avaliação musical">{([['blind','Avaliar músicas'],['community','Pareceres salvos']] as const).map(([id,label])=><button key={id} disabled={!!busy} aria-current={mode===id?'page':undefined} onClick={()=>changeMode(id)}>{label}</button>)}</nav>
     {error&&<div className="notice error" role="alert">{error} <button disabled={dirty||!!busy} onClick={()=>setRevision(v=>v+1)}>Tentar novamente</button></div>}
     {message&&<p className="notice" role="status">{message}</p>}
@@ -176,9 +176,12 @@ export default function ResearchPortal() {
           {!loading&&!error&&!data?.recordings?.length&&<p>Nenhuma música disponível para avaliação.</p>}
         </section>
         <section className="panel" aria-label="Música e avaliação">
-          {!track?<><h2>{selected?'Carregando música…':'Escolha uma música'}</h2><p className="muted">Leia a letra e registre seu parecer. Depois de salvar, você pode consultar a IA e comentar as diferenças.</p></>:<>
+          {!track?<><h2>{selected?'Carregando música…':'Escolha uma música'}</h2><p className="muted">Leia a letra e, se desejar, veja a análise da IA antes de preencher seu parecer.</p></>:<>
             <h2>{track.title}</h2><p className="muted">{track.artist}</p>
             {track.lyrics?<details open><summary>Letra da música</summary><div className="lyrics" tabIndex={0} aria-label="Letra da música">{track.lyrics}</div></details>:<p className="notice">A letra autorizada está indisponível. Registre ausência de letra ou abstenção; não atribua zero para representar essa ausência.</p>}
+            {!detail?.comparison&&<section className="ai-invitation"><h3>Análise da IA (opcional)</h3><p>Você pode consultar a classificação feita por IA antes de preencher qualquer campo da avaliação.</p><button disabled={!!busy||accessKey.length<32} onClick={()=>act('preview')}>{busy==='preview'?'Consultando…':'Ver análise da IA antes de avaliar'}</button></section>}
+            {detail?.comparison&&<AiComparison comparison={detail.comparison} dimensions={dimensions} hasReview={!!review}/>}
+            {reviewDirty&&review&&detail?.comparison&&<p className="muted">Os escores humanos na comparação são os últimos salvos. Salve seu parecer para atualizar as diferenças.</p>}
             {review&&<section className="saved-basis"><h3>Seu fundamento salvo</h3><p className="review-text">{review.justification}</p><small>{closed?'Avaliação encerrada. Os escores e este fundamento estão preservados.':'Seu fundamento original fica preservado ao registrar a ponderação sobre a IA.'}</small></section>}
             <details key={review?.id??selected} open={!review} className="review-editor"><summary>{review?'Ver escores e revisar seu parecer':'Seu parecer'}</summary>
               <form onSubmit={e=>{e.preventDefault();act('save');}}>
@@ -187,13 +190,10 @@ export default function ResearchPortal() {
                 {status==='scored'&&<div className="rubric">{dimensions.map(d=><label key={d.code}>{d.label}<small>{d.definition}</small><select required value={scores[d.code]??''} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setScores(v=>({...v,[d.code]:e.target.value}));setReviewDirty(true);}}><option value="">Selecionar intensidade</option>{['Ausente','Incidental','Substancial','Central'].map((label,i)=><option key={i} value={i}>{i} · {label}</option>)}</select></label>)}</div>}
                 <label>Seu fundamento<textarea required maxLength={6000} disabled={closed||!!busy||reflectionDirty} value={justification} onChange={e=>{setJustification(e.target.value);setReviewDirty(true);}} placeholder="Explique sua interpretação e as evidências da letra que sustentam os escores."/></label>
                 <details><summary>Idioma e identificação da letra (opcional)</summary><div className="identity-fields"><label>Idioma observado<input value={recordedLanguage} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setRecordedLanguage(e.target.value);setReviewDirty(true);}}/></label><label>Correspondência da letra<select value={identityVerdict} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setIdentityVerdict(e.target.value);setReviewDirty(true);}}><option value="">Não confirmada</option><option value="confirmed">Corresponde à música</option><option value="uncertain">Há dúvida</option><option value="mismatch">Não corresponde à música</option></select></label></div></details>
-                <div className="actions"><button className="primary" disabled={!!busy||closed||reflectionDirty||accessKey.length<32||!evaluator.trim()||!justification.trim()} type="submit">{busy==='save'?'Salvando…':closed?'Avaliação encerrada':'Salvar meu parecer'}</button><small>{reviewDirty?'Há alterações não salvas.':review?'Parecer salvo no servidor.':'Salve antes de consultar a IA.'}</small></div>
+                <div className="actions"><button className="primary" disabled={!!busy||closed||reflectionDirty||accessKey.length<32||!evaluator.trim()||!justification.trim()} type="submit">{busy==='save'?'Salvando…':closed?'Avaliação encerrada':'Salvar meu parecer'}</button><small>{reviewDirty?'Há alterações não salvas.':review?'Parecer salvo no servidor.':'Consultar a IA é opcional, antes ou depois de avaliar.'}</small></div>
               </form>
             </details>
-            {review&&!detail?.comparison&&<section className="ai-invitation"><h3>Análise da IA</h3><p>Gostaria de ver a classificação feita por IA e compará-la com seu parecer?</p><button disabled={!!busy||dirty||!evaluator.trim()||accessKey.length<32} onClick={()=>act('reveal')}>{busy==='reveal'?'Consultando…':'Ver análise da IA'}</button>{reviewDirty&&<p>Salve as alterações do seu parecer antes de comparar.</p>}</section>}
-            {reviewDirty&&detail?.comparison&&<p className="notice">Salve as alterações do seu parecer para atualizar a comparação com a IA.</p>}
-            {detail?.comparison&&!reviewDirty&&<>
-              <AiComparison comparison={detail.comparison} dimensions={dimensions}/>
+            {detail?.comparison&&review&&!reviewDirty&&<>
               <form className="reflection-form" onSubmit={e=>{e.preventDefault();act('reflect');}}>
                 <h3>Sua ponderação sobre as diferenças</h3>
                 <label>Como seu fundamento se compara à análise da IA?<textarea required maxLength={6000} value={reflection} disabled={!!busy} onChange={e=>{setReflection(e.target.value);setReflectionDirty(true);}} placeholder="Explique onde concorda ou discorda, o contexto que sustenta sua leitura e o que pode explicar as diferenças de escores."/></label>
