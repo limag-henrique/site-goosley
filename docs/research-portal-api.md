@@ -85,3 +85,12 @@ O cliente das avaliadoras usa somente `blind` e `community`. Agregados e contrat
 A resposta traz `ai`, `metrics`, `prompt` e `provenance`; sem parecer salvo, `human` e `delta` são null. A classificação não desaparece quando o formulário fica sujo. Depois de salvar, a comparação usa os escores salvos e a ponderação segue vinculada ao `reviewId` atual.
 
 Eventos técnicos `preview` guardam somente `viewerKeyHash`, nunca a chave; são idempotentes por navegador, percurso e música. O vínculo de autoria e de chave continua ocorrendo na primeira escrita identificada. `aiExposed` considera uma consulta prévia apenas quando seu hash corresponde à chave do parecer. Exportações individuais incluem somente consultas da chave vinculada e removem todos os hashes privados. O fluxo antigo `reveal` permanece compatível, mas o cliente atual usa `preview` para permitir leitura antes de preencher.
+
+
+## Exportação comparativa durante a coleta
+
+`GET ?mode=comparison-export&format=csv|json[&reviewer=1|2]` devolve arquivo com Content-Disposition attachment e sem cache. CSV é o formato padrão; formato desconhecido retorna 400. Sem reviewer inclui as duas avaliadoras; com reviewer exporta somente o percurso indicado. Não exige encerramento nem chave de edição, pois os pareceres e classificações já são legíveis publicamente no portal.
+
+O JSON identifica a versão research-comparison-export-v1, momento da exportação, fingerprint do corpus, versão da seleção e dimensões. evaluations contém o último parecer salvo por avaliadora/música, identidade documental, ponderação correspondente ao ID desse parecer e comparação com a IA. history preserva todas as revisões de pareceres e ponderações do recorte. Eventos técnicos de consulta e hashes privados não são incluídos.
+
+O CSV apresenta a comparação lado a lado por dimensão, com valores ausentes vazios, zero preservado e diferença humano menos IA; inclui texto das justificativas/ponderações e metadados. Exportar não grava eventos. O contrato histórico review-export continua sendo a cópia individual sem previsões da IA.

@@ -69,3 +69,17 @@ A ponderação separada continua disponível após salvar o fundamento e os esco
 
 
 Verificação da consulta prévia: 19 testes do portal passaram; TypeScript passou. A suíte geral teve 48 aprovações e as mesmas seis falhas preexistentes nas APIs faciais desativadas. Uma integração HTTP local, com diretório de eventos técnico isolado, consultou os 26 escores sem nome ou avaliação, salvou o parecer com exposição registrada, criou a ponderação e recuperou os dados no detalhe e na leitura pública. A revisão não encontrou pendências. O botão foi conferido no código acima do formulário e sem bloqueio por nome, escores, justificativa ou rascunho. A interação visual desta alteração não foi repetida porque o controle de navegador local está desativado nas configurações do Work. Graphify atualizado; nenhum commit, troca de branch, publicação ou escrita na coleta real.
+
+
+## Download comparativo — 23/10/2026
+
+Em Pareceres salvos, os botões Baixar comparação com IA (CSV) e Baixar dados completos (JSON) exportam as avaliações durante a coleta, sem exigir encerramento. Em Acesso e cópia dos pareceres há também o CSV da avaliadora selecionada.
+
+CSV: uma linha por música, avaliadora e dimensão, com os últimos escores humano/IA, diferença humano menos IA, concordância/divergência, fundamento, ponderação correspondente à versão do parecer, situação, exposição à IA e rastreabilidade. Zero permanece zero; ausência gera célula vazia e Sem comparação. UTF-8 com BOM, separador ponto e vírgula e aspas preservam textos multilinha e acentos. Strings que poderiam ser fórmulas são neutralizadas sem alterar diferenças numéricas negativas.
+
+JSON: comparação dos últimos pareceres, prompt/proveniência da IA e histórico dos pareceres e ponderações. Hashes privados de edição/consulta e letras não integram os arquivos. A exportação é somente leitura e não muda o corpus, a seleção nem os eventos. O download individual anterior permanece disponível.
+
+Verificação: teste de contrato com dois pareceres por avaliadora, revisão anterior, ausência de letra, ponderação vinculada e exportação antes de fechar; teste de CSV com Unicode, aspas, quebras, zero, deltas negativos, fórmulas e conjunto vazio; checagem de tipos, suíte geral, integração HTTP e build.
+
+
+Validação do download: 22 testes do portal/CSV passaram e o TypeScript passou. A integração HTTP local gerou e reabriu um CSV com 52 linhas para duas avaliadoras e 26 dimensões, um CSV individual com 26 linhas e o JSON com dois pareceres. Cabeçalhos de download, BOM, textos com acentos/aspas/quebras, ponderação, filtro por avaliadora, ausência de hashes privados e rejeição de formato inválido foram verificados. O diretório de dados era técnico e isolado. As revisões de padrões e aceite não encontraram defeitos pendentes. A suíte geral mantém as seis falhas preexistentes nas APIs faciais desativadas. Graphify atualizado; sem publicação, commits ou mudança de branch. A implementação seguiu o fluxo implement, com TDD nas fronteiras do serviço e do formatador e controles visuais existentes do portal.

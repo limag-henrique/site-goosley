@@ -27,9 +27,11 @@ export function AiComparison({comparison,dimensions,hasReview=true}:{comparison:
   </section>;
 }
 
-export function SharedReviews({reviews,recordings,dimensions}:{reviews:SharedReview[];recordings:{id:string;title:string;artist:string}[];dimensions:Dimension[]}) {
+export function SharedReviews({reviews,recordings,dimensions,onExport,exporting}:{reviews:SharedReview[];recordings:{id:string;title:string;artist:string}[];dimensions:Dimension[];onExport:(format:'csv'|'json')=>void;exporting:boolean}) {
   return <section className="panel"><h2>Pareceres e ponderações salvos</h2>
     <p className="muted">Visíveis a todos que acessam esta página. Atualizados automaticamente a cada 15 segundos. A leitura pode influenciar sua própria avaliação.</p>
+    <div className="actions"><button disabled={exporting||!reviews.length} onClick={()=>onExport('csv')}>{exporting?'Preparando download…':'Baixar comparação com IA (CSV)'}</button><button disabled={exporting||!reviews.length} onClick={()=>onExport('json')}>Baixar dados completos (JSON)</button></div>
+    <p className="muted">O CSV abre em planilhas e coloca escores humanos e da IA lado a lado, com diferenças, fundamentos e ponderações. Usa o último parecer salvo de cada avaliadora; o JSON também preserva o histórico. Não é necessário encerrar a avaliação.</p>
     {!reviews.length&&<p>Ainda não há pareceres salvos. Eles aparecerão aqui após o primeiro salvamento.</p>}
     {reviews.map(review=>{
       const track=recordings.find(r=>r.id===review.recordingId);

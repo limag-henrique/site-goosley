@@ -1,3 +1,5 @@
+import type { ComparisonExport } from './research-export';
+
 export type Reviewer = 1 | 2;
 export type ReviewStatus = 'scored' | 'missing-lyrics' | 'doubt' | 'abstain' | 'identity-error';
 export interface Recording { id:string; title:string; artist:string; documentId:string; lyricsHash:string; market:string; markets:string[]; years:number[]; genre:string|null; language:string|null; lyrics:string|null; lyricAvailable?:boolean; provenance:Record<string,unknown>; ai:Record<string,unknown> }
@@ -36,7 +38,16 @@ export class PortalService {
   private state(events:PortalEvent[]){const closed=([1,2] as const).filter(r=>events.some(e=>e.action==='close'&&e.reviewer===r));return {closedReviewers:closed,closed:closed.length===2,assigned:this.assigned().length,pilot:this.pilot??null,rubricVersion:this.rubricVersion()};}
   async read(params:URLSearchParams):Promise<Record<string,unknown>> {
     const events=await this.store.read();const campaignFingerprint=await this.fingerprint(events);await this.assignmentFingerprint(events);const state=this.state(events);const mode=params.get('mode')||'exploration';
-    if(!['blind','exploration','compare','export','review-export','community'].includes(mode))throw new PortalError('Percurso inválido.');
+    if(!['blind','exploration','compare','export','review-export','community','comparison-export'].includes(mode))throw new PortalError('Percurso inválido.');
+    if(mode==='comparison-export'){
+      const reviewer=params.has('reviewer')?reviewerOf(params.get('reviewer')):null;
+      const reviewers=reviewer?[reviewer]:[1,2] as const;
+      const evaluations=reviewers.flatMap(reviewer=>[...latest(events,reviewer).values()].map(review=>{
+        const recording=this.dataset.recordings.find(r=>r.id===review.recordingId)!;
+        return {recording:{id:recording.id,title:recording.title,artist:recording.artist,market:this.pilot?.recordings.find(r=>r.recordingId===recording.id)?.market??recording.market,documentId:recording.documentId,lyricsHash:recording.lyricsHash},review:publicEvent(review),reflection:reflectionFor(events,review),comparison:this.comparison(recording,review)};
+      }));
+      return {exportVersion:'research-comparison-export-v1',exportedAt:new Date().toISOString(),campaignFingerprint,selectionVersion:this.pilot?.version??null,comparisonRule:'Último parecer salvo por avaliadora e música. Diferença = escore humano menos IA; ausência não é zero.',dimensions:this.dataset.dimensions,evaluations,history:events.filter(e=>(e.action==='save'||e.action==='reflect')&&(!reviewer||e.reviewer===reviewer)).map(publicEvent)} satisfies ComparisonExport;
+    }
     if(mode==='community'){
       const id=params.get('id');
       const reviews=([1,2] as const).flatMap(reviewer=>[...latest(events,reviewer).values()]).filter(e=>!id||e.recordingId===id).map(e=>({...e,ownerKeyHash:undefined,reflectionEvent:reflectionFor(events,e),aiExposed:!!e.aiExposed||events.some(x=>x.action==='reveal'&&x.reviewer===e.reviewer&&x.recordingId===e.recordingId&&x.at<=e.at)}));

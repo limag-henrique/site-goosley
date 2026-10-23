@@ -279,3 +279,27 @@ test('another visitor preview does not mark an unexposed evaluator and repeated 
  const shared=await secure.read(new URLSearchParams('mode=community'));
  assert.equal((shared.reviews as PortalEvent[])[0].aiExposed,false);
 });
+
+
+test('comparison download includes latest saved human judgments, AI and ponderations before closure',async()=>{
+ const {portal,events}=setup(true);
+ await portal.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Primeiro fundamento'});
+ await portal.write({action:'save',reviewer:1,evaluator:'Ana',recordingId:'song',status:'scored',scores:{sexuality:1},justification:'Fundamento atualizado'});
+ await portal.write({action:'reveal',reviewer:1,evaluator:'Ana',recordingId:'song'});
+ const current=await portal.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
+ await portal.write({action:'reflect',reviewer:1,evaluator:'Ana',recordingId:'song',reviewId:(current.review as PortalEvent).id,reflection:'A IA exagera a intensidade.'});
+ await portal.write({action:'save',reviewer:2,evaluator:'Bea',recordingId:'song',status:'missing-lyrics',justification:'Sem letra'});
+ const before=JSON.stringify(events);
+ const result=await portal.read(new URLSearchParams('mode=comparison-export')) as {exportVersion:string;evaluations:{review:PortalEvent;reflection:PortalEvent|null;comparison:{metrics:{human:number|null;ai:number|null;delta:number|null}[]}}[];history:PortalEvent[]};
+ assert.equal(result.exportVersion,'research-comparison-export-v1');
+ assert.equal(result.evaluations.length,2);
+ assert.equal(result.evaluations[0].review.justification,'Fundamento atualizado');
+ assert.equal(result.evaluations[0].reflection?.reflection,'A IA exagera a intensidade.');
+ assert.deepEqual(result.evaluations[0].comparison.metrics[0],{dimension:'sexuality',human:1,ai:3,delta:-2});
+ assert.deepEqual(result.evaluations[1].comparison.metrics[0],{dimension:'sexuality',human:null,ai:3,delta:null});
+ assert.equal(result.history.filter(e=>e.action==='save').length,3);
+ const own=await portal.read(new URLSearchParams('mode=comparison-export&reviewer=2')) as typeof result;
+ assert.equal(own.evaluations.length,1);assert.equal(own.evaluations[0].review.evaluator,'Bea');
+ assert.equal(JSON.stringify(events),before);
+ assert.equal(JSON.stringify(result).includes('ownerKeyHash'),false);assert.equal(JSON.stringify(result).includes('viewerKeyHash'),false);
+});

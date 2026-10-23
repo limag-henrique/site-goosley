@@ -22,11 +22,12 @@ async function request(params:URLSearchParams, signal?:AbortSignal):Promise<Repl
   if (!response.ok) throw new Error(value.error || 'Não foi possível carregar os pareceres.');
   return value;
 }
-function download(value:unknown, filename:string) {
-  const url = URL.createObjectURL(new Blob([JSON.stringify(value,null,2)], {type:'application/json'}));
-  const anchor = document.createElement('a'); anchor.href=url; anchor.download=filename; anchor.click();
+function downloadBlob(blob:Blob, filename:string) {
+  const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;anchor.download=filename;anchor.click();
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
+function download(value:unknown, filename:string) { downloadBlob(new Blob([JSON.stringify(value,null,2)],{type:'application/json'}),filename); }
+
 
 export default function ResearchPortal() {
   const [mode,setMode] = useState<Mode>('blind');
@@ -148,6 +149,18 @@ export default function ResearchPortal() {
     finally {setBusy(null);}
   }
 
+  async function exportComparison(format:'csv'|'json', own=false) {
+    if(busy||dirty)return;setBusy('export');setError('');setMessage('');
+    try {
+      const params=new URLSearchParams({mode:'comparison-export',format});if(own)params.set('reviewer',String(reviewer));
+      const response=await fetch(`${api}?${params}`,{cache:'no-store'});
+      if(!response.ok){const result=await response.json();throw new Error(result.error||'Não foi possível baixar a comparação.');}
+      downloadBlob(await response.blob(),`avaliacoes-${own?`avaliadora-${reviewer}-`:''}comparadas-com-ia-${new Date().toISOString().replace(/[:.]/g,'-')}.${format}`);
+      setMessage('Download preparado com os pareceres salvos e a comparação com a IA.');
+    }catch(e){setError(e instanceof Error?e.message:'Falha ao baixar a comparação.');}
+    finally{setBusy(null);}
+  }
+
   return <main className="research">
     <header><div><p className="eyebrow">Goosley · Pesquisa musical</p><h1>Avalie as músicas.</h1><p className="muted">Se desejar, consulte a IA antes de avaliar e explique onde concorda ou discorda.</p></div></header>
     <nav aria-label="Avaliação musical">{([['blind','Avaliar músicas'],['community','Pareceres salvos']] as const).map(([id,label])=><button key={id} disabled={!!busy} aria-current={mode===id?'page':undefined} onClick={()=>changeMode(id)}>{label}</button>)}</nav>
@@ -166,7 +179,7 @@ export default function ResearchPortal() {
         <details><summary>Acesso e cópia dos pareceres</summary>
           <p>A chave privada de edição fica neste navegador. Baixe uma cópia para continuar em outro dispositivo e guarde-a só com você. Perder a chave não apaga os pareceres salvos.</p>
           <label>Chave privada da avaliadora<input type="password" value={accessKey} disabled={!!busy} autoComplete="off" onChange={e=>updateKey(e.target.value)}/></label>
-          <div className="actions"><button disabled={!!busy||accessKey.length<32} onClick={()=>download({reviewer,accessKey},`chave-privada-avaliadora-${reviewer}.json`)}>Baixar chave privada</button><button disabled={!!busy||dirty} onClick={exportReviews}>Baixar pareceres e ponderações</button></div>
+          <div className="actions"><button disabled={!!busy||accessKey.length<32} onClick={()=>download({reviewer,accessKey},`chave-privada-avaliadora-${reviewer}.json`)}>Baixar chave privada</button><button disabled={!!busy||dirty} onClick={exportReviews}>Baixar pareceres e ponderações</button><button disabled={!!busy||dirty||!data?.completed} onClick={()=>exportComparison('csv',true)}>Baixar minha comparação com IA (CSV)</button></div>
           <details><summary>Encerrar minha etapa de avaliação</summary><p>Encerre após avaliar todas as músicas. Os escores e fundamentos ficam bloqueados; ponderações sobre a IA continuam disponíveis.</p><label className="confirmation"><input type="checkbox" checked={confirmClose} disabled={!!busy} onChange={e=>setConfirmClose(e.target.checked)}/> Concluí minha avaliação de todas as músicas.</label><button disabled={!confirmClose||!!busy||closed||dirty||!evaluator.trim()||accessKey.length<32||data?.completed!==data?.state.assigned} onClick={()=>act('close')}>Encerrar avaliação</button></details>
         </details>
       </section>
@@ -205,7 +218,7 @@ export default function ResearchPortal() {
         </section>
       </div>
     </>}
-    {mode==='community'&&data&&<SharedReviews reviews={data.reviews??[]} recordings={data.recordings??[]} dimensions={dimensions}/>}
+    {mode==='community'&&data&&<SharedReviews reviews={data.reviews??[]} recordings={data.recordings??[]} dimensions={dimensions} onExport={exportComparison} exporting={!!busy}/>}
     <footer>Pesquisa musical · O país de cada música indica circulação nas paradas, não a nacionalidade do artista. Pareceres e ponderações salvos ficam no servidor; a edição exige sua chave privada.</footer>
   </main>;
 }
