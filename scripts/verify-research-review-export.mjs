@@ -11,7 +11,8 @@ try {
   const actual = createHash('sha256').update(JSON.stringify(payload), 'utf8').digest('hex');
   assert.equal(actual, integrity.sha256, 'O conteúdo diverge do checksum. Preserve a cópia original e baixe novamente.');
   assert.ok(payload.events.every(event => event.reviewer === payload.reviewer));
-  assert.equal(payload.completed, payload.latestReviews.length);
+  const assigned=Array.isArray(payload.assignedRecordingIds)?new Set(payload.assignedRecordingIds):null;
+  assert.equal(payload.completed, payload.latestReviews.filter(review=>!assigned||assigned.has(review.recordingId)).length);
   assert.ok(!('ai' in payload) && !('divergences' in payload));
   console.log(JSON.stringify({ integrity: 'valid', reviewer: payload.reviewer, completed: payload.completed, revisions: payload.events.filter(event => event.action === 'save').length, closed: payload.closed }));
 } catch (error) {

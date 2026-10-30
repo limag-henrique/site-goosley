@@ -104,3 +104,10 @@ Fluxo principal: implement (Matt Pocock), com TDD na fronteira do serviço e do 
 - Esquema SQLite conferido em memória: gatilhos bloquearam UPDATE/DELETE; dump SQL restaurou o evento em outro banco isolado.
 - SHA-256 e posições do ranking conferidos no arquivo original do artigo. Corpus JSON original intacto. Revisão final sem novos achados. Graphify atualizado localmente.
 - Backup remoto recusado pela Cloudflare (Authentication error 10000); nenhuma cópia remota foi validada. Não houve publicação nem teste de escrita no D1 de produção. Reautenticar o Wrangler antes do backup e da publicação; conferir também a migração de percursos legados sem chave.
+
+## Atualização de 30/10/2026 — cinco avaliadores
+Esta seção substitui as instruções anteriores sobre duas vagas e as mesmas 12 músicas. O servidor usa `src/data/research-selection.json`: cinco percursos exclusivos, 20 gravações iniciais e lotes opcionais de até 20. A reserva é fixa por avaliador e a expansão persiste como evento `extend`; POST exige nome, chave e `assignedCount` atual. GET blind aceita avaliadores 1 a 5 e mantém paginação (a interface reúne todas as páginas carregadas).
+
+O manifesto antigo e o corpus permanecem intactos. A transição aceita somente o fingerprint exato do piloto anterior, preserva sua autoria/chaves e histórico e não herda seus encerramentos. Não editar o novo manifesto após iniciar a coleta. Encerramento exige parecer em cada música já carregada; a reserva opcional não impede encerrar. Pareceres históricos continuam em comunidade e downloads. O JSON individual informa `assignedRecordingIds`, distinguindo o progresso da seleção atual de todo o histórico preservado; o verificador de integridade foi ajustado para essa distinção.
+
+Consulte `research-five-reviewers.md` para critérios e validação e `research-selection-evidence.md` para a seleção e suas fontes. Esta entrega é local, sem publicação nem migração destrutiva; não exige alteração do esquema D1 existente. Nas análises, as músicas diferentes não produzem medidas de concordância interavaliador.

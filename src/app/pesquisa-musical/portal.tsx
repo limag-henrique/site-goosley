@@ -1,18 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import type { Dimension, PortalEvent, ReviewStatus } from '@/lib/research-portal';
+import { REVIEWERS, type Reviewer, type Dimension, type PortalEvent, type ReviewStatus } from '@/lib/research-portal';
 import { AiComparison, SharedReviews, reviewStatuses, type Comparison, type SharedReview } from './review-results';
 import './portal.css';
 
-type Track = { id:string; title:string; artist:string; displayMarket?:string; market:string; lyrics?:string|null; reviewStatus?:string };
+type Track = { id:string; title:string; artist:string; displayMarket?:string; market:string; lyrics?:string|null; reviewStatus?:string; selectionEvidence?:{year:number;annualChartRank:number;streams:number;chartDays:number} };
 type Reply = {
-  state:{ closedReviewers:number[]; assigned:number };
+  state:{ closedReviewers:number[]; assigned:number; available:number; canLoadMore:boolean };
+  total?:number;
   dimensions:Dimension[]; completed?:number; recordings?:Track[]; recording?:Track;
   review?:PortalEvent|null; reflection?:PortalEvent|null; comparison?:Comparison; reviews?:SharedReview[];
 };
 type Mode = 'blind'|'community';
-type Action = 'save'|'close'|'reveal'|'preview'|'reflect'|'export';
+type Action = 'save'|'close'|'reveal'|'preview'|'reflect'|'export'|'extend';
 const api = '/api/pesquisa-musical';
 const marketNames:Record<string,string> = { DO:'República Dominicana', PA:'Panamá', CL:'Chile', BR:'Brasil', ID:'Indonésia', JP:'Japão', TW:'Taiwan' };
 
@@ -31,7 +32,7 @@ function download(value:unknown, filename:string) { downloadBlob(new Blob([JSON.
 
 export default function ResearchPortal() {
   const [mode,setMode] = useState<Mode>('blind');
-  const [reviewer,setReviewer] = useState<1|2>(1);
+  const [reviewer,setReviewer] = useState<Reviewer>(1);
   const [evaluator,setEvaluator] = useState('');
   const [credential,setCredential] = useState({reviewer:1,key:''});
   const accessKey = credential.reviewer===reviewer ? credential.key : '';
@@ -71,7 +72,7 @@ export default function ResearchPortal() {
     try {
       setEvaluator(localStorage.getItem('research-evaluator') ?? '');
       const stored=localStorage.getItem('research-reviewer');
-      if(stored==='1'||stored==='2') setReviewer(Number(stored) as 1|2);
+      if(stored&&REVIEWERS.some(id=>String(id)===stored)) setReviewer(Number(stored) as Reviewer);
     } catch {}
   },[]);
   useEffect(()=>{
@@ -88,7 +89,11 @@ export default function ResearchPortal() {
   useEffect(()=>{
     const controller=new AbortController(); setLoading(true); setError('');
     request(new URLSearchParams({mode,reviewer:String(reviewer),pageSize:'100'}),controller.signal)
-      .then(setData).catch(e=>{if(e.name!=='AbortError')setError(e.message);})
+      .then(async first=>{
+        if(mode!=='blind'||!first.total||first.total<=100)return first;
+        const pages=await Promise.all(Array.from({length:Math.ceil(first.total/100)-1},(_,i)=>request(new URLSearchParams({mode,reviewer:String(reviewer),pageSize:'100',page:String(i+2)}),controller.signal)));
+        return {...first,recordings:[...(first.recordings??[]),...pages.flatMap(page=>page.recordings??[])]};
+      }).then(value=>{if(!controller.signal.aborted)setData(value);}).catch(e=>{if(e.name!=='AbortError')setError(e.message);})
       .finally(()=>{if(!controller.signal.aborted)setLoading(false);});
     return ()=>controller.abort();
   },[mode,reviewer,revision]);
@@ -123,6 +128,7 @@ export default function ResearchPortal() {
     try {
       const body:Record<string,unknown>={action,reviewer,evaluator,accessKey,recordingId:selected};
       if(action==='save') Object.assign(body,{status,scores:status==='scored'?Object.fromEntries(Object.entries(scores).map(([key,value])=>[key,value===''?null:Number(value)])):{},justification,recordedLanguage,identityVerdict:identityVerdict||null});
+      if(action==='extend') Object.assign(body,{assignedCount:data?.state.assigned});
       if(action==='reflect') Object.assign(body,{reviewId:review?.id,reflection});
       const response=await fetch(api,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
       const result=await response.json();
@@ -132,6 +138,7 @@ export default function ResearchPortal() {
         setDetail(current=>current?{...current,reflection:result.reflection}:current);
         setReflectionDirty(false); setMessage('Ponderação salva e disponível em Pareceres salvos.');
       }
+      if(action==='extend'){setRevision(v=>v+1);setMessage('Novo lote carregado. As músicas anteriores continuam na sua lista.');}
       if(action==='save'||action==='close') {
         setReviewDirty(false); setConfirmClose(false); setRevision(v=>v+1);
         setMessage(action==='save'?'Parecer salvo. Consulte a IA, se desejar, e registre sua ponderação.':'Etapa de avaliação encerrada. Você ainda pode registrar ponderações sobre a IA.');
@@ -173,19 +180,20 @@ export default function ResearchPortal() {
         <div className="row"><h2>Sua avaliação</h2><span className="badge">{data?.completed??0} de {data?.state.assigned??'…'} músicas avaliadas</span></div>
         <div className="identity-fields">
           <label>Seu nome<input value={evaluator} disabled={!!busy} maxLength={160} onChange={e=>identify(e.target.value)} placeholder="Nome completo" autoComplete="name"/></label>
-          <label>Avaliadora<select value={reviewer} disabled={!!busy} onChange={e=>{if(leave()){clearSelection();setData(null);setReviewer(Number(e.target.value) as 1|2);try{localStorage.setItem('research-reviewer',e.target.value);}catch{}}}}><option value={1}>Avaliadora 1</option><option value={2}>Avaliadora 2</option></select></label>
+          <label>Avaliador<select value={reviewer} disabled={!!busy} onChange={e=>{if(leave()){clearSelection();setData(null);setReviewer(Number(e.target.value) as Reviewer);try{localStorage.setItem('research-reviewer',e.target.value);}catch{}}}}>{REVIEWERS.map(id=><option key={id} value={id}>Avaliador {id}</option>)}</select></label>
         </div>
-        <p className="muted">Use sempre o mesmo nome e número. Seu parecer e sua ponderação ficam visíveis em Pareceres salvos.</p>
+        <p className="muted">Cada avaliador recebe 20 músicas iniciais, exclusivas do seu percurso. Você pode carregar novos lotes quando desejar. Use sempre o mesmo nome e número. Seu parecer e sua ponderação ficam visíveis em Pareceres salvos.</p>
         <details><summary>Acesso e cópia dos pareceres</summary>
           <p>A chave privada de edição fica neste navegador. Baixe uma cópia para continuar em outro dispositivo e guarde-a só com você. Perder a chave não apaga os pareceres salvos.</p>
           <label>Chave privada da avaliadora<input type="password" value={accessKey} disabled={!!busy} autoComplete="off" onChange={e=>updateKey(e.target.value)}/></label>
           <div className="actions"><button disabled={!!busy||accessKey.length<32} onClick={()=>download({reviewer,accessKey},`chave-privada-avaliadora-${reviewer}.json`)}>Baixar chave privada</button><button disabled={!!busy||dirty} onClick={exportReviews}>Baixar pareceres e ponderações</button><button disabled={!!busy||dirty||!data?.completed} onClick={()=>exportComparison('csv',true)}>Baixar minha comparação com IA (CSV)</button></div>
-          <details><summary>Encerrar minha etapa de avaliação</summary><p>Encerre após avaliar todas as músicas. Os escores e fundamentos ficam bloqueados; ponderações sobre a IA continuam disponíveis.</p><label className="confirmation"><input type="checkbox" checked={confirmClose} disabled={!!busy} onChange={e=>setConfirmClose(e.target.checked)}/> Concluí minha avaliação de todas as músicas.</label><button disabled={!confirmClose||!!busy||closed||dirty||!evaluator.trim()||accessKey.length<32||data?.completed!==data?.state.assigned} onClick={()=>act('close')}>Encerrar avaliação</button></details>
+          <details><summary>Encerrar minha etapa de avaliação</summary><p>Encerre após avaliar todas as músicas carregadas. Os próximos lotes são opcionais. Os escores e fundamentos ficam bloqueados; ponderações sobre a IA continuam disponíveis.</p><label className="confirmation"><input type="checkbox" checked={confirmClose} disabled={!!busy} onChange={e=>setConfirmClose(e.target.checked)}/> Concluí minha avaliação de todas as músicas carregadas.</label><button disabled={!confirmClose||!!busy||closed||dirty||!evaluator.trim()||accessKey.length<32||data?.completed!==data?.state.assigned} onClick={()=>act('close')}>Encerrar avaliação</button></details>
         </details>
       </section>
       <div className="split">
         <section className="panel"><h2>Músicas para avaliar</h2>
-          {data?.recordings?.map(item=><button className="track" key={item.id} disabled={loading||!!busy} aria-pressed={selected===item.id} onClick={()=>{if(selected===item.id)return;if(leave()){clearSelection();setSelected(item.id);}}}><strong>{item.title}</strong><small>{item.artist}</small><small>{marketNames[item.displayMarket??item.market]??item.market}{item.reviewStatus?' · Parecer salvo':''}</small></button>)}
+          {data?.recordings?.map(item=><button className="track" key={item.id} disabled={loading||!!busy} aria-pressed={selected===item.id} onClick={()=>{if(selected===item.id)return;if(leave()){clearSelection();setSelected(item.id);}}}><strong>{item.title}</strong><small>{item.artist}</small><small>{marketNames[item.displayMarket??item.market]??item.market}{item.reviewStatus?' · Parecer salvo':''}</small>{item.selectionEvidence&&<small>{item.selectionEvidence.year===2022?'2022 (até 13/03)':item.selectionEvidence.year} · #{item.selectionEvidence.annualChartRank} por streams no país/ano · {new Intl.NumberFormat('pt-BR').format(item.selectionEvidence.streams)} streams observados</small>}</button>)}
+          {data&&<div className="more-tracks"><p className="muted">{data.recordings?.length??0} músicas carregadas de {data.state.available} disponíveis neste percurso.</p>{data.state.canLoadMore?<><button className="primary" disabled={loading||!!busy||dirty||closed||!evaluator.trim()||accessKey.length<32} onClick={()=>act('extend')}>{busy==='extend'?'Carregando mais músicas…':`Carregar mais músicas (+${Math.min(20,data.state.available-data.state.assigned)})`}</button>{!evaluator.trim()&&<p className="muted">Preencha seu nome para carregar outro lote.</p>}{dirty&&<p className="muted">Salve seu parecer antes de carregar outro lote.</p>}</>:<p className="muted">{closed?'Sua etapa foi encerrada.':'Todas as músicas disponíveis para este percurso já foram carregadas.'}</p>}</div>}
           {!loading&&!error&&!data?.recordings?.length&&<p>Nenhuma música disponível para avaliação.</p>}
         </section>
         <section className="panel" aria-label="Música e avaliação">

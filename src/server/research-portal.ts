@@ -1,7 +1,7 @@
 import 'server-only';
 import { getCloudflareContext } from '@opennextjs/cloudflare';
 import data from '@/data/research-portal.json';
-import pilot from '@/data/research-pilot.json';
+import pilot from '@/data/research-selection.json';
 import { localStore } from './research-local-store';
 import { PortalError, PortalService, type EventStore, type PortalDataset, type PortalEvent } from '@/lib/research-portal';
 
