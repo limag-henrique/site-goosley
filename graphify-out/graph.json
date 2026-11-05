@@ -7207,8 +7207,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_manifest",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "manifest.ts"
     },
     {
@@ -7219,8 +7219,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_app_manifest_manifest",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "manifest()"
     },
     {
@@ -8016,8 +8016,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_components_criminalidadefacialexperience_criminalidadefacialdeactivated",
-      "community": 27,
-      "community_name": "criminalidadefacial-profile.ts",
+      "community": 15,
+      "community_name": "CriminalidadeFacialExperience.tsx",
       "norm_label": "criminalidadefacialdeactivated()"
     },
     {
@@ -8321,8 +8321,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_components_useimmersivemode",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "useimmersivemode.ts"
     },
     {
@@ -8333,8 +8333,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_components_useimmersivemode_useimmersivemode",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "useimmersivemode()"
     },
     {
@@ -9014,8 +9014,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_lib_immersive_mode",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "immersive-mode.ts"
     },
     {
@@ -9027,8 +9027,8 @@
       "_callable_class": true,
       "_origin": "ast",
       "id": "src_lib_immersive_mode_fullscreendocument",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "fullscreendocument"
     },
     {
@@ -9039,8 +9039,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_immersive_mode_isimmersivefullscreen",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "isimmersivefullscreen()"
     },
     {
@@ -9051,8 +9051,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_immersive_mode_isimmersivefullscreensupported",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "isimmersivefullscreensupported()"
     },
     {
@@ -9063,8 +9063,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_immersive_mode_requestimmersivefullscreen",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "requestimmersivefullscreen()"
     },
     {
@@ -9075,8 +9075,8 @@
       "_callable": true,
       "_origin": "ast",
       "id": "src_lib_immersive_mode_exitimmersivefullscreen",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "exitimmersivefullscreen()"
     },
     {
@@ -10091,7 +10091,7 @@
       "label": "findDeclaration()",
       "file_type": "code",
       "source_file": "src/server/electronic-signature.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "_callable": true,
       "_origin": "ast",
       "id": "src_server_electronic_signature_finddeclaration",
@@ -10316,8 +10316,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "tests_criminalidadefacial_pwa_test",
-      "community": 16,
-      "community_name": "CostEstimator.tsx",
+      "community": 69,
+      "community_name": "criminalidadefacial-pwa.test.ts",
       "norm_label": "criminalidadefacial-pwa.test.ts"
     },
     {
@@ -11019,7 +11019,7 @@
       "label": "Crit\u00e9rios de aceita\u00e7\u00e3o e verifica\u00e7\u00e3o",
       "file_type": "document",
       "source_file": "docs/electronic-signature.md",
-      "source_location": "L12",
+      "source_location": "L14",
       "_origin": "ast",
       "id": "docs_electronic_signature_crit\u00e9rios_de_aceita\u00e7\u00e3o_e_verifica\u00e7\u00e3o",
       "community": 66,
@@ -11030,12 +11030,23 @@
       "label": "Fora do escopo",
       "file_type": "document",
       "source_file": "docs/electronic-signature.md",
-      "source_location": "L20",
+      "source_location": "L22",
       "_origin": "ast",
       "id": "docs_electronic_signature_fora_do_escopo",
       "community": 66,
       "community_name": "Consulta de declara\u00e7\u00e3o",
       "norm_label": "fora do escopo"
+    },
+    {
+      "label": "Valida\u00e7\u00e3o realizada",
+      "file_type": "document",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L26",
+      "_origin": "ast",
+      "id": "docs_electronic_signature_valida\u00e7\u00e3o_realizada",
+      "community": 66,
+      "community_name": "Consulta de declara\u00e7\u00e3o",
+      "norm_label": "validacao realizada"
     },
     {
       "label": "pricing-market.md",
@@ -30402,7 +30413,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/server/electronic-signature.ts",
-      "source_location": "L15",
+      "source_location": "L17",
       "weight": 1.0,
       "_origin": "ast",
       "source": "src_server_electronic_signature",
@@ -31156,7 +31167,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/electronic-signature.md",
-      "source_location": "L12",
+      "source_location": "L14",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
@@ -31178,11 +31189,22 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "docs/electronic-signature.md",
-      "source_location": "L20",
+      "source_location": "L22",
       "weight": 1.0,
       "_origin": "ast",
       "source": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
       "target": "docs_electronic_signature_fora_do_escopo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L26",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
+      "target": "docs_electronic_signature_valida\u00e7\u00e3o_realizada",
       "confidence_score": 1.0
     },
     {
@@ -31880,5 +31902,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d69d40d88d0a84aec71509f73ef242014e24719c"
+  "built_at_commit": "5fe06e7ff5f9d78c20c41e91604537223d4e693a"
 }

@@ -535,7 +535,7 @@
     "semantic_hash": ""
   },
   "src/server/criminalidadefacial/pessoas.generated.ts": {
-    "mtime": 1793894030.263489,
+    "mtime": 1793895462.1899815,
     "ast_hash": "934aabe54099c9227c6e0433aed513a0",
     "semantic_hash": ""
   },
@@ -48165,13 +48165,13 @@
     "semantic_hash": ""
   },
   "src/app/assinatura-eletronica/[chave]/page.tsx": {
-    "mtime": 1793893961.8323905,
-    "ast_hash": "76acbe5d08bd0a63741eec45764e0514",
+    "mtime": 1793895485.3917842,
+    "ast_hash": "2e9727e5b5b7b20fd0229f2693aeffc4",
     "semantic_hash": ""
   },
   "src/app/assinatura-eletronica/layout.tsx": {
-    "mtime": 1793893961.781753,
-    "ast_hash": "f043fa82273ee0b32629a2e61298bc42",
+    "mtime": 1793895447.4686785,
+    "ast_hash": "52da2c6db9fb52160025c91191a41326",
     "semantic_hash": ""
   },
   "src/app/assinatura-eletronica/not-found.tsx": {
@@ -48185,8 +48185,8 @@
     "semantic_hash": ""
   },
   "src/server/electronic-signature.ts": {
-    "mtime": 1793893886.8632486,
-    "ast_hash": "9b348092c7b58f92a8cc46205c478582",
+    "mtime": 1793895485.3905444,
+    "ast_hash": "de632792fd6e063fccd1b9919255d44f",
     "semantic_hash": ""
   },
   "tests/electronic-signature.test.ts": {
@@ -48195,8 +48195,8 @@
     "semantic_hash": ""
   },
   "docs/electronic-signature.md": {
-    "mtime": 1793893842.6242886,
-    "ast_hash": "2b112d0353a59e0b77cbaea8a7455fb4",
+    "mtime": 1793895485.3927996,
+    "ast_hash": "a7558bf468624de1b6cf7d91b1fc74d2",
     "semantic_hash": ""
   },
   "public/images/declaracao-logo.png": {

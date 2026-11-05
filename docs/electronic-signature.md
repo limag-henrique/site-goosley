@@ -8,6 +8,8 @@
 - Endereços não listados na navegação ou sitemap, com indexação e cache desativados. O link permite acesso sem autenticação, conforme autorizado.
 - Dados do documento permanecem em módulo do servidor; o formulário não recebe uma lista de registros nem a chave correta.
 - Interface documental simples, fundo externo escuro e superfície branca para legibilidade do documento e do logo, sem animações.
+- Cabeçalho padrão compartilhado entre consulta, declaração e documento não encontrado: logo CASU UFMG navegável, identificação da rede e endereço em HTML, e título “LAUDO MÉDICO” em caixa com borda. Três colunas em desktop e impressão; blocos empilhados em celular.
+- A declaração apresenta as datas de emissão e expiração fornecidas pelo solicitante junto aos dados de assinatura. Esses dados não aparecem no formulário de consulta.
 
 ## Critérios de aceitação e verificação
 
@@ -29,4 +31,6 @@ Emissão de documentos, edição de declarações, verificação de certificados
 - Servidor de produção local: formulário e chave correta retornam 200; chave desconhecida retorna 404, sem dados pessoais. As três respostas têm noindex, no-store e no-referrer.
 - Navegador: entrada vazia, chave desconhecida, consulta com Enter e retorno pelo logo verificados. Largura de 390 px sem transbordamento horizontal; logo carregado.
 - Nome e CPF ausentes dos arquivos JavaScript, HTML e JSON públicos do build. Dados somente na resposta do documento solicitado.
-- Graphify atualizado localmente. Trabalho realizado na branch existente, sem commit ou deploy.
+- Cabeçalho comparado à referência em desktop e celular (390 px), sem transbordamento horizontal. Logo preservado como imagem; identificação, endereço e título renderizados em HTML.
+- Emissão e expiração conferidas no documento publicado, com ausência dessas datas na consulta. Build final OpenNext aprovado; atualização publicada no Worker `goosley-web`, versão `85890957-73f5-4956-9e86-bd85c3902a20`.
+- Graphify atualizado localmente. Trabalho realizado na branch existente, sem criação de commit.
