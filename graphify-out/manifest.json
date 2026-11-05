@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "next.config.ts": {
-    "mtime": 1790648052.5432365,
-    "ast_hash": "8b821c999c194ee1eec9d95a7714ca5a",
+    "mtime": 1793893961.7742062,
+    "ast_hash": "cb27eef50284ed48f8a7428b4dc223a1",
     "semantic_hash": ""
   },
   "open-next.config.ts": {
@@ -515,8 +515,8 @@
     "semantic_hash": ""
   },
   "src/lib/public-chrome.ts": {
-    "mtime": 1792594216.0651371,
-    "ast_hash": "11208881603a6a9226883953516a6091",
+    "mtime": 1793893961.671681,
+    "ast_hash": "2fe13ae2f4ac609e9831551028d22c5b",
     "semantic_hash": ""
   },
   "src/lib/reference-handler.ts": {
@@ -535,7 +535,7 @@
     "semantic_hash": ""
   },
   "src/server/criminalidadefacial/pessoas.generated.ts": {
-    "mtime": 1793393915.3223293,
+    "mtime": 1793894030.263489,
     "ast_hash": "934aabe54099c9227c6e0433aed513a0",
     "semantic_hash": ""
   },
@@ -48085,8 +48085,8 @@
     "semantic_hash": ""
   },
   "docs/research-portal-operations.md": {
-    "mtime": 1792671087.1265807,
-    "ast_hash": "6efcf8c97c4d1c026e8ffacf442be15e",
+    "mtime": 1793394116.194309,
+    "ast_hash": "0fb2595acf4c35ebc6e192e3a7d96c1a",
     "semantic_hash": ""
   },
   "scripts/split-portal-lyrics.py": {
@@ -48150,13 +48150,58 @@
     "semantic_hash": ""
   },
   "docs/research-five-reviewers.md": {
-    "mtime": 1793393457.7346427,
-    "ast_hash": "80efade0ebeaee86f3092ef4f6c0c868",
+    "mtime": 1793394116.1933062,
+    "ast_hash": "01f5721b93423a27d94601111b0cb5d4",
     "semantic_hash": ""
   },
   "docs/research-selection-evidence.md": {
     "mtime": 1793393855.8217852,
     "ast_hash": "38be50de98a889bd02868b1da325d06c",
+    "semantic_hash": ""
+  },
+  "src/app/assinatura-eletronica/ConsultaForm.tsx": {
+    "mtime": 1793893961.8088963,
+    "ast_hash": "3d9e7fe57d38ef8b23745429fbf5e964",
+    "semantic_hash": ""
+  },
+  "src/app/assinatura-eletronica/[chave]/page.tsx": {
+    "mtime": 1793893961.8323905,
+    "ast_hash": "76acbe5d08bd0a63741eec45764e0514",
+    "semantic_hash": ""
+  },
+  "src/app/assinatura-eletronica/layout.tsx": {
+    "mtime": 1793893961.781753,
+    "ast_hash": "f043fa82273ee0b32629a2e61298bc42",
+    "semantic_hash": ""
+  },
+  "src/app/assinatura-eletronica/not-found.tsx": {
+    "mtime": 1793893961.8367093,
+    "ast_hash": "2d4d87d0798302161efc489f8425e3e9",
+    "semantic_hash": ""
+  },
+  "src/app/assinatura-eletronica/page.tsx": {
+    "mtime": 1793893961.8118944,
+    "ast_hash": "d2371fc6a72bbbe241f0feea615aa119",
+    "semantic_hash": ""
+  },
+  "src/server/electronic-signature.ts": {
+    "mtime": 1793893886.8632486,
+    "ast_hash": "9b348092c7b58f92a8cc46205c478582",
+    "semantic_hash": ""
+  },
+  "tests/electronic-signature.test.ts": {
+    "mtime": 1793893902.1484709,
+    "ast_hash": "c049bd9846caf14b1d2bf1ed151451aa",
+    "semantic_hash": ""
+  },
+  "docs/electronic-signature.md": {
+    "mtime": 1793893842.6242886,
+    "ast_hash": "2b112d0353a59e0b77cbaea8a7455fb4",
+    "semantic_hash": ""
+  },
+  "public/images/declaracao-logo.png": {
+    "mtime": 1793893635.4872663,
+    "ast_hash": "9cdb560e75a40ae61bbb8f6e0df3860c",
     "semantic_hash": ""
   }
 }

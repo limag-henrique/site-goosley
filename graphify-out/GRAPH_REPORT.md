@@ -1,16 +1,16 @@
-# Graph Report - site-goosley  (2026-10-30)
+# Graph Report - site-goosley  (2026-11-05)
 
 ## Corpus Check
-- 137 files · ~826,560 words
+- 145 files · ~828,338 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 997 nodes · 1714 edges · 69 communities (51 shown, 18 thin omitted)
+- 1020 nodes · 1740 edges · 72 communities (52 shown, 20 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1e625cb8`
+- Built from commit: `d69d40d8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -68,7 +68,10 @@
 - D1Statement
 - Criminalidade Facial Mobile — Especificação
 - Review Focus
+- ConsultaForm.tsx
+- Consulta de declaração
 - generate-people-data.mjs
+- assinatura-eletronica/layout.tsx
 - criminalidadefacial/layout.tsx
 - galleryData.ts
 - progress.md
@@ -100,7 +103,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (69 total, 18 thin omitted)
+## Communities (72 total, 20 thin omitted)
 
 ### Community 0 - "cloudflare-env.d.ts"
 Cohesion: 0.36
@@ -156,7 +159,7 @@ Nodes (4): Decisões, Faixas comerciais do simulador, Referências públicas con
 
 ### Community 13 - "Piloto de avaliação musical — 12 gravações"
 Cohesion: 0.06
-Nodes (28): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Download comparativo — 23/10/2026, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações (+20 more)
+Nodes (29): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Download comparativo — 23/10/2026, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações (+21 more)
 
 ### Community 14 - "worker/package.json"
 Cohesion: 0.10
@@ -167,8 +170,8 @@ Cohesion: 0.06
 Nodes (44): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialExperience() (+36 more)
 
 ### Community 16 - "CostEstimator.tsx"
-Cohesion: 0.07
-Nodes (31): lenis, lenis, dancingScript, inter, metadata, RootLayout(), manifest(), metadata (+23 more)
+Cohesion: 0.06
+Nodes (34): lenis, lenis, DeclarationPage(), dancingScript, inter, metadata, RootLayout(), manifest() (+26 more)
 
 ### Community 17 - "split-portal-lyrics.py"
 Cohesion: 0.67
@@ -235,8 +238,8 @@ Cohesion: 0.22
 Nodes (13): dynamic, failure(), GET(), headers, POST(), comparisonCsv(), ComparisonExport, csvCell() (+5 more)
 
 ### Community 50 - "Pesquisa musical: cinco percursos exclusivos"
-Cohesion: 0.40
-Nodes (4): Escopo e critérios de aceite, Limites dos módulos, Pesquisa musical: cinco percursos exclusivos, Verificação acordada
+Cohesion: 0.33
+Nodes (5): Escopo e critérios de aceite, Limites dos módulos, Pesquisa musical: cinco percursos exclusivos, Resultado e validação — 30/10/2026, Verificação acordada
 
 ### Community 54 - "select-research-recordings.py"
 Cohesion: 0.60
@@ -254,29 +257,33 @@ Nodes (10): Arquitetura, Criminalidade Facial Mobile — Especificação, Dados 
 Cohesion: 0.20
 Nodes (9): Criminalidade Facial Mobile Implementation Plan, Global Constraints, Review Focus, Task 1: Fonte server-only e projeção de perfis, Task 2: Rotas de desafio e confirmação, Task 3: ArcFace obrigatório e contêiner inicializável, Task 4: Fluxo móvel, galeria e painéis retráteis, Task 5: Experiência PWA fullscreen (+1 more)
 
+### Community 66 - "Consulta de declaração"
+Cohesion: 0.40
+Nodes (4): Consulta de declaração, Critérios de aceitação e verificação, Escopo acordado, Fora do escopo
+
 ### Community 67 - "generate-people-data.mjs"
 Cohesion: 0.33
 Nodes (6): parseLine(), records, root, slugify(), sourcePath, targetPath
 
 ## Knowledge Gaps
-- **246 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+241 more)
+- **254 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+249 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `GallerySimilarityScorer` connect `GallerySimilarityScorer` to `cli.py`, `container_api.py`?**
-  _High betweenness centrality (0.027) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `scripts` to `CostEstimator.tsx`?**
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
+- **Why does `ArcFaceEmbedder` connect `cli.py` to `GallerySimilarityScorer`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `FaceProfileModel` connect `cli.py` to `GallerySimilarityScorer`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `GallerySimilarityScorer` (e.g. with `ImageScorer` and `ScoreCalibrator`) actually correct?**
   _`GallerySimilarityScorer` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Cloudflare`, `NodeJS`, `face-profile-ml` to the rest of the system?**
-  _246 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _254 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `cli.py` be split into smaller, more focused modules?**
   _Cohesion score 0.057729138166894664 - nodes in this community are weakly interconnected._
 - **Should `experiment_runner.py` be split into smaller, more focused modules?**
   _Cohesion score 0.060764587525150904 - nodes in this community are weakly interconnected._
-- **Should `GallerySimilarityScorer` be split into smaller, more focused modules?**
-  _Cohesion score 0.0701484895033282 - nodes in this community are weakly interconnected._

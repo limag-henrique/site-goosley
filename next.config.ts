@@ -51,6 +51,13 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        source: "/assinatura-eletronica/:path*",
+        headers: [
+          { key: "X-Robots-Tag", value: "noindex, nofollow, noarchive, nosnippet, noimageindex" },
+          { key: "Referrer-Policy", value: "no-referrer" },
+        ],
+      },
+      {
         source: "/criminalidadefacial",
         headers: [
           { key: "Permissions-Policy", value: "camera=(self), microphone=(), geolocation=(), browsing-topics=()" },

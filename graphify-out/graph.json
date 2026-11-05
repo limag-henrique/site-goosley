@@ -6803,6 +6803,143 @@
       "norm_label": "post"
     },
     {
+      "label": "ConsultaForm.tsx",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/ConsultaForm.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_consultaform",
+      "community": 65,
+      "community_name": "ConsultaForm.tsx",
+      "norm_label": "consultaform.tsx"
+    },
+    {
+      "label": "ConsultaForm()",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/ConsultaForm.tsx",
+      "source_location": "L6",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_consultaform_consultaform",
+      "community": 65,
+      "community_name": "ConsultaForm.tsx",
+      "norm_label": "consultaform()"
+    },
+    {
+      "label": "[chave]/page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/[chave]/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_chave_page",
+      "community": 16,
+      "community_name": "CostEstimator.tsx",
+      "norm_label": "[chave]/page.tsx"
+    },
+    {
+      "label": "DeclarationPage()",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/[chave]/page.tsx",
+      "source_location": "L4",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_chave_page_declarationpage",
+      "community": 16,
+      "community_name": "CostEstimator.tsx",
+      "norm_label": "declarationpage()"
+    },
+    {
+      "label": "assinatura-eletronica/layout.tsx",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_layout",
+      "community": 68,
+      "community_name": "assinatura-eletronica/layout.tsx",
+      "norm_label": "assinatura-eletronica/layout.tsx"
+    },
+    {
+      "label": "dynamic",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_layout_dynamic",
+      "community": 68,
+      "community_name": "assinatura-eletronica/layout.tsx",
+      "norm_label": "dynamic"
+    },
+    {
+      "label": "metadata",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L7",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_layout_metadata",
+      "community": 68,
+      "community_name": "assinatura-eletronica/layout.tsx",
+      "norm_label": "metadata"
+    },
+    {
+      "label": "SignatureLayout()",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_layout_signaturelayout",
+      "community": 68,
+      "community_name": "assinatura-eletronica/layout.tsx",
+      "norm_label": "signaturelayout()"
+    },
+    {
+      "label": "assinatura-eletronica/not-found.tsx",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/not-found.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_not_found",
+      "community": 65,
+      "community_name": "ConsultaForm.tsx",
+      "norm_label": "assinatura-eletronica/not-found.tsx"
+    },
+    {
+      "label": "DeclarationNotFound()",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/not-found.tsx",
+      "source_location": "L3",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_not_found_declarationnotfound",
+      "community": 65,
+      "community_name": "ConsultaForm.tsx",
+      "norm_label": "declarationnotfound()"
+    },
+    {
+      "label": "assinatura-eletronica/page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_page",
+      "community": 65,
+      "community_name": "ConsultaForm.tsx",
+      "norm_label": "assinatura-eletronica/page.tsx"
+    },
+    {
+      "label": "SignatureConsultationPage()",
+      "file_type": "code",
+      "source_file": "src/app/assinatura-eletronica/page.tsx",
+      "source_location": "L3",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_app_assinatura_eletronica_page_signatureconsultationpage",
+      "community": 65,
+      "community_name": "ConsultaForm.tsx",
+      "norm_label": "signatureconsultationpage()"
+    },
+    {
       "label": "automacoes/page.tsx",
       "file_type": "code",
       "source_file": "src/app/automacoes/page.tsx",
@@ -7110,7 +7247,7 @@
       "norm_label": "metodologia()"
     },
     {
-      "label": "not-found.tsx",
+      "label": "app/not-found.tsx",
       "file_type": "code",
       "source_file": "src/app/not-found.tsx",
       "source_location": "L1",
@@ -7118,7 +7255,7 @@
       "id": "src_app_not_found",
       "community": 28,
       "community_name": "not-found.tsx",
-      "norm_label": "not-found.tsx"
+      "norm_label": "app/not-found.tsx"
     },
     {
       "label": "metadata",
@@ -9929,6 +10066,40 @@
       "norm_label": "generated_people"
     },
     {
+      "label": "electronic-signature.ts",
+      "file_type": "code",
+      "source_file": "src/server/electronic-signature.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_server_electronic_signature",
+      "community": 16,
+      "community_name": "CostEstimator.tsx",
+      "norm_label": "electronic-signature.ts"
+    },
+    {
+      "label": "declaration",
+      "file_type": "code",
+      "source_file": "src/server/electronic-signature.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_server_electronic_signature_declaration",
+      "community": 16,
+      "community_name": "CostEstimator.tsx",
+      "norm_label": "declaration"
+    },
+    {
+      "label": "findDeclaration()",
+      "file_type": "code",
+      "source_file": "src/server/electronic-signature.ts",
+      "source_location": "L15",
+      "_callable": true,
+      "_origin": "ast",
+      "id": "src_server_electronic_signature_finddeclaration",
+      "community": 16,
+      "community_name": "CostEstimator.tsx",
+      "norm_label": "finddeclaration()"
+    },
+    {
       "label": "research-local-store.ts",
       "file_type": "code",
       "source_file": "src/server/research-local-store.ts",
@@ -10170,6 +10341,17 @@
       "community": 15,
       "community_name": "CriminalidadeFacialExperience.tsx",
       "norm_label": "photo"
+    },
+    {
+      "label": "electronic-signature.test.ts",
+      "file_type": "code",
+      "source_file": "tests/electronic-signature.test.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "tests_electronic_signature_test",
+      "community": 16,
+      "community_name": "CostEstimator.tsx",
+      "norm_label": "electronic-signature.test.ts"
     },
     {
       "label": "marketing-ctas.test.ts",
@@ -10801,6 +10983,61 @@
       "norm_label": "verificacao local"
     },
     {
+      "label": "electronic-signature.md",
+      "file_type": "document",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_electronic_signature",
+      "community": 66,
+      "community_name": "Consulta de declara\u00e7\u00e3o",
+      "norm_label": "electronic-signature.md"
+    },
+    {
+      "label": "Consulta de declara\u00e7\u00e3o",
+      "file_type": "document",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
+      "community": 66,
+      "community_name": "Consulta de declara\u00e7\u00e3o",
+      "norm_label": "consulta de declaracao"
+    },
+    {
+      "label": "Escopo acordado",
+      "file_type": "document",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L3",
+      "_origin": "ast",
+      "id": "docs_electronic_signature_escopo_acordado",
+      "community": 66,
+      "community_name": "Consulta de declara\u00e7\u00e3o",
+      "norm_label": "escopo acordado"
+    },
+    {
+      "label": "Crit\u00e9rios de aceita\u00e7\u00e3o e verifica\u00e7\u00e3o",
+      "file_type": "document",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "docs_electronic_signature_crit\u00e9rios_de_aceita\u00e7\u00e3o_e_verifica\u00e7\u00e3o",
+      "community": 66,
+      "community_name": "Consulta de declara\u00e7\u00e3o",
+      "norm_label": "criterios de aceitacao e verificacao"
+    },
+    {
+      "label": "Fora do escopo",
+      "file_type": "document",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L20",
+      "_origin": "ast",
+      "id": "docs_electronic_signature_fora_do_escopo",
+      "community": 66,
+      "community_name": "Consulta de declara\u00e7\u00e3o",
+      "norm_label": "fora do escopo"
+    },
+    {
       "label": "pricing-market.md",
       "file_type": "document",
       "source_file": "docs/pricing-market.md",
@@ -10909,6 +11146,17 @@
       "community": 50,
       "community_name": "Pesquisa musical: cinco percursos exclusivos",
       "norm_label": "verificacao acordada"
+    },
+    {
+      "label": "Resultado e valida\u00e7\u00e3o \u2014 30/10/2026",
+      "file_type": "document",
+      "source_file": "docs/research-five-reviewers.md",
+      "source_location": "L19",
+      "_origin": "ast",
+      "id": "docs_research_five_reviewers_resultado_e_valida\u00e7\u00e3o_30_10_2026",
+      "community": 50,
+      "community_name": "Pesquisa musical: cinco percursos exclusivos",
+      "norm_label": "resultado e validacao \u2014 30/10/2026"
     },
     {
       "label": "research-pilot.md",
@@ -11217,6 +11465,17 @@
       "community": 13,
       "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
       "norm_label": "verificacao do piloto \u2014 22/10/2026"
+    },
+    {
+      "label": "Atualiza\u00e7\u00e3o de 30/10/2026 \u2014 cinco avaliadores",
+      "file_type": "document",
+      "source_file": "docs/research-portal-operations.md",
+      "source_location": "L108",
+      "_origin": "ast",
+      "id": "docs_research_portal_operations_atualiza\u00e7\u00e3o_de_30_10_2026_cinco_avaliadores",
+      "community": 13,
+      "community_name": "Piloto de avalia\u00e7\u00e3o musical \u2014 12 grava\u00e7\u00f5es",
+      "norm_label": "atualizacao de 30/10/2026 \u2014 cinco avaliadores"
     },
     {
       "label": "research-portal.md",
@@ -24157,6 +24416,167 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/ConsultaForm.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_consultaform",
+      "target": "src_app_assinatura_eletronica_consultaform_consultaform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/not-found.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_not_found",
+      "target": "src_app_assinatura_eletronica_consultaform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_page",
+      "target": "src_app_assinatura_eletronica_consultaform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/not-found.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_not_found",
+      "target": "src_app_assinatura_eletronica_consultaform_consultaform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/page.tsx",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_page",
+      "target": "src_app_assinatura_eletronica_consultaform_consultaform",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/[chave]/page.tsx",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_chave_page",
+      "target": "src_app_assinatura_eletronica_chave_page_declarationpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/[chave]/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_chave_page",
+      "target": "src_server_electronic_signature",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/[chave]/page.tsx",
+      "source_location": "L2",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_chave_page",
+      "target": "src_server_electronic_signature_finddeclaration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/assinatura-eletronica/[chave]/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_chave_page_declarationpage",
+      "target": "src_server_electronic_signature_finddeclaration"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L5",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_layout",
+      "target": "src_app_assinatura_eletronica_layout_dynamic",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_layout",
+      "target": "src_app_assinatura_eletronica_layout_metadata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/layout.tsx",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_layout",
+      "target": "src_app_assinatura_eletronica_layout_signaturelayout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/not-found.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_not_found",
+      "target": "src_app_assinatura_eletronica_not_found_declarationnotfound",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/assinatura-eletronica/page.tsx",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_app_assinatura_eletronica_page",
+      "target": "src_app_assinatura_eletronica_page_signatureconsultationpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/app/automacoes/page.tsx",
       "source_location": "L7",
       "weight": 1.0,
@@ -27959,6 +28379,18 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/electronic-signature.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_electronic_signature_test",
+      "target": "src_lib_public_chrome",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "imports",
       "context": "import",
       "confidence": "EXTRACTED",
@@ -27967,6 +28399,18 @@
       "weight": 1.0,
       "_origin": "ast",
       "source": "tests_criminalidadefacial_pwa_test",
+      "target": "src_lib_public_chrome_isimmersiveroute",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/electronic-signature.test.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_electronic_signature_test",
       "target": "src_lib_public_chrome_isimmersiveroute",
       "confidence_score": 1.0
     },
@@ -29946,6 +30390,52 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/server/electronic-signature.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_server_electronic_signature",
+      "target": "src_server_electronic_signature_declaration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/server/electronic-signature.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "src_server_electronic_signature",
+      "target": "src_server_electronic_signature_finddeclaration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/electronic-signature.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_electronic_signature_test",
+      "target": "src_server_electronic_signature",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/electronic-signature.test.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "tests_electronic_signature_test",
+      "target": "src_server_electronic_signature_finddeclaration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/server/research-local-store.ts",
       "source_location": "L4",
       "weight": 1.0,
@@ -30654,6 +31144,50 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_electronic_signature",
+      "target": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L12",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
+      "target": "docs_electronic_signature_crit\u00e9rios_de_aceita\u00e7\u00e3o_e_verifica\u00e7\u00e3o",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L3",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
+      "target": "docs_electronic_signature_escopo_acordado",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/electronic-signature.md",
+      "source_location": "L20",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_electronic_signature_consulta_de_declara\u00e7\u00e3o",
+      "target": "docs_electronic_signature_fora_do_escopo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "docs/pricing-market.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -30726,6 +31260,17 @@
       "_origin": "ast",
       "source": "docs_research_five_reviewers_pesquisa_musical_cinco_percursos_exclusivos",
       "target": "docs_research_five_reviewers_limites_dos_m\u00f3dulos",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/research-five-reviewers.md",
+      "source_location": "L19",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_research_five_reviewers_pesquisa_musical_cinco_percursos_exclusivos",
+      "target": "docs_research_five_reviewers_resultado_e_valida\u00e7\u00e3o_30_10_2026",
       "confidence_score": 1.0
     },
     {
@@ -30979,6 +31524,17 @@
       "_origin": "ast",
       "source": "docs_research_portal_operations",
       "target": "docs_research_portal_operations_opera\u00e7\u00e3o_do_portal",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/research-portal-operations.md",
+      "source_location": "L108",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "docs_research_portal_operations_opera\u00e7\u00e3o_do_portal",
+      "target": "docs_research_portal_operations_atualiza\u00e7\u00e3o_de_30_10_2026_cinco_avaliadores",
       "confidence_score": 1.0
     },
     {
@@ -31324,5 +31880,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "1e625cb84c92b965acb421a45ebf680b0b52aa6b"
+  "built_at_commit": "d69d40d88d0a84aec71509f73ef242014e24719c"
 }
