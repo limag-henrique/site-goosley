@@ -1,4 +1,4 @@
-import type { Dimension, PortalEvent, ReviewStatus } from '@/lib/research-portal';
+import { IDENTITY_LABELS, type Participation, type Dimension, type PortalEvent, type ReviewStatus } from '@/lib/research-portal';
 
 export const reviewStatuses:Record<ReviewStatus,string> = {
   scored:'Avaliação com escores', 'missing-lyrics':'Ausência de letra', doubt:'Dúvida de interpretação', abstain:'Abstenção', 'identity-error':'Erro de identidade',
@@ -27,8 +27,9 @@ export function AiComparison({comparison,dimensions,hasReview=true}:{comparison:
   </section>;
 }
 
-export function SharedReviews({reviews,recordings,dimensions,onExport,exporting}:{reviews:SharedReview[];recordings:{id:string;title:string;artist:string}[];dimensions:Dimension[];onExport:(format:'csv'|'json')=>void;exporting:boolean}) {
+export function SharedReviews({ranking,reviews,recordings,dimensions,onExport,exporting}:{ranking:Participation[];reviews:SharedReview[];recordings:{id:string;title:string;artist:string}[];dimensions:Dimension[];onExport:(format:'csv'|'json')=>void;exporting:boolean}) {
   return <section className="panel"><h2>Pareceres e ponderações salvos</h2>
+    <section className="participation" aria-label="Ranking de participação"><h3>Ranking de participação</h3><p>A participação registrada orientará a ordem dos nomes no artigo. Cada música com avaliação completa de escores conta uma vez; revisar não soma pontos. A meta mínima é de 20 músicas por pessoa.</p><div className="table-wrap"><table><thead><tr><th>Posição</th><th>Participante</th><th>Avaliações</th></tr></thead><tbody>{ranking.map(person=><tr key={person.reviewer}><td>{person.position}º</td><th scope="row">{person.name}</th><td><span>{person.count}/{person.minimum}</span><progress max={person.minimum} value={Math.min(person.count,person.minimum)} aria-label={`${person.name}: ${person.count} avaliações; meta mínima de ${person.minimum}`}/></td></tr>)}</tbody></table></div></section>
     <p className="muted">Visíveis a todos que acessam esta página. Atualizados automaticamente a cada 15 segundos. A leitura pode influenciar sua própria avaliação.</p>
     <div className="actions"><button disabled={exporting||!reviews.length} onClick={()=>onExport('csv')}>{exporting?'Preparando download…':'Baixar comparação com IA (CSV)'}</button><button disabled={exporting||!reviews.length} onClick={()=>onExport('json')}>Baixar dados completos (JSON)</button></div>
     <p className="muted">O CSV abre em planilhas e coloca escores humanos e da IA lado a lado, com diferenças, fundamentos e ponderações. Usa o último parecer salvo de cada avaliadora; o JSON também preserva o histórico. Não é necessário encerrar a avaliação.</p>
@@ -36,8 +37,9 @@ export function SharedReviews({reviews,recordings,dimensions,onExport,exporting}
     {reviews.map(review=>{
       const track=recordings.find(r=>r.id===review.recordingId);
       return <article key={review.id} className="shared-review"><h3>{track?.title??review.recordingId}</h3>
-        <p className="muted">{track?.artist} · {review.evaluator} · Avaliadora {review.reviewer} · <time dateTime={review.at}>{new Date(review.at).toLocaleString('pt-BR')}</time></p>
+        <p className="muted">{track?.artist} · {review.evaluator} · <time dateTime={review.at}>{new Date(review.at).toLocaleString('pt-BR')}</time></p>
         <p className="muted">{review.aiExposed?'Parecer elaborado após consultar a IA.':'Parecer salvo antes da consulta à IA neste portal.'} Situação: {review.status?reviewStatuses[review.status]:'Não informada'}.</p>
+        <p className="muted">Idioma observado: {review.recordedLanguage||'Não informado'} · {review.identityVerdict?IDENTITY_LABELS[review.identityVerdict]:'Correspondência não confirmada'}</p>
         <h4>Fundamento da avaliadora</h4><p className="review-text">{review.justification}</p>
         {review.reflectionEvent&&<><h4>Ponderação sobre as diferenças com a IA</h4><p className="review-text">{review.reflectionEvent.reflection}</p><small>Salva em <time dateTime={review.reflectionEvent.at}>{new Date(review.reflectionEvent.at).toLocaleString('pt-BR')}</time>.</small></>}
         <details><summary>Escores da avaliadora</summary><div className="table-wrap"><table><thead><tr><th>Dimensão</th><th>Escore</th></tr></thead><tbody>{dimensions.map(d=><tr key={d.code}><th scope="row">{d.label}</th><td>{scoreLabel(review.scores?.[d.code]??null)}</td></tr>)}</tbody></table></div></details>

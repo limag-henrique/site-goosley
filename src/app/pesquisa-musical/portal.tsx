@@ -1,14 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { REVIEWERS, type Reviewer, type Dimension, type PortalEvent, type ReviewStatus } from '@/lib/research-portal';
+import { REVIEWERS, REVIEWER_NAMES, IDENTITY_LABELS, type Participation, type Reviewer, type Dimension, type PortalEvent, type ReviewStatus } from '@/lib/research-portal';
 import { AiComparison, SharedReviews, reviewStatuses, type Comparison, type SharedReview } from './review-results';
 import './portal.css';
 
 type Track = { id:string; title:string; artist:string; displayMarket?:string; market:string; lyrics?:string|null; reviewStatus?:string; selectionEvidence?:{year:number;annualChartRank:number;streams:number;chartDays:number} };
 type Reply = {
   state:{ closedReviewers:number[]; assigned:number; available:number; canLoadMore:boolean };
-  total?:number;
+  ranking?:Participation[]; total?:number;
   dimensions:Dimension[]; completed?:number; recordings?:Track[]; recording?:Track;
   review?:PortalEvent|null; reflection?:PortalEvent|null; comparison?:Comparison; reviews?:SharedReview[];
 };
@@ -32,9 +32,9 @@ function download(value:unknown, filename:string) { downloadBlob(new Blob([JSON.
 
 export default function ResearchPortal() {
   const [mode,setMode] = useState<Mode>('blind');
-  const [reviewer,setReviewer] = useState<Reviewer>(1);
-  const [evaluator,setEvaluator] = useState('');
-  const [credential,setCredential] = useState({reviewer:1,key:''});
+  const [reviewer,setReviewer] = useState<Reviewer>(2);
+  const [credential,setCredential] = useState({reviewer:2,key:''});
+  const evaluator = REVIEWER_NAMES[reviewer];
   const accessKey = credential.reviewer===reviewer ? credential.key : '';
   const [data,setData] = useState<Reply|null>(null);
   const [detail,setDetail] = useState<Reply|null>(null);
@@ -65,12 +65,10 @@ export default function ResearchPortal() {
     setError(''); setMessage(''); setConfirmClose(false);
   }
   function changeMode(next:Mode) { if(next===mode)return; if(leave()) { clearSelection(); setData(null); setMode(next); } }
-  function identify(value:string) { setEvaluator(value); try { localStorage.setItem('research-evaluator',value); } catch {} }
   function updateKey(value:string) { setCredential({reviewer,key:value}); try { localStorage.setItem(`research-access-key-${reviewer}`,value); } catch {} }
 
   useEffect(()=>{
     try {
-      setEvaluator(localStorage.getItem('research-evaluator') ?? '');
       const stored=localStorage.getItem('research-reviewer');
       if(stored&&REVIEWERS.some(id=>String(id)===stored)) setReviewer(Number(stored) as Reviewer);
     } catch {}
@@ -169,7 +167,7 @@ export default function ResearchPortal() {
   }
 
   return <main className="research">
-    <header><div><p className="eyebrow">Goosley · Pesquisa musical</p><h1>Avalie as músicas.</h1><p className="muted">Se desejar, consulte a IA antes de avaliar e explique onde concorda ou discorda.</p></div></header>
+    <header><div><p className="eyebrow">Goosley · Pesquisa musical</p><h1>Avalie as músicas.</h1><p className="muted">Avalie a letra primeiro. Após salvar, consulte a IA e explique onde concorda ou discorda.</p></div></header>
     <nav aria-label="Avaliação musical">{([['blind','Avaliar músicas'],['community','Pareceres salvos']] as const).map(([id,label])=><button key={id} disabled={!!busy} aria-current={mode===id?'page':undefined} onClick={()=>changeMode(id)}>{label}</button>)}</nav>
     {error&&<div className="notice error" role="alert">{error} <button disabled={dirty||!!busy} onClick={()=>setRevision(v=>v+1)}>Tentar novamente</button></div>}
     {message&&<p className="notice" role="status">{message}</p>}
@@ -179,10 +177,9 @@ export default function ResearchPortal() {
       <section className="panel" aria-label="Sua identificação">
         <div className="row"><h2>Sua avaliação</h2><span className="badge">{data?.completed??0} de {data?.state.assigned??'…'} músicas avaliadas</span></div>
         <div className="identity-fields">
-          <label>Seu nome<input value={evaluator} disabled={!!busy} maxLength={160} onChange={e=>identify(e.target.value)} placeholder="Nome completo" autoComplete="name"/></label>
-          <label>Avaliador<select value={reviewer} disabled={!!busy} onChange={e=>{if(leave()){clearSelection();setData(null);setReviewer(Number(e.target.value) as Reviewer);try{localStorage.setItem('research-reviewer',e.target.value);}catch{}}}}>{REVIEWERS.map(id=><option key={id} value={id}>Avaliador {id}</option>)}</select></label>
+          <label>Avaliador<select aria-label="Avaliador" value={reviewer} disabled={!!busy} onChange={e=>{if(leave()){clearSelection();setData(null);setReviewer(Number(e.target.value) as Reviewer);try{localStorage.setItem('research-reviewer',e.target.value);}catch{}}}}>{REVIEWERS.map(id=><option key={id} value={id}>{REVIEWER_NAMES[id]}</option>)}</select></label>
         </div>
-        <p className="muted">Cada avaliador recebe 20 músicas iniciais, exclusivas do seu percurso. Você pode carregar novos lotes quando desejar. Use sempre o mesmo nome e número. Seu parecer e sua ponderação ficam visíveis em Pareceres salvos.</p>
+        <p className="muted">Cada avaliador recebe 20 músicas iniciais, exclusivas do seu percurso. Você pode carregar novos lotes quando desejar. Selecione seu nome e use sempre a mesma chave privada. Seu parecer e sua ponderação ficam visíveis em Pareceres salvos.</p>
         <details><summary>Acesso e cópia dos pareceres</summary>
           <p>A chave privada de edição fica neste navegador. Baixe uma cópia para continuar em outro dispositivo e guarde-a só com você. Perder a chave não apaga os pareceres salvos.</p>
           <label>Chave privada da avaliadora<input type="password" value={accessKey} disabled={!!busy} autoComplete="off" onChange={e=>updateKey(e.target.value)}/></label>
@@ -197,23 +194,24 @@ export default function ResearchPortal() {
           {!loading&&!error&&!data?.recordings?.length&&<p>Nenhuma música disponível para avaliação.</p>}
         </section>
         <section className="panel" aria-label="Música e avaliação">
-          {!track?<><h2>{selected?'Carregando música…':'Escolha uma música'}</h2><p className="muted">Leia a letra e, se desejar, veja a análise da IA antes de preencher seu parecer.</p></>:<>
+          {!track?<><h2>{selected?'Carregando música…':'Escolha uma música'}</h2><p className="muted">Leia a letra e salve seu parecer. Depois, você poderá consultar a análise da IA.</p></>:<>
             <h2>{track.title}</h2><p className="muted">{track.artist}</p>
             {track.lyrics?<details open><summary>Letra da música</summary><div className="lyrics" tabIndex={0} aria-label="Letra da música">{track.lyrics}</div></details>:<p className="notice">A letra autorizada está indisponível. Registre ausência de letra ou abstenção; não atribua zero para representar essa ausência.</p>}
-            {!detail?.comparison&&<section className="ai-invitation"><h3>Análise da IA (opcional)</h3><p>Você pode consultar a classificação feita por IA antes de preencher qualquer campo da avaliação.</p><button disabled={!!busy||accessKey.length<32} onClick={()=>act('preview')}>{busy==='preview'?'Consultando…':'Ver análise da IA antes de avaliar'}</button></section>}
+
             {detail?.comparison&&<AiComparison comparison={detail.comparison} dimensions={dimensions} hasReview={!!review}/>}
             {reviewDirty&&review&&detail?.comparison&&<p className="muted">Os escores humanos na comparação são os últimos salvos. Salve seu parecer para atualizar as diferenças.</p>}
             {review&&<section className="saved-basis"><h3>Seu fundamento salvo</h3><p className="review-text">{review.justification}</p><small>{closed?'Avaliação encerrada. Os escores e este fundamento estão preservados.':'Seu fundamento original fica preservado ao registrar a ponderação sobre a IA.'}</small></section>}
-            <details key={review?.id??selected} open={!review} className="review-editor"><summary>{review?'Ver escores e revisar seu parecer':'Seu parecer'}</summary>
+            <details key={review?.id??selected} open className="review-editor"><summary>{review?'Ver escores e revisar seu parecer':'Seu parecer'}</summary>
               <form onSubmit={e=>{e.preventDefault();act('save');}}>
                 <p className="muted">Escala: 0 ausente · 1 incidental · 2 substancial · 3 central. Considere o contexto da letra e diferencie representação de endosso.</p>
-                <label>Situação<select value={status} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setStatus(e.target.value as ReviewStatus);setReviewDirty(true);}}>{Object.entries(reviewStatuses).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
+                <label>Situação<select aria-label="Situação" value={status} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setStatus(e.target.value as ReviewStatus);setReviewDirty(true);}}>{Object.entries(reviewStatuses).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label>
                 {status==='scored'&&<div className="rubric">{dimensions.map(d=><label key={d.code}>{d.label}<small>{d.definition}</small><select required value={scores[d.code]??''} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setScores(v=>({...v,[d.code]:e.target.value}));setReviewDirty(true);}}><option value="">Selecionar intensidade</option>{['Ausente','Incidental','Substancial','Central'].map((label,i)=><option key={i} value={i}>{i} · {label}</option>)}</select></label>)}</div>}
                 <label>Seu fundamento<textarea required maxLength={6000} disabled={closed||!!busy||reflectionDirty} value={justification} onChange={e=>{setJustification(e.target.value);setReviewDirty(true);}} placeholder="Explique sua interpretação e as evidências da letra que sustentam os escores."/></label>
-                <details><summary>Idioma e identificação da letra (opcional)</summary><div className="identity-fields"><label>Idioma observado<input value={recordedLanguage} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setRecordedLanguage(e.target.value);setReviewDirty(true);}}/></label><label>Correspondência da letra<select value={identityVerdict} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setIdentityVerdict(e.target.value);setReviewDirty(true);}}><option value="">Não confirmada</option><option value="confirmed">Corresponde à música</option><option value="uncertain">Há dúvida</option><option value="mismatch">Não corresponde à música</option></select></label></div></details>
-                <div className="actions"><button className="primary" disabled={!!busy||closed||reflectionDirty||accessKey.length<32||!evaluator.trim()||!justification.trim()} type="submit">{busy==='save'?'Salvando…':closed?'Avaliação encerrada':'Salvar meu parecer'}</button><small>{reviewDirty?'Há alterações não salvas.':review?'Parecer salvo no servidor.':'Consultar a IA é opcional, antes ou depois de avaliar.'}</small></div>
+                <section aria-label="Idioma e identificação da letra"><h3>Idioma e identificação da letra (opcional)</h3><div className="identity-fields"><label>Idioma observado<input value={recordedLanguage} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setRecordedLanguage(e.target.value);setReviewDirty(true);}}/></label><label>Correspondência da letra<select aria-label="Correspondência da letra" value={identityVerdict} disabled={closed||!!busy||reflectionDirty} onChange={e=>{setIdentityVerdict(e.target.value);setReviewDirty(true);}}><option value="">Não confirmada</option>{Object.entries(IDENTITY_LABELS).map(([value,label])=><option key={value} value={value}>{label}</option>)}</select></label></div></section>
+                <div className="actions"><button className="primary" disabled={!!busy||closed||reflectionDirty||accessKey.length<32||!evaluator.trim()||!justification.trim()} type="submit">{busy==='save'?'Salvando…':closed?'Avaliação encerrada':'Salvar meu parecer'}</button><small>{reviewDirty?'Há alterações não salvas.':review?'Parecer salvo no servidor.':'A consulta à IA será liberada após salvar.'}</small></div>
               </form>
             </details>
+            {review&&!detail?.comparison&&<div className="actions"><button disabled={!!busy||dirty||accessKey.length<32} onClick={()=>act('reveal')}>{busy==='reveal'?'Consultando…':'Ver parecer da IA'}</button><small>Consulta opcional após salvar seu parecer.</small></div>}
             {detail?.comparison&&review&&!reviewDirty&&<>
               <form className="reflection-form" onSubmit={e=>{e.preventDefault();act('reflect');}}>
                 <h3>Sua ponderação sobre as diferenças</h3>
@@ -226,7 +224,7 @@ export default function ResearchPortal() {
         </section>
       </div>
     </>}
-    {mode==='community'&&data&&<SharedReviews reviews={data.reviews??[]} recordings={data.recordings??[]} dimensions={dimensions} onExport={exportComparison} exporting={!!busy}/>}
+    {mode==='community'&&data&&<SharedReviews ranking={data.ranking??[]} reviews={data.reviews??[]} recordings={data.recordings??[]} dimensions={dimensions} onExport={exportComparison} exporting={!!busy}/>}
     <footer>Pesquisa musical · O país de cada música indica circulação nas paradas, não a nacionalidade do artista. Pareceres e ponderações salvos ficam no servidor; a edição exige sua chave privada.</footer>
   </main>;
 }

@@ -1,0 +1,15 @@
+{
+  "selectionVersion": "research-disjoint-7-v1",
+  "recordingsChecked": 1299,
+  "annotationSource": "research/article/analysis-final/native-id-annotations.csv",
+  "annotationSourceSha256": "59389bfac1126e8049d9c9c20c62a7594bd4585f7b1b90b5b6ede02da35c2712",
+  "titlesAndArtistsCheckedByNativeId": 1299,
+  "artistComparison": "casefold; quatro diferenças apenas de capitalização, sem alterar metadados",
+  "privateLyricsVerified": 1299,
+  "issues": [],
+  "limits": [
+    "Conferência do snapshot e SQL privado locais; PostgreSQL indisponível na sessão.",
+    "O D1 de produção não foi consultado: credencial Cloudflare indisponível.",
+    "Títulos e artistas conferidos por ID nativo em track_master; capitalização dos artistas preservada. Sem validação semântica humana da transcrição."
+  ]
+}

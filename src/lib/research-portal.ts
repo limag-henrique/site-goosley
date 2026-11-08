@@ -1,17 +1,25 @@
 import type { ComparisonExport } from './research-export';
 
-export type Reviewer = 1 | 2 | 3 | 4 | 5;
-export const REVIEWERS = [1,2,3,4,5] as const;
+export type Reviewer = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+// Stable internal IDs preserve historical editing keys; display order is independent.
+export const REVIEWERS = [2,3,1,4,5,6,7] as const;
+export const REVIEWER_NAMES:Record<Reviewer,string> = {2:'Henrique Lima',3:'Miguel Offerman (Mosov)',1:'Grazi',4:'Caio',5:'Amanda',6:'Samuel',7:'José'};
+export const IDENTITY_LABELS = {confirmed:'Música corresponde',uncertain:'Música corresponde parcialmente',mismatch:'Música não corresponde'};
+export interface Participation { reviewer:Reviewer; name:string; count:number; position:number; minimum:number }
+export function canonicalReviewerName(reviewer:Reviewer,name:string):string {
+ const aliases:Partial<Record<Reviewer,string[]>>={2:['Henrique Lima Gusmão','Henrique Lima'],3:['Mesov','Mosov','Miguel Offerman','Miguel Offerman (Mosov)']};
+ return aliases[reviewer]?.some(alias=>alias.toLocaleLowerCase('pt-BR')===name.trim().toLocaleLowerCase('pt-BR'))?REVIEWER_NAMES[reviewer]:name.trim();
+}
 export type ReviewStatus = 'scored' | 'missing-lyrics' | 'doubt' | 'abstain' | 'identity-error';
 export interface Recording { id:string; title:string; artist:string; documentId:string; lyricsHash:string; market:string; markets:string[]; years:number[]; genre:string|null; language:string|null; lyrics:string|null; lyricAvailable?:boolean; provenance:Record<string,unknown>; ai:Record<string,unknown> }
 export interface Dimension { code:string; label:string; definition:string }
 export interface PortalDataset { recordings:Recording[]; dimensions:Dimension[]; annual:unknown[]; context?:unknown[]; sources:unknown[]; methodology:Record<string,unknown> }
-export interface PortalEvent { id:string; action:'save'|'close'|'reveal'|'reflect'|'preview'|'extend'; reviewer:Reviewer; evaluator:string; at:string; rubricVersion:string; campaignFingerprint?:string; assignmentFingerprint?:string; assignedCount?:number; ownerKeyHash?:string; viewerKeyHash?:string; recordingId?:string; documentId?:string; lyricsHash?:string; status?:ReviewStatus; scores?:Record<string,number|null>; justification?:string; recordedLanguage?:string|null; identityVerdict?:'confirmed'|'uncertain'|'mismatch'|null; aiExposed?:boolean; reviewId?:string; reflection?:string }
+export interface PortalEvent { id:string; action:'save'|'close'|'reveal'|'reflect'|'preview'|'extend'; reviewer:Reviewer; evaluator:string; originalEvaluator?:string; at:string; rubricVersion:string; campaignFingerprint?:string; assignmentFingerprint?:string; assignedCount?:number; ownerKeyHash?:string; viewerKeyHash?:string; recordingId?:string; documentId?:string; lyricsHash?:string; status?:ReviewStatus; scores?:Record<string,number|null>; justification?:string; recordedLanguage?:string|null; identityVerdict?:'confirmed'|'uncertain'|'mismatch'|null; aiExposed?:boolean; reviewId?:string; reflection?:string }
 export interface EventStore { read():Promise<PortalEvent[]>; append(event:PortalEvent,expectedCount:number):Promise<void>; lyric?(documentId:string,hash:string):Promise<string|null> }
 export class PortalError extends Error { status:number; constructor(message:string,status=400){super(message);this.status=status;} }
 export const RUBRIC_VERSION='human-lyrics-review-v1';
 const statuses:ReviewStatus[]=['scored','missing-lyrics','doubt','abstain','identity-error'];
-function reviewerOf(value:unknown):Reviewer { const n=typeof value==='string'&&/^[1-5]$/.test(value)?Number(value):value;if(typeof n==='number'&&REVIEWERS.includes(n as Reviewer))return n as Reviewer;throw new PortalError('Selecione um avaliador de 1 a 5.'); }
+function reviewerOf(value:unknown):Reviewer { const n=typeof value==='string'&&/^[1-7]$/.test(value)?Number(value):value;if(typeof n==='number'&&REVIEWERS.includes(n as Reviewer))return n as Reviewer;throw new PortalError('Selecione um avaliador disponível.'); }
 function nonempty(value:unknown,label:string,max=6000):string {if(typeof value!=='string'||!value.trim()||value.length>max)throw new PortalError(`${label} é obrigatório (até ${max} caracteres).`);return value.trim();}
 function blindRecording(r:Recording){return {id:r.id,title:r.title,artist:r.artist,documentId:r.documentId,lyricsHash:r.lyricsHash,market:r.market,markets:r.markets,years:r.years,genre:r.genre,language:r.language,lyrics:r.lyrics};}
 function publicEvent(event:PortalEvent){const visible={...event};delete visible.ownerKeyHash;delete visible.viewerKeyHash;return visible;}
@@ -20,14 +28,40 @@ function latest(events:PortalEvent[],reviewer:Reviewer){const map=new Map<string
 function hasAiExposure(events:PortalEvent[],reviewer:Reviewer,recordingId:string,ownerKeyHash?:string){return events.some(e=>e.reviewer===reviewer&&e.recordingId===recordingId&&(e.action==='reveal'||(e.action==='preview'&&!!ownerKeyHash&&e.viewerKeyHash===ownerKeyHash)));}
 function reflectionFor(events:PortalEvent[],review:PortalEvent|undefined){if(!review)return null;const event=[...events].reverse().find(e=>e.action==='reflect'&&e.reviewer===review.reviewer&&e.recordingId===review.recordingId&&e.reviewId===review.id);return event?publicEvent(event):null;}
 
-export interface PilotSelection {version:string; ranking:string; selection:string; reviewers?:number[]; initialBatchSize?:number; previousSelectionFingerprints?:string[]; recordings:{recordingId:string;market:string;rank:number;reviewer?:number;year?:number;annualChartRank?:number;streams?:number;chartDays?:number}[]}
+export interface PilotSelection {version:string; ranking:string; selection:string; reviewers?:number[]; initialBatchSize?:number; previousSelectionFingerprints?:string[]; namedReviewers?:boolean; preservedSelectionFingerprints?:string[]; recordings:{recordingId:string;market:string;rank:number;reviewer?:number;year?:number;annualChartRank?:number;streams?:number;chartDays?:number}[]}
 
 /** Server-only service. Optional per-recording disclosure is recorded after a saved judgment. */
 export class PortalService {
   dataset:PortalDataset; store:EventStore; pilot?:PilotSelection; secureWrites:boolean;
   constructor(dataset:PortalDataset,store:EventStore,pilot?:PilotSelection,secureWrites=false){this.dataset=dataset;this.store=store;this.pilot=pilot;this.secureWrites=secureWrites;
-    if(pilot?.reviewers&&(pilot.reviewers.length!==5||new Set(pilot.reviewers).size!==5||pilot.reviewers.some(r=>!REVIEWERS.includes(r as Reviewer))||!Number.isInteger(pilot.initialBatchSize)||pilot.initialBatchSize!==20||pilot.recordings.some(r=>!pilot.reviewers!.includes(r.reviewer!))||pilot.reviewers.some(reviewer=>pilot.recordings.filter(r=>r.reviewer===reviewer).length<20)))throw new PortalError('Configuração dos cinco avaliadores inválida.',503);
+    if(pilot?.reviewers&&(![5,7].includes(pilot.reviewers.length)||new Set(pilot.reviewers).size!==pilot.reviewers.length||pilot.reviewers.some(r=>!REVIEWERS.includes(r as Reviewer))||!Number.isInteger(pilot.initialBatchSize)||pilot.initialBatchSize!==20||pilot.recordings.some(r=>!pilot.reviewers!.includes(r.reviewer!))||pilot.reviewers.some(reviewer=>pilot.recordings.filter(r=>r.reviewer===reviewer).length<20)))throw new PortalError('Configuração dos avaliadores inválida.',503);
     if(pilot&&(new Set(pilot.recordings.map(r=>r.recordingId)).size!==pilot.recordings.length||pilot.recordings.some(r=>!dataset.recordings.some(x=>x.id===r.recordingId&&x.markets.includes(r.market)))))throw new PortalError('Seleção piloto inválida.',503);
+  }
+  private async events(){
+    const events=await this.store.read();
+    for(const event of events){
+      if(event.action!=='save')continue;
+      const recording=this.dataset.recordings.find(r=>r.id===event.recordingId);
+      if(!recording||recording.documentId!==event.documentId||recording.lyricsHash!==event.lyricsHash)throw new PortalError('O corpus mudou desde o início: o vínculo entre parecer, gravação e letra está inconsistente. Solicite conferência à coordenação.',409);
+    }
+    if(!this.pilot?.namedReviewers)return events;
+    return events.map(event=>{
+      if(event.action==='preview')return event;
+      if(event.assignmentFingerprint&&this.pilot?.previousSelectionFingerprints?.includes(event.assignmentFingerprint)&&![2,3].includes(event.reviewer))throw new PortalError('Percurso antigo contém autoria inesperada. A coordenação deve conferir o histórico.',409);
+      const evaluator=canonicalReviewerName(event.reviewer,event.evaluator);
+      if(evaluator!==REVIEWER_NAMES[event.reviewer])throw new PortalError('Autoria histórica não reconhecida. A coordenação deve conferir os vínculos antes de continuar.',409);
+      return {...event,evaluator,...(evaluator!==event.evaluator?{originalEvaluator:event.evaluator}:{})};
+    });
+  }
+  private participation(events:PortalEvent[]):Participation[]{
+    const rows=this.reviewers().map(reviewer=>({
+      reviewer,name:REVIEWER_NAMES[reviewer],minimum:20,
+      count:[...latest(events,reviewer).values()].filter(event=>event.status==='scored'&&this.dataset.dimensions.every(({code})=>{
+        const score=event.scores?.[code];
+        return typeof score==='number'&&Number.isInteger(score)&&score>=0&&score<=3;
+      })).length,
+    })).sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name,'pt-BR'));
+    return rows.map(row=>({...row,position:rows.findIndex(other=>other.count===row.count)+1}));
   }
   private reviewers():readonly Reviewer[]{return this.pilot?.reviewers as Reviewer[]??[1,2];}
   private reviewer(value:unknown){const reviewer=reviewerOf(value);if(!this.reviewers().includes(reviewer))throw new PortalError('Avaliador não disponível nesta seleção.');return reviewer;}
@@ -35,7 +69,7 @@ export class PortalService {
   private assigned(reviewer?:Reviewer,events:PortalEvent[]=[]):Recording[]{
     if(!this.pilot?.reviewers)return this.pool();
     if(!reviewer)return this.reviewers().flatMap(r=>this.assigned(r,events));
-    const count=events.filter(e=>e.reviewer===reviewer&&e.action==='extend'&&!this.pilot?.previousSelectionFingerprints?.includes(e.assignmentFingerprint??'')).reduce((n,e)=>Math.max(n,e.assignedCount??0),this.pilot.initialBatchSize??20);
+    const count=events.filter(e=>e.reviewer===reviewer&&e.action==='extend'&&(!this.pilot?.previousSelectionFingerprints?.includes(e.assignmentFingerprint??'')||!!this.pilot?.preservedSelectionFingerprints?.includes(e.assignmentFingerprint??''))).reduce((n,e)=>Math.max(n,e.assignedCount??0),this.pilot.initialBatchSize??20);
     return this.pool(reviewer).slice(0,count);
   }
   private completed(events:PortalEvent[],reviewer:Reviewer){const own=latest(events,reviewer);return this.assigned(reviewer,events).filter(r=>own.has(r.id)).length;}
@@ -46,12 +80,12 @@ export class PortalService {
   private async assignmentFingerprint(events:PortalEvent[]){const hash=await this.digest(JSON.stringify(this.pilot??null));if(events.some(e=>e.assignmentFingerprint&&e.assignmentFingerprint!==hash&&!this.pilot?.previousSelectionFingerprints?.includes(e.assignmentFingerprint)))throw new PortalError('A seleção piloto mudou desde o primeiro registro. Preserve a seleção congelada.',409);return hash;}
   private async fingerprint(events:PortalEvent[]){const content=JSON.stringify({rubric:this.rubricVersion(),dimensions:this.dataset.dimensions,methodology:this.dataset.methodology,assignments:this.dataset.recordings.map(r=>({id:r.id,documentId:r.documentId,lyricsHash:r.lyricsHash,ai:r.ai,provenance:r.provenance}))});const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(content));const hash=Array.from(new Uint8Array(bytes),b=>b.toString(16).padStart(2,'0')).join('');if(events.some(e=>e.campaignFingerprint!==hash))throw new PortalError('O corpus, a rubrica ou a referência da IA mudou desde o início da campanha. Preserve a versão congelada.',409);return hash;}
   private state(events:PortalEvent[],reviewer?:Reviewer){
-    const closed=this.reviewers().filter(r=>events.some(e=>e.action==='close'&&e.reviewer===r&&(!this.pilot?.reviewers||(!!e.assignmentFingerprint&&!this.pilot.previousSelectionFingerprints?.includes(e.assignmentFingerprint)))));
+    const closed=this.reviewers().filter(r=>events.some(e=>e.action==='close'&&e.reviewer===r&&(!this.pilot?.reviewers||(!!e.assignmentFingerprint&&(!this.pilot.previousSelectionFingerprints?.includes(e.assignmentFingerprint)||!!this.pilot.preservedSelectionFingerprints?.includes(e.assignmentFingerprint))))));
     const assigned=this.assigned(reviewer,events).length;
     return {closedReviewers:closed,closed:closed.length===this.reviewers().length,reviewers:this.reviewers(),assigned,available:this.pool(reviewer).length,canLoadMore:!!reviewer&&!closed.includes(reviewer)&&assigned<this.pool(reviewer).length,pilot:this.pilot?.reviewers?{version:this.pilot.version,ranking:this.pilot.ranking,selection:this.pilot.selection}:this.pilot??null,rubricVersion:this.rubricVersion()};
   }
   async read(params:URLSearchParams):Promise<Record<string,unknown>> {
-    const events=await this.store.read();const campaignFingerprint=await this.fingerprint(events);await this.assignmentFingerprint(events);const state=this.state(events,params.has('reviewer')?this.reviewer(params.get('reviewer')):undefined);const mode=params.get('mode')||'exploration';
+    const events=await this.events();const campaignFingerprint=await this.fingerprint(events);await this.assignmentFingerprint(events);const state=this.state(events,params.has('reviewer')?this.reviewer(params.get('reviewer')):undefined);const mode=params.get('mode')||'exploration';
     if(!['blind','exploration','compare','export','review-export','community','comparison-export'].includes(mode))throw new PortalError('Percurso inválido.');
     if(mode==='comparison-export'){
       const reviewer=params.has('reviewer')?this.reviewer(params.get('reviewer')):null;
@@ -65,7 +99,7 @@ export class PortalService {
     if(mode==='community'){
       const id=params.get('id');
       const reviews=this.reviewers().flatMap(reviewer=>[...latest(events,reviewer).values()]).filter(e=>!id||e.recordingId===id).map(e=>({...e,ownerKeyHash:undefined,reflectionEvent:reflectionFor(events,e),aiExposed:!!e.aiExposed||events.some(x=>x.action==='reveal'&&x.reviewer===e.reviewer&&x.recordingId===e.recordingId&&x.at<=e.at)}));
-      return {state,dimensions:this.dataset.dimensions,reviews,recordings:this.dataset.recordings.filter(r=>reviews.some(e=>e.recordingId===r.id)).map(r=>({...blindRecording(r),lyrics:undefined})),notice:'Pareceres compartilhados após salvar. Nomes declarados, justificativas e escores são visíveis a quem acessar esta página.'};
+      return {state,ranking:this.participation(events),dimensions:this.dataset.dimensions,reviews,recordings:this.dataset.recordings.filter(r=>reviews.some(e=>e.recordingId===r.id)).map(r=>({...blindRecording(r),lyrics:undefined})),notice:'Pareceres compartilhados após salvar. Nomes declarados, justificativas e escores são visíveis a quem acessar esta página.'};
     }
     if(mode==='review-export'){
       const reviewer=this.reviewer(params.get('reviewer'));
@@ -113,18 +147,11 @@ export class PortalService {
   async write(input:unknown):Promise<Record<string,unknown>> {
     if(!input||typeof input!=='object'||Array.isArray(input))throw new PortalError('Requisição inválida.');
     const body=input as Record<string,unknown>;const reviewer=this.reviewer(body.reviewer);
-    const events=await this.store.read();const campaignFingerprint=await this.fingerprint(events);await this.assignmentFingerprint(events);const state=this.state(events,reviewer);
-    if(body.action==='preview'){
-      const accessKey=nonempty(body.accessKey,'Identificador privado do navegador',256);if(accessKey.length<32)throw new PortalError('Identificador privado do navegador inválido.',403);
-      const recordingId=nonempty(body.recordingId,'Gravação',200);const recording=this.assigned(reviewer,events).find(r=>r.id===recordingId);if(!recording)throw new PortalError('Gravação não atribuída.',404);
-      const viewerKeyHash=await this.digest(accessKey);
-      if(!events.some(e=>e.action==='preview'&&e.reviewer===reviewer&&e.recordingId===recordingId&&e.viewerKeyHash===viewerKeyHash)){
-        const assignmentFingerprint=await this.assignmentFingerprint(events);
-        await this.store.append({id:crypto.randomUUID(),action:'preview',reviewer,evaluator:'',at:new Date().toISOString(),rubricVersion:this.rubricVersion(),campaignFingerprint,assignmentFingerprint:this.pilot?assignmentFingerprint:undefined,recordingId,viewerKeyHash},events.length);
-      }
-      return {ok:true,aiRevealed:true,...this.comparison(recording,latest(events,reviewer).get(recordingId))};
-    }
-    const evaluator=nonempty(body.evaluator,'Identificação da avaliadora',160);
+    const events=await this.events();const campaignFingerprint=await this.fingerprint(events);await this.assignmentFingerprint(events);const state=this.state(events,reviewer);
+    if(body.action==='preview')throw new PortalError('Salve seu parecer antes de consultar a classificação da IA. Use a consulta após salvar.',409);
+    const declared=nonempty(body.evaluator,'Identificação da avaliadora',160);
+    const evaluator=this.pilot?.namedReviewers?canonicalReviewerName(reviewer,declared):declared;
+    if(this.pilot?.namedReviewers&&evaluator!==REVIEWER_NAMES[reviewer])throw new PortalError('Selecione seu nome no percurso de avaliação.',403);
     if(!['reveal','reflect'].includes(String(body.action))&&state.closedReviewers.includes(reviewer))throw new PortalError('A avaliação desta avaliadora foi encerrada e está bloqueada.',409);
     const owner=events.find(e=>e.reviewer===reviewer&&e.action!=='preview')?.evaluator;if(owner&&owner!==evaluator)throw new PortalError('Este percurso pertence a outra identificação de avaliadora.',403);
     let ownerKeyHash:string|undefined;

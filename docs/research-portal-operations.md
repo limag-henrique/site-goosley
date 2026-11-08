@@ -111,3 +111,25 @@ Esta seção substitui as instruções anteriores sobre duas vagas e as mesmas 1
 O manifesto antigo e o corpus permanecem intactos. A transição aceita somente o fingerprint exato do piloto anterior, preserva sua autoria/chaves e histórico e não herda seus encerramentos. Não editar o novo manifesto após iniciar a coleta. Encerramento exige parecer em cada música já carregada; a reserva opcional não impede encerrar. Pareceres históricos continuam em comunidade e downloads. O JSON individual informa `assignedRecordingIds`, distinguindo o progresso da seleção atual de todo o histórico preservado; o verificador de integridade foi ajustado para essa distinção.
 
 Consulte `research-five-reviewers.md` para critérios e validação e `research-selection-evidence.md` para a seleção e suas fontes. Esta entrega é local, sem publicação nem migração destrutiva; não exige alteração do esquema D1 existente. Nas análises, as músicas diferentes não produzem medidas de concordância interavaliador.
+
+
+## Sete participantes nomeados — 07/11/2026
+
+Esta seção substitui as instruções de cinco vagas e consulta antecipada à IA. A apresentação segue Henrique Lima, Miguel Offerman (Mosov), Grazi, Caio, Amanda, Samuel e José. Os IDs internos continuam 2, 3, 1, 4, 5, 6 e 7 para preservar chaves, nomes antigos, vínculos e eventos. Não renumerar os eventos nem as credenciais exportadas. `Henrique Lima Gusmão` e `Mesov`/`Mosov` são apresentados sob as identidades canônicas; `originalEvaluator` conserva o nome declarado nas leituras normalizadas, sem reescrever o armazenamento.
+
+`src/data/research-selection-five.json` conserva o manifesto anterior. `scripts/extend-research-selection.py` gera o manifesto de sete percursos a partir dessa fonte congelada; não executar o gerador histórico de cinco percursos sobre o manifesto ativo. Filas completas de Henrique e Miguel, suas expansões e encerramentos da seleção anterior permanecem válidos. Eventos antigos de outros percursos ou autores desconhecidos bloqueiam a transição para conferência, em vez de atribuir trabalho a novos nomes.
+
+GET `mode=community` inclui `ranking` com `reviewer`, `name`, `count`, `position` e `minimum`. Conta somente a última avaliação completa com escores por pessoa/música, inclusive pareceres históricos preservados. Empates compartilham posição; nomes empatados seguem ordem alfabética pt-BR. Ausência, dúvida, abstenção e erro de identidade não somam pontos. O ranking não altera o artigo.
+
+POST `preview` retorna 409 sem revelar IA ou gravar evento. POST `reveal` exige parecer salvo e a chave privada de edição. Consultas históricas continuam preservadas e revisões após exposição ficam identificadas. O bloco de idioma permanece aberto; `confirmed`, `uncertain` e `mismatch` são apresentados como corresponde, corresponde parcialmente e não corresponde. Sem resposta não equivale a confirmação.
+
+Antes de publicar, conferir o D1 real: nesta sessão não havia credencial Cloudflare e o PostgreSQL local não estava acessível. A verificação local dos 1.299 vínculos está em `docs/research-links-verification.json`; fontes, proporções e reservas estão em `docs/research-seven-reviewers.md`. Nenhuma escrita na coleta real foi feita.
+
+### Validação local da atualização
+
+- `npm run typecheck`: aprovado. Os 29 testes musicais passaram; suíte geral: 67 testes, 61 aprovados e seis falhas preexistentes nas APIs faciais que retornam HTTP 410, já documentadas no piloto.
+- Navegador Chromium com armazenamento técnico separado: sete nomes na ordem combinada, 20 músicas iniciais, salvamento e recarga, botão de IA somente após salvar, opções de correspondência persistidas, ranking de sete pessoas, desktop 1440px e celular 390px sem overflow horizontal. Foco de teclado visível verificado. Letras ausentes no adaptador local foram registradas como ausência, sem inventar escores. Testes de serviço cobrem escores, empates e progresso do ranking.
+- `scripts/verify-research-links.py`: 1.299 gravações verificadas por ID nativo, título, artista, documento, hash do texto privado, snapshot e 26 escores históricos; nenhuma divergência. Quatro diferenças de capitalização de artistas são preservadas. O relatório não substitui validação semântica humana nem conferência do D1 real.
+- `npm run build`: Next.js compilou, validou tipos e gerou as páginas; OpenNext falhou no empacotamento em Windows com ENOENT ao copiar `.open-next/.build/open-next.config.edge.mjs`. A tentativa sem reconstruir Next reproduziu a mesma falha. Nenhuma dependência ou configuração de deploy foi alterada para contornar o problema.
+- ESLint dos arquivos alterados encontra os mesmos quatro erros `react-hooks/set-state-in-effect` presentes no `portal.tsx` do HEAD; comparação com o arquivo original confirmou a preexistência. Demais arquivos alterados sem novos erros.
+- `graphify update .` foi tentado, mas o executável não está instalado nesta sessão. Sem commit, publicação ou escrita no D1/PostgreSQL.

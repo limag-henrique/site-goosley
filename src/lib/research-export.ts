@@ -17,7 +17,7 @@ function csvCell(value:unknown):string {
   return '"'+text.replaceAll('"','""')+'"';
 }
 export function comparisonCsv(value:ComparisonExport):string {
-  const header=['Música','Artista','Avaliadora','Nome','Dimensão','Escore humano','Escore IA','Diferença (humano - IA)','Resultado','Fundamento da avaliadora','Ponderação sobre a IA','Situação','IA consultada antes do parecer','Parecer salvo em','Ponderação salva em','Mercado de circulação','ID da música','ID do parecer','Documento da letra','SHA-256 da letra','Rubrica humana','Modelo de IA','Versão do prompt','Exportado em'];
+  const header=['Música','Artista','ID interno do participante','Nome','Dimensão','Escore humano','Escore IA','Diferença (humano - IA)','Resultado','Fundamento da avaliadora','Ponderação sobre a IA','Situação','IA consultada antes do parecer','Parecer salvo em','Ponderação salva em','Mercado de circulação','ID da música','ID do parecer','Documento da letra','SHA-256 da letra','Rubrica humana','Modelo de IA','Versão do prompt','Exportado em'];
   const lines=[header.map(csvCell).join(';')];
   for(const {recording,review,reflection,comparison} of value.evaluations) {
     for(const metric of comparison.metrics) {

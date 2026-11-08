@@ -239,47 +239,19 @@ test('a ponderation after reading AI is saved separately and survives reopening 
 });
 
 
-test('AI can be previewed before any evaluation fields without claiming the evaluator slot',async()=>{
+test('preview is blocked and disclosure requires a saved judgment and its editing key',async()=>{
  const {portal,events}=setup(true);const secure=new PortalService(portal.dataset,portal.store,undefined,true);
- const accessKey='preview-browser-private-key-with-more-than-32-characters';
- const preview=await secure.write({action:'preview',reviewer:1,accessKey,recordingId:'song'});
- assert.deepEqual(preview.ai,{sexuality:3});
- assert.deepEqual(preview.metrics,[{dimension:'sexuality',human:null,ai:3,delta:null}]);
- assert.equal(events.filter(e=>e.action==='save').length,0);
- const untouched=await secure.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
- assert.equal(untouched.review,null);assert.equal(untouched.completed,0);
- // A different visitor reading the model must not reserve the named evaluator's slot.
- await secure.write({action:'preview',reviewer:1,accessKey:'another-browser-private-key-with-at-least-32-characters',recordingId:'song'});
- await secure.write({action:'save',reviewer:1,evaluator:'Ana',accessKey,recordingId:'song',status:'scored',scores:{sexuality:0},justification:'A IA erra ao considerar o tema central.'});
- const restored=await new PortalService(portal.dataset,portal.store,undefined,true).read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
- assert.equal((restored.review as PortalEvent).aiExposed,true);
- assert.deepEqual((restored.comparison as {metrics:unknown}).metrics,[{dimension:'sexuality',human:0,ai:3,delta:-3}]);
- await secure.write({action:'reflect',reviewer:1,evaluator:'Ana',accessKey,recordingId:'song',reviewId:(restored.review as PortalEvent).id,reflection:'A IA acerta a presença, mas erra a intensidade no contexto.'});
- const shared=await secure.read(new URLSearchParams('mode=community'));
- assert.equal(JSON.stringify(shared).includes('A IA acerta a presença'),true);
- const exported=await secure.read(new URLSearchParams('mode=review-export&reviewer=1'));
- const payload=(exported as {payload:{events:PortalEvent[]}}).payload;
- assert.equal(payload.events.filter(e=>e.action==='preview').length,1);
- assert.equal(JSON.stringify(exported).includes('viewerKeyHash'),false);
+ const accessKey='a'.repeat(40);
+ await assert.rejects(()=>secure.write({action:'preview',reviewer:1,accessKey,recordingId:'song'}),/Salve seu parecer/);
+ assert.equal(events.length,0);
+ await assert.rejects(()=>secure.write({action:'reveal',reviewer:1,evaluator:'Ana',accessKey,recordingId:'song'}),/Salve seu parecer/);
+ await secure.write({action:'save',reviewer:1,evaluator:'Ana',accessKey,recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Ausência'});
+ await assert.rejects(()=>secure.write({action:'reveal',reviewer:1,evaluator:'Ana',accessKey:'b'.repeat(40),recordingId:'song'}),/Chave privada/);
+ const result=await secure.write({action:'reveal',reviewer:1,evaluator:'Ana',accessKey,recordingId:'song'});
+ assert.deepEqual(result.ai,{sexuality:3});assert.equal(events[0].aiExposed,false);
+ await secure.write({action:'save',reviewer:1,evaluator:'Ana',accessKey,recordingId:'song',status:'scored',scores:{sexuality:1},justification:'Revisão'});
+ assert.equal(events.at(-1)?.aiExposed,true);
 });
-
-
-test('another visitor preview does not mark an unexposed evaluator and repeated previews are idempotent',async()=>{
- const {portal,events}=setup(true);const secure=new PortalService(portal.dataset,portal.store,undefined,true);
- const visitorKey='visitor-browser-key-of-at-least-32-characters';const ownerKey='owner-browser-key-of-at-least-32-characters';
- for(let i=0;i<2;i++)await secure.write({action:'preview',reviewer:1,accessKey:visitorKey,recordingId:'song'});
- assert.equal(events.length,1);
- await assert.rejects(()=>secure.write({action:'preview',reviewer:1,accessKey:visitorKey,recordingId:'unknown'}),/não atribuída/);
- await secure.write({action:'save',reviewer:1,evaluator:'Ana',accessKey:ownerKey,recordingId:'song',status:'scored',scores:{sexuality:0},justification:'Parecer sem consultar o modelo'});
- const blind=await secure.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
- assert.equal((blind.review as PortalEvent).aiExposed,false);assert.equal(blind.comparison,undefined);
- await secure.write({action:'preview',reviewer:1,accessKey:ownerKey,recordingId:'song'});
- const comparison=await secure.read(new URLSearchParams('mode=blind&reviewer=1&id=song'));
- assert.deepEqual((comparison.comparison as {metrics:unknown}).metrics,[{dimension:'sexuality',human:0,ai:3,delta:-3}]);
- const shared=await secure.read(new URLSearchParams('mode=community'));
- assert.equal((shared.reviews as PortalEvent[])[0].aiExposed,false);
-});
-
 
 test('comparison download includes latest saved human judgments, AI and ponderations before closure',async()=>{
  const {portal,events}=setup(true);
