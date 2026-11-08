@@ -1,16 +1,16 @@
-# Graph Report - site-goosley  (2026-11-05)
+# Graph Report - site-goosley  (2026-11-08)
 
 ## Corpus Check
-- 145 files · ~828,613 words
+- 150 files · ~882,487 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1021 nodes · 1741 edges · 73 communities (53 shown, 20 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.5)
+- 1037 nodes · 1766 edges · 75 communities (53 shown, 22 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5fe06e7f`
+- Built from commit: `5ba74ac8`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -65,22 +65,24 @@
 - Seleção musical por popularidade — 30/10/2026
 - marketing-ctas.test.ts
 - face-profile-ml
-- D1Statement
+- server/research-portal.ts
 - Criminalidade Facial Mobile — Especificação
 - Review Focus
 - ConsultaForm.tsx
 - Consulta de declaração
 - generate-people-data.mjs
 - assinatura-eletronica/layout.tsx
-- criminalidadefacial-pwa.test.ts
+- extend-research-selection.py
 - criminalidadefacial/layout.tsx
 - galleryData.ts
 - progress.md
+- verify-research-links.py
+- research-seven-reviewers.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `GallerySimilarityScorer` - 34 edges
 2. `ArtifactBundle` - 31 edges
-3. `PortalService` - 19 edges
+3. `PortalService` - 21 edges
 4. `scripts` - 18 edges
 5. `run_specifications()` - 17 edges
 6. `ArcFaceEmbedder` - 16 edges
@@ -104,7 +106,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (73 total, 20 thin omitted)
+## Communities (75 total, 22 thin omitted)
 
 ### Community 0 - "cloudflare-env.d.ts"
 Cohesion: 0.36
@@ -151,8 +153,8 @@ Cohesion: 0.07
 Nodes (27): @emnapi/core, @emnapi/runtime, eslint, eslint-config-next, devDependencies, @emnapi/core, @emnapi/runtime, eslint (+19 more)
 
 ### Community 11 - "portal.tsx"
-Cohesion: 0.12
-Nodes (21): metadata, Action, download(), downloadBlob(), marketNames, Mode, Reply, request() (+13 more)
+Cohesion: 0.11
+Nodes (24): metadata, Action, download(), downloadBlob(), marketNames, Mode, Reply, request() (+16 more)
 
 ### Community 12 - "Faixas comerciais do simulador"
 Cohesion: 0.40
@@ -160,7 +162,7 @@ Nodes (4): Decisões, Faixas comerciais do simulador, Referências públicas con
 
 ### Community 13 - "Piloto de avaliação musical — 12 gravações"
 Cohesion: 0.06
-Nodes (29): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Download comparativo — 23/10/2026, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações (+21 more)
+Nodes (31): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Download comparativo — 23/10/2026, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações (+23 more)
 
 ### Community 14 - "worker/package.json"
 Cohesion: 0.10
@@ -168,11 +170,11 @@ Nodes (20): @cloudflare/containers, @cloudflare/workers-types, dependencies, @cl
 
 ### Community 15 - "CriminalidadeFacialExperience.tsx"
 Cohesion: 0.06
-Nodes (45): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialDeactivated() (+37 more)
+Nodes (44): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialExperience() (+36 more)
 
 ### Community 16 - "CostEstimator.tsx"
-Cohesion: 0.07
-Nodes (27): lenis, lenis, DeclarationPage(), dancingScript, inter, metadata, RootLayout(), metadata (+19 more)
+Cohesion: 0.06
+Nodes (34): lenis, lenis, DeclarationPage(), dancingScript, inter, metadata, RootLayout(), manifest() (+26 more)
 
 ### Community 17 - "split-portal-lyrics.py"
 Cohesion: 0.67
@@ -203,20 +205,20 @@ Cohesion: 0.36
 Nodes (7): POST(), EmailInput, getCloudflareEmailBinding(), getEnvVar(), parseEmailFrom(), sendEmail(), SendEmailBinding
 
 ### Community 26 - "lib/research-portal.ts"
-Cohesion: 0.13
-Nodes (13): blindRecording(), EventStore, nonempty(), PilotSelection, PortalDataset, PortalError, PortalEvent, Recording (+5 more)
+Cohesion: 0.16
+Nodes (10): blindRecording(), nonempty(), PilotSelection, PortalDataset, publicEvent(), Recording, reflectionFor(), RUBRIC_VERSION (+2 more)
 
 ### Community 27 - "criminalidadefacial-profile.ts"
 Cohesion: 0.07
-Nodes (41): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+33 more)
+Nodes (42): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+34 more)
 
 ### Community 28 - "not-found.tsx"
 Cohesion: 0.32
 Nodes (3): metadata, ErrorState(), ErrorStateProps
 
 ### Community 29 - "PortalService"
-Cohesion: 0.31
-Nodes (5): hasAiExposure(), latest(), PortalService, publicEvent(), reflectionFor()
+Cohesion: 0.30
+Nodes (4): canonicalReviewerName(), hasAiExposure(), latest(), PortalService
 
 ### Community 30 - "server.mjs"
 Cohesion: 0.33
@@ -250,6 +252,10 @@ Nodes (4): digest(), identity(), main(), Build disjoint review queues from froze
 Cohesion: 0.50
 Nodes (3): Fontes e verificação externa, Primeiro lote de cada avaliador, Seleção musical por popularidade — 30/10/2026
 
+### Community 62 - "server/research-portal.ts"
+Cohesion: 0.17
+Nodes (6): EventStore, PortalError, PortalEvent, localStore(), D1Database, D1Statement
+
 ### Community 63 - "Criminalidade Facial Mobile — Especificação"
 Cohesion: 0.18
 Nodes (10): Arquitetura, Criminalidade Facial Mobile — Especificação, Dados do perfil, Estados de erro, Experiência imersiva, Fluxo, Fora de escopo, Objetivo (+2 more)
@@ -266,28 +272,24 @@ Nodes (5): Consulta de declaração, Critérios de aceitação e verificação, 
 Cohesion: 0.33
 Nodes (6): parseLine(), records, root, slugify(), sourcePath, targetPath
 
-### Community 69 - "criminalidadefacial-pwa.test.ts"
-Cohesion: 0.45
-Nodes (7): manifest(), useImmersiveMode(), exitImmersiveFullscreen(), FullscreenDocument, isImmersiveFullscreen(), isImmersiveFullscreenSupported(), requestImmersiveFullscreen()
-
 ## Knowledge Gaps
-- **255 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+250 more)
+- **257 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+252 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `GallerySimilarityScorer` connect `GallerySimilarityScorer` to `cli.py`, `container_api.py`?**
   _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `ArcFaceEmbedder` connect `cli.py` to `GallerySimilarityScorer`?**
+- **Why does `dependencies` connect `scripts` to `CostEstimator.tsx`?**
   _High betweenness centrality (0.024) - this node is a cross-community bridge._
-- **Why does `FaceProfileModel` connect `cli.py` to `GallerySimilarityScorer`?**
+- **Why does `ArcFaceEmbedder` connect `cli.py` to `GallerySimilarityScorer`?**
   _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `GallerySimilarityScorer` (e.g. with `ImageScorer` and `ScoreCalibrator`) actually correct?**
   _`GallerySimilarityScorer` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Cloudflare`, `NodeJS`, `face-profile-ml` to the rest of the system?**
-  _255 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _257 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `cli.py` be split into smaller, more focused modules?**
   _Cohesion score 0.057729138166894664 - nodes in this community are weakly interconnected._
 - **Should `experiment_runner.py` be split into smaller, more focused modules?**

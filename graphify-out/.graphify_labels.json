@@ -61,15 +61,17 @@
   "59": "marketing-ctas.test.ts",
   "60": "CLAUDE.md",
   "61": "face-profile-ml",
-  "62": "D1Statement",
+  "62": "server/research-portal.ts",
   "63": "Criminalidade Facial Mobile — Especificação",
   "64": "Review Focus",
   "65": "ConsultaForm.tsx",
   "66": "Consulta de declaração",
   "67": "generate-people-data.mjs",
   "68": "assinatura-eletronica/layout.tsx",
-  "69": "criminalidadefacial-pwa.test.ts",
+  "69": "extend-research-selection.py",
   "70": "criminalidadefacial/layout.tsx",
   "71": "galleryData.ts",
-  "72": "progress.md"
+  "72": "progress.md",
+  "73": "verify-research-links.py",
+  "74": "research-seven-reviewers.md"
 }

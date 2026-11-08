@@ -115,7 +115,7 @@ Consulte `research-five-reviewers.md` para critérios e validação e `research-
 
 ## Sete participantes nomeados — 07/11/2026
 
-Esta seção substitui as instruções de cinco vagas e consulta antecipada à IA. A apresentação segue Henrique Lima, Miguel Offerman (Mosov), Grazi, Caio, Amanda, Samuel e José. Os IDs internos continuam 2, 3, 1, 4, 5, 6 e 7 para preservar chaves, nomes antigos, vínculos e eventos. Não renumerar os eventos nem as credenciais exportadas. `Henrique Lima Gusmão` e `Mesov`/`Mosov` são apresentados sob as identidades canônicas; `originalEvaluator` conserva o nome declarado nas leituras normalizadas, sem reescrever o armazenamento.
+Esta seção substitui as instruções de cinco vagas e consulta antecipada à IA. A apresentação segue Henrique Lima, Miguel Offerman (Mosov), Grazi, Gabriela, Geovana, Pedro Inácio e Rafael Medeiros. Os IDs internos continuam 2, 3, 1, 4, 5, 6 e 7 para preservar chaves, nomes antigos, vínculos e eventos. Não renumerar os eventos nem as credenciais exportadas. `Henrique Lima Gusmão` e `Mesov`/`Mosov` são apresentados sob as identidades canônicas; `originalEvaluator` conserva o nome declarado nas leituras normalizadas, sem reescrever o armazenamento.
 
 `src/data/research-selection-five.json` conserva o manifesto anterior. `scripts/extend-research-selection.py` gera o manifesto de sete percursos a partir dessa fonte congelada; não executar o gerador histórico de cinco percursos sobre o manifesto ativo. Filas completas de Henrique e Miguel, suas expansões e encerramentos da seleção anterior permanecem válidos. Eventos antigos de outros percursos ou autores desconhecidos bloqueiam a transição para conferência, em vez de atribuir trabalho a novos nomes.
 

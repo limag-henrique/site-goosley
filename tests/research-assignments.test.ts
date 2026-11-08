@@ -143,13 +143,20 @@ test('named transition preserves authors, keys, expanded queues, closure, exposu
  await portal.write({action:'save',reviewer:3,evaluator:'Miguel Offerman (Mosov)',accessKey:miguelKey,recordingId:'song-80',status:'abstain',justification:'Revisão sem escores'});
  updated=await portal.read(new URLSearchParams('mode=community'));
  assert.equal((updated.ranking as typeof ranking).find(r=>r.reviewer===3)?.count,0);
- for(const [reviewer,evaluator,start] of [[1,'Grazi',0],[4,'Caio',120],[5,'Amanda',160],[6,'Samuel',200],[7,'José',240]] as const){
+ for(const [reviewer,evaluator,start,name] of [[1,'Grazi',0,'Grazi'],[4,'Caio',120,'Gabriela'],[5,'Amanda',160,'Geovana'],[6,'Samuel',200,'Pedro Inácio'],[7,'José',240,'Rafael Medeiros']] as const){
   await portal.write({action:'save',reviewer,evaluator,accessKey:String(reviewer).repeat(40),recordingId:`song-${start}`,status:'scored',scores:{theme:0},justification:'Parecer completo'});
-  await portal.write({action:'extend',reviewer,evaluator,accessKey:String(reviewer).repeat(40),assignedCount:20});
+  // Simulate a stored judgment made before the display names changed.
+  const historical=events.at(-1)!;historical.evaluator=evaluator;
+  const original=structuredClone(historical);
+  const detail=await portal.read(new URLSearchParams(`mode=blind&reviewer=${reviewer}&id=song-${start}`));
+  assert.equal((detail.review as PortalEvent).evaluator,name);
+  if(name!==evaluator)assert.equal((detail.review as PortalEvent).originalEvaluator,evaluator);
+  assert.deepEqual(historical,original);
+  await portal.write({action:'extend',reviewer,evaluator:name,accessKey:String(reviewer).repeat(40),assignedCount:20});
   const list=await portal.read(new URLSearchParams(`mode=blind&reviewer=${reviewer}&pageSize=100`));assert.equal((list.recordings as unknown[]).length,40);
  }
  updated=await portal.read(new URLSearchParams('mode=community'));
- assert.deepEqual((updated.ranking as typeof ranking).filter(r=>r.count===1).map(r=>[r.name,r.position]),[['Amanda',2],['Caio',2],['Grazi',2],['José',2],['Samuel',2]]);
+ assert.deepEqual((updated.ranking as typeof ranking).filter(r=>r.count===1).map(r=>[r.name,r.position]),[['Gabriela',2],['Geovana',2],['Grazi',2],['Pedro Inácio',2],['Rafael Medeiros',2]]);
  events[0].lyricsHash='wrong';await assert.rejects(()=>portal.read(new URLSearchParams('mode=community')),/vínculo/);
 });
 

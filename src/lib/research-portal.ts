@@ -3,11 +3,11 @@ import type { ComparisonExport } from './research-export';
 export type Reviewer = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 // Stable internal IDs preserve historical editing keys; display order is independent.
 export const REVIEWERS = [2,3,1,4,5,6,7] as const;
-export const REVIEWER_NAMES:Record<Reviewer,string> = {2:'Henrique Lima',3:'Miguel Offerman (Mosov)',1:'Grazi',4:'Caio',5:'Amanda',6:'Samuel',7:'José'};
+export const REVIEWER_NAMES:Record<Reviewer,string> = {2:'Henrique Lima',3:'Miguel Offerman (Mosov)',1:'Grazi',4:'Gabriela',5:'Geovana',6:'Pedro Inácio',7:'Rafael Medeiros'};
 export const IDENTITY_LABELS = {confirmed:'Música corresponde',uncertain:'Música corresponde parcialmente',mismatch:'Música não corresponde'};
 export interface Participation { reviewer:Reviewer; name:string; count:number; position:number; minimum:number }
 export function canonicalReviewerName(reviewer:Reviewer,name:string):string {
- const aliases:Partial<Record<Reviewer,string[]>>={2:['Henrique Lima Gusmão','Henrique Lima'],3:['Mesov','Mosov','Miguel Offerman','Miguel Offerman (Mosov)']};
+ const aliases:Partial<Record<Reviewer,string[]>>={2:['Henrique Lima Gusmão','Henrique Lima'],3:['Mesov','Mosov','Miguel Offerman','Miguel Offerman (Mosov)'],4:['Caio','Gabriela'],5:['Amanda','Geovana'],6:['Samuel','Pedro Inácio'],7:['José','Rafael Medeiros']};
  return aliases[reviewer]?.some(alias=>alias.toLocaleLowerCase('pt-BR')===name.trim().toLocaleLowerCase('pt-BR'))?REVIEWER_NAMES[reviewer]:name.trim();
 }
 export type ReviewStatus = 'scored' | 'missing-lyrics' | 'doubt' | 'abstain' | 'identity-error';
