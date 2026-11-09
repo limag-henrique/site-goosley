@@ -535,7 +535,7 @@
     "semantic_hash": ""
   },
   "src/server/criminalidadefacial/pessoas.generated.ts": {
-    "mtime": 1794171249.0767195,
+    "mtime": 1794189410.860048,
     "ast_hash": "934aabe54099c9227c6e0433aed513a0",
     "semantic_hash": ""
   },
@@ -48055,8 +48055,8 @@
     "semantic_hash": ""
   },
   "src/lib/research-portal.ts": {
-    "mtime": 1794171209.379148,
-    "ast_hash": "ff76c753291f29216164553822b8633d",
+    "mtime": 1794189310.9716334,
+    "ast_hash": "73431fd9b3091d45835c4540615409b8",
     "semantic_hash": ""
   },
   "src/server/research-portal.ts": {
@@ -48085,8 +48085,8 @@
     "semantic_hash": ""
   },
   "docs/research-portal-operations.md": {
-    "mtime": 1794171209.8110788,
-    "ast_hash": "a83aeab9fc8223662c93d36dc8d335be",
+    "mtime": 1794189365.2151392,
+    "ast_hash": "aa52a87f5959f0f0573cc8015bb94b4c",
     "semantic_hash": ""
   },
   "scripts/split-portal-lyrics.py": {
@@ -48140,13 +48140,13 @@
     "semantic_hash": ""
   },
   "src/data/research-selection.json": {
-    "mtime": 1794171051.2777908,
-    "ast_hash": "c0f360ea4d9c412669ebc78dab6ba653",
+    "mtime": 1794189365.6822622,
+    "ast_hash": "caf3d699d0d311c484aa56d7e0a4bae8",
     "semantic_hash": ""
   },
   "tests/research-assignments.test.ts": {
-    "mtime": 1794171188.2827878,
-    "ast_hash": "a69cd15c8fe81d7d96f2c1c6442fdd55",
+    "mtime": 1794189332.2379882,
+    "ast_hash": "f832f25979afda5089c9520eae4c7b7c",
     "semantic_hash": ""
   },
   "docs/research-five-reviewers.md": {
@@ -48210,8 +48210,8 @@
     "semantic_hash": ""
   },
   "scripts/extend-research-selection.py": {
-    "mtime": 1794171209.8032377,
-    "ast_hash": "4d348ddb765d63c92021e9a190271233",
+    "mtime": 1794189365.210079,
+    "ast_hash": "6fa578461222561e727ed33da4d3dd51",
     "semantic_hash": ""
   },
   "scripts/verify-research-links.py": {
@@ -48227,6 +48227,21 @@
   "docs/research-seven-reviewers.md": {
     "mtime": 1794171209.8032377,
     "ast_hash": "495c081529c342cb4d5e9273a781603d",
+    "semantic_hash": ""
+  },
+  "scripts/extend-research-selection-eight.py": {
+    "mtime": 1794189365.2090786,
+    "ast_hash": "72abe7bb8d5898aa9b43e96f459f1478",
+    "semantic_hash": ""
+  },
+  "src/data/research-selection-seven.json": {
+    "mtime": 1794171051.2777908,
+    "ast_hash": "c0f360ea4d9c412669ebc78dab6ba653",
+    "semantic_hash": ""
+  },
+  "docs/research-eight-reviewers.md": {
+    "mtime": 1794189365.2121277,
+    "ast_hash": "10b107a7c04d419284d1bf970779369d",
     "semantic_hash": ""
   }
 }

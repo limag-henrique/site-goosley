@@ -1,16 +1,16 @@
 # Graph Report - site-goosley  (2026-11-08)
 
 ## Corpus Check
-- 150 files · ~882,487 words
+- 153 files · ~941,444 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1037 nodes · 1766 edges · 75 communities (53 shown, 22 thin omitted)
+- 1044 nodes · 1773 edges · 77 communities (53 shown, 24 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `5ba74ac8`
+- Built from commit: `721f2c30`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -78,6 +78,8 @@
 - progress.md
 - verify-research-links.py
 - research-seven-reviewers.md
+- extend-research-selection-eight.py
+- research-eight-reviewers.md
 
 ## God Nodes (most connected - your core abstractions)
 1. `GallerySimilarityScorer` - 34 edges
@@ -106,7 +108,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (75 total, 22 thin omitted)
+## Communities (77 total, 24 thin omitted)
 
 ### Community 0 - "cloudflare-env.d.ts"
 Cohesion: 0.36
@@ -153,8 +155,8 @@ Cohesion: 0.07
 Nodes (27): @emnapi/core, @emnapi/runtime, eslint, eslint-config-next, devDependencies, @emnapi/core, @emnapi/runtime, eslint (+19 more)
 
 ### Community 11 - "portal.tsx"
-Cohesion: 0.11
-Nodes (24): metadata, Action, download(), downloadBlob(), marketNames, Mode, Reply, request() (+16 more)
+Cohesion: 0.12
+Nodes (22): metadata, Action, download(), downloadBlob(), marketNames, Mode, Reply, request() (+14 more)
 
 ### Community 12 - "Faixas comerciais do simulador"
 Cohesion: 0.40
@@ -162,7 +164,7 @@ Nodes (4): Decisões, Faixas comerciais do simulador, Referências públicas con
 
 ### Community 13 - "Piloto de avaliação musical — 12 gravações"
 Cohesion: 0.06
-Nodes (31): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Download comparativo — 23/10/2026, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações (+23 more)
+Nodes (32): Chave privada de edição e congelamento do piloto, Consulta opcional antes de preencher — decisão posterior de 22/10/2026, Critérios de aceite, Download comparativo — 23/10/2026, Evidências da simplificação, Fluxo simplificado das avaliadoras — 22/10/2026, Limites, Piloto de avaliação musical — 12 gravações (+24 more)
 
 ### Community 14 - "worker/package.json"
 Cohesion: 0.10
@@ -170,7 +172,7 @@ Nodes (20): @cloudflare/containers, @cloudflare/workers-types, dependencies, @cl
 
 ### Community 15 - "CriminalidadeFacialExperience.tsx"
 Cohesion: 0.06
-Nodes (44): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialExperience() (+36 more)
+Nodes (45): POST, runtime, AntiScreenshotShield(), AppStep, CriminalidadeFacialClient(), LOADING_STAGES, percent(), CriminalidadeFacialDeactivated() (+37 more)
 
 ### Community 16 - "CostEstimator.tsx"
 Cohesion: 0.06
@@ -205,20 +207,20 @@ Cohesion: 0.36
 Nodes (7): POST(), EmailInput, getCloudflareEmailBinding(), getEnvVar(), parseEmailFrom(), sendEmail(), SendEmailBinding
 
 ### Community 26 - "lib/research-portal.ts"
-Cohesion: 0.16
-Nodes (10): blindRecording(), nonempty(), PilotSelection, PortalDataset, publicEvent(), Recording, reflectionFor(), RUBRIC_VERSION (+2 more)
+Cohesion: 0.14
+Nodes (12): blindRecording(), nonempty(), PilotSelection, PortalDataset, publicEvent(), Recording, reflectionFor(), reviewerOf() (+4 more)
 
 ### Community 27 - "criminalidadefacial-profile.ts"
 Cohesion: 0.07
-Nodes (42): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+34 more)
+Nodes (41): POST(), responseHeaders, runtime, POST(), responseHeaders, runtime, GET, runtime (+33 more)
 
 ### Community 28 - "not-found.tsx"
 Cohesion: 0.32
 Nodes (3): metadata, ErrorState(), ErrorStateProps
 
 ### Community 29 - "PortalService"
-Cohesion: 0.30
-Nodes (4): canonicalReviewerName(), hasAiExposure(), latest(), PortalService
+Cohesion: 0.28
+Nodes (5): canonicalReviewerName(), hasAiExposure(), latest(), PortalService, uniqueRecordings()
 
 ### Community 30 - "server.mjs"
 Cohesion: 0.33
@@ -273,23 +275,23 @@ Cohesion: 0.33
 Nodes (6): parseLine(), records, root, slugify(), sourcePath, targetPath
 
 ## Knowledge Gaps
-- **257 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+252 more)
+- **259 isolated node(s):** `Cloudflare`, `NodeJS`, `face-profile-ml`, `name`, `private` (+254 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **24 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `GallerySimilarityScorer` connect `GallerySimilarityScorer` to `cli.py`, `container_api.py`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `dependencies` connect `scripts` to `CostEstimator.tsx`?**
-  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Why does `ArcFaceEmbedder` connect `cli.py` to `GallerySimilarityScorer`?**
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
+- **Why does `FaceProfileModel` connect `cli.py` to `GallerySimilarityScorer`?**
   _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Are the 4 inferred relationships involving `GallerySimilarityScorer` (e.g. with `ImageScorer` and `ScoreCalibrator`) actually correct?**
   _`GallerySimilarityScorer` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Cloudflare`, `NodeJS`, `face-profile-ml` to the rest of the system?**
-  _257 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _259 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `cli.py` be split into smaller, more focused modules?**
   _Cohesion score 0.057729138166894664 - nodes in this community are weakly interconnected._
 - **Should `experiment_runner.py` be split into smaller, more focused modules?**

@@ -1,9 +1,9 @@
 import type { ComparisonExport } from './research-export';
 
-export type Reviewer = 1 | 2 | 3 | 4 | 5 | 6 | 7;
+export type Reviewer = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 // Stable internal IDs preserve historical editing keys; display order is independent.
-export const REVIEWERS = [2,3,1,4,5,6,7] as const;
-export const REVIEWER_NAMES:Record<Reviewer,string> = {2:'Henrique Lima',3:'Miguel Offerman (Mosov)',1:'Grazi',4:'Gabriela',5:'Geovana',6:'Pedro Inácio',7:'Rafael Medeiros'};
+export const REVIEWERS = [2,3,1,4,5,6,7,8] as const;
+export const REVIEWER_NAMES:Record<Reviewer,string> = {2:'Henrique Lima',3:'Miguel Offerman (Mosov)',1:'Grazi',4:'Gabriela',5:'Geovana',6:'Pedro Inácio',7:'Rafael Medeiros',8:'Elaine Vilela'};
 export const IDENTITY_LABELS = {confirmed:'Música corresponde',uncertain:'Música corresponde parcialmente',mismatch:'Música não corresponde'};
 export interface Participation { reviewer:Reviewer; name:string; count:number; position:number; minimum:number }
 export function canonicalReviewerName(reviewer:Reviewer,name:string):string {
@@ -19,23 +19,24 @@ export interface EventStore { read():Promise<PortalEvent[]>; append(event:Portal
 export class PortalError extends Error { status:number; constructor(message:string,status=400){super(message);this.status=status;} }
 export const RUBRIC_VERSION='human-lyrics-review-v1';
 const statuses:ReviewStatus[]=['scored','missing-lyrics','doubt','abstain','identity-error'];
-function reviewerOf(value:unknown):Reviewer { const n=typeof value==='string'&&/^[1-7]$/.test(value)?Number(value):value;if(typeof n==='number'&&REVIEWERS.includes(n as Reviewer))return n as Reviewer;throw new PortalError('Selecione um avaliador disponível.'); }
+function reviewerOf(value:unknown):Reviewer { const n=typeof value==='string'&&/^[1-8]$/.test(value)?Number(value):value;if(typeof n==='number'&&REVIEWERS.includes(n as Reviewer))return n as Reviewer;throw new PortalError('Selecione um avaliador disponível.'); }
 function nonempty(value:unknown,label:string,max=6000):string {if(typeof value!=='string'||!value.trim()||value.length>max)throw new PortalError(`${label} é obrigatório (até ${max} caracteres).`);return value.trim();}
 function blindRecording(r:Recording){return {id:r.id,title:r.title,artist:r.artist,documentId:r.documentId,lyricsHash:r.lyricsHash,market:r.market,markets:r.markets,years:r.years,genre:r.genre,language:r.language,lyrics:r.lyrics};}
+function uniqueRecordings(recordings:Recording[]){return [...new Map(recordings.map(r=>[r.id,r])).values()];}
 function publicEvent(event:PortalEvent){const visible={...event};delete visible.ownerKeyHash;delete visible.viewerKeyHash;return visible;}
 function latest(events:PortalEvent[],reviewer:Reviewer){const map=new Map<string,PortalEvent>();for(const e of events)if(e.action==='save'&&e.reviewer===reviewer&&e.recordingId)map.set(e.recordingId,e);return map;}
 
 function hasAiExposure(events:PortalEvent[],reviewer:Reviewer,recordingId:string,ownerKeyHash?:string){return events.some(e=>e.reviewer===reviewer&&e.recordingId===recordingId&&(e.action==='reveal'||(e.action==='preview'&&!!ownerKeyHash&&e.viewerKeyHash===ownerKeyHash)));}
 function reflectionFor(events:PortalEvent[],review:PortalEvent|undefined){if(!review)return null;const event=[...events].reverse().find(e=>e.action==='reflect'&&e.reviewer===review.reviewer&&e.recordingId===review.recordingId&&e.reviewId===review.id);return event?publicEvent(event):null;}
 
-export interface PilotSelection {version:string; ranking:string; selection:string; reviewers?:number[]; initialBatchSize?:number; previousSelectionFingerprints?:string[]; namedReviewers?:boolean; preservedSelectionFingerprints?:string[]; recordings:{recordingId:string;market:string;rank:number;reviewer?:number;year?:number;annualChartRank?:number;streams?:number;chartDays?:number}[]}
+export interface PilotSelection {version:string; ranking:string; selection:string; reviewers?:number[]; initialBatchSize?:number; previousSelectionFingerprints?:string[]; namedReviewers?:boolean; preservedSelectionFingerprints?:string[]; preservedReviewerIds?:Record<string,number[]>; recordings:{recordingId:string;market:string;rank:number;reviewer?:number;year?:number;annualChartRank?:number;streams?:number;chartDays?:number}[]}
 
 /** Server-only service. Optional per-recording disclosure is recorded after a saved judgment. */
 export class PortalService {
   dataset:PortalDataset; store:EventStore; pilot?:PilotSelection; secureWrites:boolean;
   constructor(dataset:PortalDataset,store:EventStore,pilot?:PilotSelection,secureWrites=false){this.dataset=dataset;this.store=store;this.pilot=pilot;this.secureWrites=secureWrites;
-    if(pilot?.reviewers&&(![5,7].includes(pilot.reviewers.length)||new Set(pilot.reviewers).size!==pilot.reviewers.length||pilot.reviewers.some(r=>!REVIEWERS.includes(r as Reviewer))||!Number.isInteger(pilot.initialBatchSize)||pilot.initialBatchSize!==20||pilot.recordings.some(r=>!pilot.reviewers!.includes(r.reviewer!))||pilot.reviewers.some(reviewer=>pilot.recordings.filter(r=>r.reviewer===reviewer).length<20)))throw new PortalError('Configuração dos avaliadores inválida.',503);
-    if(pilot&&(new Set(pilot.recordings.map(r=>r.recordingId)).size!==pilot.recordings.length||pilot.recordings.some(r=>!dataset.recordings.some(x=>x.id===r.recordingId&&x.markets.includes(r.market)))))throw new PortalError('Seleção piloto inválida.',503);
+    if(pilot?.reviewers&&(![5,7,8].includes(pilot.reviewers.length)||new Set(pilot.reviewers).size!==pilot.reviewers.length||pilot.reviewers.some(r=>!REVIEWERS.includes(r as Reviewer))||!Number.isInteger(pilot.initialBatchSize)||pilot.initialBatchSize!==20||pilot.recordings.some(r=>!pilot.reviewers!.includes(r.reviewer!))||pilot.reviewers.some(reviewer=>pilot.recordings.filter(r=>r.reviewer===reviewer).length<20)))throw new PortalError('Configuração dos avaliadores inválida.',503);
+    if(pilot&&(new Set(pilot.recordings.map(r=>pilot.reviewers?`${r.reviewer}:${r.recordingId}`:r.recordingId)).size!==pilot.recordings.length||pilot.recordings.some(r=>!dataset.recordings.some(x=>x.id===r.recordingId&&x.markets.includes(r.market)))))throw new PortalError('Seleção piloto inválida.',503);
   }
   private async events(){
     const events=await this.store.read();
@@ -47,7 +48,7 @@ export class PortalService {
     if(!this.pilot?.namedReviewers)return events;
     return events.map(event=>{
       if(event.action==='preview')return event;
-      if(event.assignmentFingerprint&&this.pilot?.previousSelectionFingerprints?.includes(event.assignmentFingerprint)&&![2,3].includes(event.reviewer))throw new PortalError('Percurso antigo contém autoria inesperada. A coordenação deve conferir o histórico.',409);
+      if(event.assignmentFingerprint&&this.pilot?.previousSelectionFingerprints?.includes(event.assignmentFingerprint)&&!(this.pilot.preservedReviewerIds?.[event.assignmentFingerprint]??[2,3]).includes(event.reviewer))throw new PortalError('Percurso antigo contém autoria inesperada. A coordenação deve conferir o histórico.',409);
       const evaluator=canonicalReviewerName(event.reviewer,event.evaluator);
       if(evaluator!==REVIEWER_NAMES[event.reviewer])throw new PortalError('Autoria histórica não reconhecida. A coordenação deve conferir os vínculos antes de continuar.',409);
       return {...event,evaluator,...(evaluator!==event.evaluator?{originalEvaluator:event.evaluator}:{})};
@@ -65,10 +66,10 @@ export class PortalService {
   }
   private reviewers():readonly Reviewer[]{return this.pilot?.reviewers as Reviewer[]??[1,2];}
   private reviewer(value:unknown){const reviewer=reviewerOf(value);if(!this.reviewers().includes(reviewer))throw new PortalError('Avaliador não disponível nesta seleção.');return reviewer;}
-  private pool(reviewer?:Reviewer){return this.pilot?this.pilot.recordings.filter(item=>!this.pilot?.reviewers||!reviewer||item.reviewer===reviewer).map(item=>this.dataset.recordings.find(r=>r.id===item.recordingId)!):this.dataset.recordings;}
+  private pool(reviewer?:Reviewer){return this.pilot?uniqueRecordings(this.pilot.recordings.filter(item=>!this.pilot?.reviewers||!reviewer||item.reviewer===reviewer).map(item=>this.dataset.recordings.find(r=>r.id===item.recordingId)!)):this.dataset.recordings;}
   private assigned(reviewer?:Reviewer,events:PortalEvent[]=[]):Recording[]{
     if(!this.pilot?.reviewers)return this.pool();
-    if(!reviewer)return this.reviewers().flatMap(r=>this.assigned(r,events));
+    if(!reviewer)return uniqueRecordings(this.reviewers().flatMap(r=>this.assigned(r,events)));
     const count=events.filter(e=>e.reviewer===reviewer&&e.action==='extend'&&(!this.pilot?.previousSelectionFingerprints?.includes(e.assignmentFingerprint??'')||!!this.pilot?.preservedSelectionFingerprints?.includes(e.assignmentFingerprint??''))).reduce((n,e)=>Math.max(n,e.assignedCount??0),this.pilot.initialBatchSize??20);
     return this.pool(reviewer).slice(0,count);
   }
@@ -114,7 +115,7 @@ export class PortalService {
     if(mode==='compare'||mode==='export'){
       if(!state.closed)throw new PortalError('Comparação e divergências disponíveis somente após todos os percursos independentes encerrarem.',403);
       const reviews=events.filter(e=>e.action==='save').map(publicEvent);
-      if(this.pilot?.reviewers)return {state,reviews,comparisons:this.reviewers().flatMap(reviewer=>[...latest(events,reviewer).values()].map(review=>({reviewer,recordingId:review.recordingId,...this.comparison(this.dataset.recordings.find(r=>r.id===review.recordingId)!,review)}))),comparisonStatus:'exclusive-recordings-no-inter-rater-agreement'};
+      if(this.pilot?.reviewers)return {state,reviews,comparisons:this.reviewers().flatMap(reviewer=>[...latest(events,reviewer).values()].map(review=>({reviewer,recordingId:review.recordingId,...this.comparison(this.dataset.recordings.find(r=>r.id===review.recordingId)!,review)}))),comparisonStatus:new Set(this.pilot.recordings.map(r=>r.recordingId)).size<this.pilot.recordings.length?'shared-recordings-no-inter-rater-agreement':'exclusive-recordings-no-inter-rater-agreement'};
       const a=latest(events,1),b=latest(events,2);
       const divergences=this.assigned().flatMap(r=>this.dataset.dimensions.flatMap(d=>{
         const first=a.get(r.id),second=b.get(r.id);const human1=first?.scores?.[d.code]??null,human2=second?.scores?.[d.code]??null;

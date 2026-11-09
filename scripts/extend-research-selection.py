@@ -5,7 +5,7 @@ from pathlib import Path
 import json, hashlib
 ROOT=Path(__file__).resolve().parents[1]
 SOURCE=ROOT/'src/data/research-selection-five.json'
-OUT=ROOT/'src/data/research-selection.json'
+OUT=ROOT/'src/data/research-selection-seven.json'
 NAMES={2:'Henrique Lima',3:'Miguel Offerman (Mosov)',1:'Grazi',4:'Gabriela',5:'Geovana',6:'Pedro Inácio',7:'Rafael Medeiros'}
 MARKETS=['BR','DO','PA','CL','ID','JP','TW']
 def main():

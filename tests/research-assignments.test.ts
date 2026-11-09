@@ -172,8 +172,68 @@ test('named transition blocks unexpected historical authors rather than attribut
 test('seven-participant manifest preserves both historical queues and authorizes only the exact frozen transition',async()=>{
  const {readFile}=await import('node:fs/promises');const {createHash}=await import('node:crypto');
  const before=JSON.parse(await readFile(new URL('../src/data/research-selection-five.json',import.meta.url),'utf8'));
- const after=JSON.parse(await readFile(new URL('../src/data/research-selection.json',import.meta.url),'utf8'));
+ const after=JSON.parse(await readFile(new URL('../src/data/research-selection-seven.json',import.meta.url),'utf8'));
  for(const reviewer of [2,3])assert.deepEqual(after.recordings.filter((r:{reviewer:number})=>r.reviewer===reviewer),before.recordings.filter((r:{reviewer:number})=>r.reviewer===reviewer));
  const hash=createHash('sha256').update(JSON.stringify(before)).digest('hex');
  assert.deepEqual(after.preservedSelectionFingerprints,[hash]);assert.deepEqual(after.previousSelectionFingerprints,[...before.previousSelectionFingerprints,hash]);
+});
+
+test('Elaine shares songs with Grazi while preserving all seven authors, keys, queues and independent judgments',async()=>{
+ const {dataset,selection,store,events}=setup();
+ for(let i=200;i<280;i++)dataset.recordings.push({...dataset.recordings[0],id:`song-${i}`,documentId:`doc-${i}`,lyricsHash:`hash-${i}`});
+ const seven={...selection,version:'seven-v1',namedReviewers:true,reviewers:[2,3,1,4,5,6,7],recordings:[...selection.recordings,...dataset.recordings.slice(200).map((r,i)=>({recordingId:r.id,market:'BR',rank:22,reviewer:i<40?6:7}))]};
+ const old=new PortalService(dataset,store,seven,true);
+ for(const [reviewer,evaluator,start] of [[1,'Grazi',0],[2,'Henrique Lima',40],[3,'Miguel Offerman (Mosov)',80],[4,'Gabriela',120],[5,'Geovana',160],[6,'Pedro Inácio',200],[7,'Rafael Medeiros',240]] as const){
+  for(let n=0;n<(reviewer===1?20:1);n++)await old.write({action:'save',reviewer,evaluator,accessKey:String(reviewer).repeat(40),recordingId:`song-${start+n}`,status:'scored',scores:{theme:0},justification:'Parecer anterior'});
+ }
+ await old.write({action:'close',reviewer:1,evaluator:'Grazi',accessKey:'1'.repeat(40)});
+ await old.write({action:'extend',reviewer:4,evaluator:'Gabriela',accessKey:'4'.repeat(40),assignedCount:20});
+ const original=structuredClone(events);
+ const {createHash}=await import('node:crypto');
+ const hash=createHash('sha256').update(JSON.stringify(seven)).digest('hex');
+ const eight={...seven,version:'eight-v1',reviewers:[...seven.reviewers,8],previousSelectionFingerprints:[hash],preservedSelectionFingerprints:[hash],preservedReviewerIds:{[hash]:seven.reviewers},recordings:[...seven.recordings,...seven.recordings.filter(r=>r.reviewer===1).map(r=>({...r,reviewer:8}))]};
+ const portal=new PortalService(dataset,store,eight,true);
+ const shared=await portal.read(new URLSearchParams('mode=community'));
+ assert.ok((shared.ranking as {reviewer:number;name:string;count:number}[]).some(r=>r.reviewer===8&&r.name==='Elaine Vilela'&&r.count===0));
+ assert.deepEqual((shared.state as {closedReviewers:number[]}).closedReviewers,[1]);
+ assert.equal(((await portal.read(new URLSearchParams('mode=blind&reviewer=4'))).state as {assigned:number}).assigned,40);
+ const elaine=await portal.read(new URLSearchParams('mode=blind&reviewer=8'));
+ assert.equal(elaine.completed,0);assert.equal((elaine.recordings as unknown[]).length,20);
+ assert.deepEqual((elaine.recordings as {id:string}[]).map(r=>r.id),Array.from({length:20},(_,i)=>`song-${i}`));
+ assert.deepEqual(events,original);
+ await assert.rejects(()=>portal.write({action:'save',reviewer:8,evaluator:'Elaine Vilela',accessKey:'8'.repeat(40),recordingId:'song-40',status:'scored',scores:{theme:3},justification:'Outra fila'}),/não atribuída/);
+ await portal.write({action:'save',reviewer:8,evaluator:'Elaine Vilela',accessKey:'8'.repeat(40),recordingId:'song-0',status:'scored',scores:{theme:3},justification:'Parecer independente'});
+ await assert.rejects(()=>portal.write({action:'extend',reviewer:8,evaluator:'Elaine Vilela',accessKey:'1'.repeat(40),assignedCount:20}),/Chave privada incorreta/);
+ await portal.write({action:'extend',reviewer:8,evaluator:'Elaine Vilela',accessKey:'8'.repeat(40),assignedCount:20});
+ assert.equal(((await portal.read(new URLSearchParams('mode=blind&reviewer=8'))).state as {assigned:number}).assigned,40);
+ const grazi=await portal.read(new URLSearchParams('mode=blind&reviewer=1&id=song-0'));
+ assert.equal((grazi.review as PortalEvent).scores?.theme,0);
+ assert.equal((grazi.state as {assigned:number}).assigned,20);
+ const exported=await portal.read(new URLSearchParams('mode=comparison-export'));
+ assert.deepEqual((exported.evaluations as {recording:{id:string};review:PortalEvent}[]).filter(r=>r.recording.id==='song-0').map(r=>[r.review.reviewer,r.review.scores?.theme]),[[1,0],[8,3]]);
+ const catalog=await portal.read(new URLSearchParams('pageSize=100'));
+ assert.equal(catalog.total,180);
+ assert.equal(new Set((catalog.recordings as {id:string}[]).map(r=>r.id)).size,100);
+ const changed={...eight,selection:'Alteração não autorizada'};
+ await assert.rejects(()=>new PortalService(dataset,store,changed,true).read(new URLSearchParams('mode=community')),/seleção piloto mudou/);
+ assert.throws(()=>new PortalService(dataset,store,{...eight,recordings:[...eight.recordings,eight.recordings[0]]},true),/Seleção piloto inválida/);
+});
+
+test('published eight-reviewer selection appends Elaine without changing any previous assignment',async()=>{
+ const {readFile}=await import('node:fs/promises');const {createHash}=await import('node:crypto');
+ const before=JSON.parse(await readFile(new URL('../src/data/research-selection-seven.json',import.meta.url),'utf8'));
+ const after=JSON.parse(await readFile(new URL('../src/data/research-selection.json',import.meta.url),'utf8'));
+ assert.deepEqual(after.reviewers,[2,3,1,4,5,6,7,8]);
+ assert.deepEqual(after.recordings.filter((r:{reviewer:number})=>r.reviewer!==8),before.recordings);
+ assert.deepEqual(after.recordings.filter((r:{reviewer:number})=>r.reviewer===8).map((r:{reviewer:number})=>({...r,reviewer:1})),before.recordings.filter((r:{reviewer:number})=>r.reviewer===1));
+ const hash=createHash('sha256').update(JSON.stringify(before)).digest('hex');
+ assert.deepEqual(after.previousSelectionFingerprints,[...before.previousSelectionFingerprints,hash]);
+ assert.deepEqual(after.preservedSelectionFingerprints,[...before.preservedSelectionFingerprints,hash]);
+ assert.deepEqual(after.preservedReviewerIds,{[hash]:before.reviewers});
+ const corpus=JSON.parse(await readFile(new URL('../src/data/research-portal.json',import.meta.url),'utf8'));
+ const portal=new PortalService(corpus,{read:async()=>[],append:async()=>{}},after,true);
+ const result=await portal.read(new URLSearchParams('mode=blind&reviewer=8'));
+ assert.equal((result.recordings as unknown[]).length,20);
+ assert.equal((result.state as {available:number}).available,156);
+ assert.equal(JSON.stringify(result).includes('"ai":'),false);
 });

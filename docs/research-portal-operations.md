@@ -113,7 +113,13 @@ O manifesto antigo e o corpus permanecem intactos. A transição aceita somente 
 Consulte `research-five-reviewers.md` para critérios e validação e `research-selection-evidence.md` para a seleção e suas fontes. Esta entrega é local, sem publicação nem migração destrutiva; não exige alteração do esquema D1 existente. Nas análises, as músicas diferentes não produzem medidas de concordância interavaliador.
 
 
-## Sete participantes nomeados — 07/11/2026
+## Oito participantes — 08/11/2026
+
+Elaine Vilela foi adicionada com ID 8, após os sete participantes existentes. Por autorização do usuário, ela compartilha o percurso musical da Grazi: 20 músicas iniciais e reserva de 156, com pareceres, chave privada, progresso e encerramento independentes. O manifesto ativo é `research-shared-8-v1`; o catálogo geral não duplica músicas compartilhadas.
+
+`src/data/research-selection-seven.json` congela a seleção anterior. `python scripts/extend-research-selection-eight.py` gera o manifesto ativo preservando todas as atribuições anteriores e seus fingerprints. O campo `preservedReviewerIds` vincula os sete autores ao fingerprint exato dessa seleção; a restrição de autoria das seleções mais antigas permanece em vigor. O gerador de sete participantes agora escreve somente o snapshot de sete; não executar o gerador de cinco sobre a seleção ativa. Consulte `research-eight-reviewers.md` para escopo e validação.
+
+## Sete participantes nomeados — 07/11/2026 (histórico)
 
 Esta seção substitui as instruções de cinco vagas e consulta antecipada à IA. A apresentação segue Henrique Lima, Miguel Offerman (Mosov), Grazi, Gabriela, Geovana, Pedro Inácio e Rafael Medeiros. Os IDs internos continuam 2, 3, 1, 4, 5, 6 e 7 para preservar chaves, nomes antigos, vínculos e eventos. Não renumerar os eventos nem as credenciais exportadas. `Henrique Lima Gusmão` e `Mesov`/`Mosov` são apresentados sob as identidades canônicas; `originalEvaluator` conserva o nome declarado nas leituras normalizadas, sem reescrever o armazenamento.
 
